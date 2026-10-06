@@ -118,11 +118,17 @@ export async function makeFiles(catalog, sourceCommit, releases) {
   };
 }
 
-async function zenodoRecords(title) {
+async function zenodoRecords(title, token) {
+  if (!token) throw new Error("ZENODO_TOKEN is required for Zenodo DOI lookups");
   const query = new URLSearchParams({ q: `metadata.title:"${title}"`, size: "10" });
   for (let attempt = 0; attempt < 4; attempt++) {
-    const response = await fetch(`https://zenodo.org/api/records?${query}`, { headers: { Accept: "application/json" } });
+    const response = await fetch(`https://zenodo.org/api/records?${query}`, {
+      headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+    });
     if (response.ok) return (await response.json()).hits?.hits ?? [];
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(`Zenodo DOI lookup for ${title}: HTTP ${response.status}; check ZENODO_TOKEN`);
+    }
     if (![429, 500, 502, 503, 504].includes(response.status) || attempt === 3) {
       throw new Error(`Zenodo DOI lookup for ${title}: HTTP ${response.status}`);
     }
@@ -131,7 +137,7 @@ async function zenodoRecords(title) {
   return [];
 }
 
-export async function collectDoiMetadata(catalog, releases, delayMs = 2100) {
+export async function collectDoiMetadata(catalog, releases, { delayMs = 2100, token } = {}) {
   const found = {};
   const groups = new Map();
   for (const { path, data } of releases) {
@@ -150,7 +156,7 @@ export async function collectDoiMetadata(catalog, releases, delayMs = 2100) {
       for (const [name, app] of related) if (!app.doi) (found[tool] ??= {})[name] = existing;
       continue;
     }
-    const records = await zenodoRecords(title);
+    const records = await zenodoRecords(title, token);
     const matches = records.filter((record) => record.metadata?.title === title);
     matches.sort((a, b) => Number(b.id) - Number(a.id));
     const doi = matches[0]?.doi ?? matches[0]?.metadata?.doi;
@@ -196,13 +202,13 @@ export function applyMetadata(catalog, dois, licenses) {
   return updated;
 }
 
-export async function consolidate({ root, sourceRoot, sourceCommit, doiDelayMs = 2100 }) {
+export async function consolidate({ root, sourceRoot, sourceCommit, doiDelayMs = 2100, zenodoToken = process.env.ZENODO_TOKEN }) {
   const [previous, releases] = await Promise.all([
     readPreviousCatalog(root), readReleases(sourceRoot),
   ]);
   const base = buildCatalog(releases, previous);
   const [dois, licenses] = await Promise.all([
-    collectDoiMetadata(base, releases, doiDelayMs),
+    collectDoiMetadata(base, releases, { delayMs: doiDelayMs, token: zenodoToken }),
     collectLicenseMetadata(base, sourceRoot),
   ]);
   const files = await makeFiles(applyMetadata(base, dois, licenses), sourceCommit, releases);

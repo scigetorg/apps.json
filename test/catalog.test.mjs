@@ -82,19 +82,48 @@ test("DOI and recipe license enrich the same app versions", async () => {
   await mkdir(join(sourceRoot, "recipes", "demo"), { recursive: true });
   await writeFile(join(sourceRoot, "recipes", "demo", "build.yaml"), "copyright:\n  - license: MIT\n");
   const previousFetch = globalThis.fetch;
-  globalThis.fetch = async () => ({ ok: true, json: async () => ({ hits: { hits: [{
-    id: 12, doi: "10.123/demo", metadata: { title: "demo_1.0_20260921" },
-  }] } }) });
+  globalThis.fetch = async (url, options) => {
+    assert.equal(options.headers.Authorization, "Bearer test-token");
+    assert.equal(url.includes("test-token"), false);
+    return { ok: true, json: async () => ({ hits: { hits: [{
+      id: 12, doi: "10.123/demo", metadata: { title: "demo_1.0_20260921" },
+    }] } }) };
+  };
   try {
     const base = buildCatalog([release], { catalog: {} });
     const [dois, licenses] = await Promise.all([
-      collectDoiMetadata(base, [release], 0), collectLicenseMetadata(base, sourceRoot),
+      collectDoiMetadata(base, [release], { delayMs: 0, token: "test-token" }),
+      collectLicenseMetadata(base, sourceRoot),
     ]);
     const catalog = applyMetadata(base, dois, licenses);
     assert.deepEqual(Object.values(catalog.demo.apps).map((app) => app.doi), [
       "https://doi.org/10.123/demo", "https://doi.org/10.123/demo",
     ]);
     assert.deepEqual(Object.values(catalog.demo.apps).map((app) => app.license), [["MIT"], ["MIT"]]);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("DOI lookup requires a token and reports forbidden responses", async () => {
+  const base = buildCatalog([release], { catalog: {} });
+  await assert.rejects(
+    collectDoiMetadata(base, [release], { delayMs: 0 }),
+    /ZENODO_TOKEN is required/,
+  );
+  const previousFetch = globalThis.fetch;
+  let requests = 0;
+  globalThis.fetch = async (_url, options) => {
+    requests++;
+    assert.equal(options.headers.Authorization, "Bearer test-token");
+    return { ok: false, status: 403 };
+  };
+  try {
+    await assert.rejects(
+      collectDoiMetadata(base, [release], { delayMs: 0, token: "test-token" }),
+      /HTTP 403; check ZENODO_TOKEN/,
+    );
+    assert.equal(requests, 1);
   } finally {
     globalThis.fetch = previousFetch;
   }

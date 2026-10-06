@@ -28,9 +28,19 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Check Zenodo token
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+        run: |
+          if [[ -z "$ZENODO_TOKEN" ]]; then
+            echo 'ZENODO_TOKEN is required for DOI lookups' >&2
+            exit 1
+          fi
       - name: Check out configured containers repositories
         run: node scripts/workflow.mjs checkout
       - name: Consolidate every domain and enrich DOI and license
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
         run: npm run consolidate
       - name: Commit domain catalog files
         shell: bash

@@ -66,3 +66,34 @@ test("generates isolated catalogs for two configured domains", async () => {
     "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json",
   ]);
 });
+
+test("passes ZENODO_TOKEN from the workflow to DOI requests", async () => {
+  const root = await fixture();
+  const path = join(root, ".catalog-sources", "neuroimaging", "releases", "demo", "1.0.json");
+  const release = JSON.parse(await readFile(path, "utf8"));
+  delete release.apps["demo 1.0"].doi;
+  await writeFile(path, JSON.stringify(release));
+  const previousToken = process.env.ZENODO_TOKEN;
+  const previousFetch = globalThis.fetch;
+  process.env.ZENODO_TOKEN = "test-token";
+  let requests = 0;
+  globalThis.fetch = async (_url, options) => {
+    requests++;
+    assert.equal(options.headers.Authorization, "Bearer test-token");
+    return { ok: true, json: async () => ({ hits: { hits: [{
+      id: 12, doi: "10.123/demo", metadata: { title: "demo_1.0_20260921" },
+    }] } }) };
+  };
+  try {
+    await consolidateDomains(root, { neuroimaging: configs.neuroimaging }, {
+      doiDelayMs: 0, sourceCommits: { neuroimaging: "a".repeat(40) },
+    });
+    const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+    assert.equal(catalog.demo.apps["demo 1.0"].doi, "https://doi.org/10.123/demo");
+    assert.equal(requests, 1);
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousToken === undefined) delete process.env.ZENODO_TOKEN;
+    else process.env.ZENODO_TOKEN = previousToken;
+  }
+});

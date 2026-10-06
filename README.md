@@ -47,8 +47,9 @@ and license values are retained when release JSON does not supply them.
 
 `logs.txt` contains every release image and build, including hidden and
 GUI-only releases. `manifest.json` records the log's SHA-256, entry count,
-and source commit. DOI lookups by exact image and build title run alongside
-recipe license extraction. Historical releases should state their license
+and source commit. DOI lookups by exact image and build title use the Zenodo
+Records API with a bearer token and run alongside local recipe license
+extraction. Historical releases should state their license
 when it differs from the current recipe.
 
 ## Enable the schedule
@@ -57,12 +58,16 @@ when it differs from the current recipe.
    place the **contents** of this directory at its root, including
    `.github/workflows/` and `neuroimaging/apps.json`. For a local checkout,
    use `cp -a catalog/apps-json-repo/. /path/to/apps.json/`.
-2. Update the website's app catalog source to
+2. Create a Zenodo access token for `zenodo.org` and save it as the
+   `ZENODO_TOKEN` Actions secret in `NeuroDesk/apps.json`. The workflow uses
+   it only for DOI lookup requests. A sandbox Zenodo token is separate and will
+   not work for production Zenodo.
+3. Update the website's app catalog source to
    `https://raw.githubusercontent.com/NeuroDesk/apps.json/main/neuroimaging/apps.json`.
    Website consumers should read the catalog directly and use
    `show_in_applist` to select visible entries. The catalog workflow sends
    no dispatch event and needs no website token.
-3. Run **Consolidate apps catalog** manually, then check the files under
+4. Run **Consolidate apps catalog** manually, then check the files under
    `neuroimaging/`, website consumption, and CVMFS log retrieval before
    archiving `neurocommand` or disabling its old queue.
 
@@ -74,7 +79,7 @@ remains enabled.
 ## Local checks
 
 Use Node.js 24.0.0, then run `npm ci` and `npm test`. For a local consolidation
-of all configured domains, run:
+of all configured domains, set `ZENODO_TOKEN` in your environment and run:
 
 ```bash
 node scripts/workflow.mjs checkout
