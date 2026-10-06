@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "consolidate": "node scripts/workflow.mjs run",
+    "test": "node test/catalog.test.mjs && node test/workflow.test.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

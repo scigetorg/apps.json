@@ -1,0 +1,8 @@
+{
+  "domains": {
+    "neuroimaging": {
+      "source_repository": "NeuroDesk/neurocontainers",
+      "dispatch_repository": "NeuroDesk/neurodesk.github.io"
+    }
+  }
+}
