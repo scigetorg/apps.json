@@ -4,19 +4,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import {
-  changedDomains,
   consolidateDomains,
-  dispatchDomains,
   outputPaths,
   readDomains,
-  requiresDispatchToken,
 } from "../scripts/workflow.mjs";
 
 const configs = {
-  neuroimaging: {
-    source_repository: "NeuroDesk/neurocontainers",
-    dispatch_repository: "NeuroDesk/neurodesk.github.io",
-  },
+  neuroimaging: { source_repository: "NeuroDesk/neurocontainers" },
   microscopy: { source_repository: "Example/microcontainers" },
 };
 
@@ -45,6 +39,10 @@ test("validates domain IDs and repositories", async () => {
     domains: { "../escape": { source_repository: "Example/repo" } },
   }));
   await assert.rejects(readDomains(root), /Invalid domain ID/);
+  await writeFile(join(root, "domains.json"), JSON.stringify({
+    domains: { neuroimaging: { source_repository: "NeuroDesk/neurocontainers", dispatch_repository: "NeuroDesk/neurodesk.github.io" } },
+  }));
+  await assert.rejects(readDomains(root), /Unknown configuration field/);
 });
 
 test("generates isolated catalogs for two configured domains", async () => {
@@ -63,30 +61,8 @@ test("generates isolated catalogs for two configured domains", async () => {
   assert.equal((await readFile(join(root, "microscopy", "logs.txt"), "utf8")),
     "demo_1.0_20260922 categories:microscopy,\n");
   assert.equal(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8")).source_commit.length, 40);
-  assert.equal(outputPaths(domains).length, 8);
-  assert.equal(requiresDispatchToken(domains), true);
-  assert.equal(requiresDispatchToken({ microscopy: domains.microscopy }), false);
-  assert.deepEqual(changedDomains([
-    "neuroimaging/apps.json", "microscopy/applist.json", "microscopy/manifest.json", "other/apps.json",
-  ], domains), ["microscopy", "neuroimaging"]);
-});
-
-test("dispatches only a changed domain with its path and source repository", async () => {
-  const previousFetch = globalThis.fetch;
-  const requests = [];
-  globalThis.fetch = async (url, options) => {
-    requests.push({ url, body: JSON.parse(options.body) });
-    return { ok: true };
-  };
-  try {
-    await dispatchDomains(configs, ["neuroimaging", "microscopy"], {
-      token: "test-token", repository: "NeuroDesk/apps.json", commit: "a".repeat(40),
-    });
-    assert.equal(requests.length, 1);
-    assert.equal(requests[0].body.client_payload.domain, "neuroimaging");
-    assert.equal(requests[0].body.client_payload.applist_path, "neuroimaging/applist.json");
-    assert.equal(requests[0].body.client_payload.source_repository, "NeuroDesk/neurocontainers");
-  } finally {
-    globalThis.fetch = previousFetch;
-  }
+  assert.deepEqual(outputPaths(domains), [
+    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json",
+    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json",
+  ]);
 });

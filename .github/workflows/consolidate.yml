@@ -3,12 +3,7 @@ name: Consolidate apps catalog
 on:
   schedule:
     - cron: '25 2 * * *'
-  workflow_dispatch:
-    inputs:
-      force_site_dispatch:
-        description: Notify the website even when the catalog is unchanged
-        type: boolean
-        default: false
+  workflow_dispatch: {}
 
 concurrency:
   group: apps-catalog
@@ -33,24 +28,17 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Check website dispatch token
-        env:
-          SITE_DISPATCH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
-        run: node scripts/workflow.mjs check-token
       - name: Check out configured containers repositories
         run: node scripts/workflow.mjs checkout
       - name: Consolidate every domain and enrich DOI and license
         run: npm run consolidate
       - name: Commit domain catalog files
-        id: publish
         shell: bash
         run: |
           paths="$(node scripts/workflow.mjs output-paths)"
           while IFS= read -r path; do
             git add -- "$path"
           done <<< "$paths"
-          changed_domains="$(git diff --cached --name-only | node scripts/workflow.mjs changed-domains)"
-          echo "changed_domains=$changed_domains" >> "$GITHUB_OUTPUT"
           if git diff --cached --quiet; then
             echo 'No catalog changes to commit'
             exit 0
@@ -59,10 +47,3 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'Update domain apps catalogs from container releases'
           git push origin HEAD:main
-      - name: Notify domain websites
-        if: steps.publish.outputs.changed_domains != '[]' || inputs.force_site_dispatch == true
-        env:
-          SITE_DISPATCH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
-          CHANGED_DOMAINS: ${{ steps.publish.outputs.changed_domains }}
-          FORCE_SITE_DISPATCH: ${{ inputs.force_site_dispatch }}
-        run: node scripts/workflow.mjs dispatch

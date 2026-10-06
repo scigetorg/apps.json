@@ -82,7 +82,7 @@ export function buildCatalog(releases, previous) {
       const prior = old.apps?.[name] ?? {};
       const combined = { ...app };
       for (const flag of ["show_in_menu", "show_in_applist"]) {
-        const value = app[flag] ?? prior[flag] ?? old[flag] ?? true;
+        const value = prior[flag] ?? app[flag] ?? old[flag] ?? true;
         if (typeof value !== "boolean") throw new Error(`${flag} must be boolean for ${name}`);
         combined[flag] = value;
       }
@@ -100,18 +100,12 @@ export function buildCatalog(releases, previous) {
 
 export async function makeFiles(catalog, sourceCommit, releases) {
   const rows = new Map();
-  const visible = [];
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
     for (const app of Object.values(data.apps)) {
       const image = imageKey(tool, release, app);
       const application = `${image}_${app.version}`;
       rows.set(application, `${application} categories:${catalog[tool].categories.join(",")},`);
-    }
-    const primary = catalog[tool].apps[`${tool} ${release}`];
-    if (primary?.show_in_applist) {
-      const application = `${imageKey(tool, release, primary)}_${primary.version}`;
-      visible.push({ application, categories: catalog[tool].categories });
     }
   }
   if (!rows.size) throw new Error("Catalog has no container images");
@@ -121,7 +115,6 @@ export async function makeFiles(catalog, sourceCommit, releases) {
     "apps.json": jsonText(catalog),
     "logs.txt": logs,
     "manifest.json": jsonText({ sha256, entries: rows.size, source_commit: sourceCommit }),
-    "applist.json": jsonText({ list: visible.sort((a, b) => a.application.localeCompare(b.application)) }),
   };
 }
 

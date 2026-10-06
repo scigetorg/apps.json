@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -24,17 +24,19 @@ const release = {
   },
 };
 
-test("retains per-version visibility and generates a complete CVMFS inventory", async () => {
+test("preserves seeded per-app visibility without an applist", async () => {
   const previous = { catalog: { demo: { apps: {
-    "demo 1.0": { show_in_applist: false },
-    "viewerGUI-demo 1.0": { show_in_menu: false },
+    "demo 1.0": { show_in_menu: false, show_in_applist: false },
+    "viewerGUI-demo 1.0": { show_in_menu: true, show_in_applist: true },
   } } } };
   const catalog = buildCatalog([release], previous);
   assert.equal(catalog.demo.apps["demo 1.0"].show_in_applist, false);
-  assert.equal(catalog.demo.apps["viewerGUI-demo 1.0"].show_in_menu, false);
+  assert.equal(catalog.demo.apps["demo 1.0"].show_in_menu, false);
+  assert.equal(catalog.demo.apps["viewerGUI-demo 1.0"].show_in_applist, true);
+  assert.equal(catalog.demo.apps["viewerGUI-demo 1.0"].show_in_menu, true);
   const files = await makeFiles(catalog, "source-sha", [release]);
   assert.equal(files["logs.txt"], "demo_1.0_20260921 categories:visualization,\n");
-  assert.deepEqual(JSON.parse(files["applist.json"]).list, []);
+  assert.equal(Object.hasOwn(files, "applist.json"), false);
   assert.equal(JSON.parse(files["manifest.json"]).entries, 1);
 });
 
@@ -46,9 +48,11 @@ test("a GUI-only release remains in the CVMFS inventory", async () => {
   const catalog = buildCatalog([guiOnly], { catalog: {} });
   const files = await makeFiles(catalog, "source-sha", [guiOnly]);
   assert.equal(files["logs.txt"], "demo_2.0_20260922 categories:visualization,\n");
+  assert.equal(catalog.demo.apps["viewerGUI-demo 2.0"].show_in_menu, true);
+  assert.equal(catalog.demo.apps["viewerGUI-demo 2.0"].show_in_applist, true);
 });
 
-test("an explicit image name is used in the CVMFS log and website list", async () => {
+test("an explicit image name is used in the CVMFS log", async () => {
   const renamed = {
     path: "releases/demo/3.0.json",
     data: { apps: { "demo 3.0": { version: "20260923", image: "renamed_demo_3.0" } }, categories: ["visualization"] },
@@ -56,7 +60,21 @@ test("an explicit image name is used in the CVMFS log and website list", async (
   const catalog = buildCatalog([renamed], { catalog: {} });
   const files = await makeFiles(catalog, "source-sha", [renamed]);
   assert.equal(files["logs.txt"], "renamed_demo_3.0_20260923 categories:visualization,\n");
-  assert.equal(JSON.parse(files["applist.json"]).list[0].application, "renamed_demo_3.0_20260923");
+});
+
+test("release flags initialize new apps while seeded choices survive rebuilds", () => {
+  const flagged = structuredClone(release);
+  flagged.data.apps["demo 1.0"].show_in_menu = false;
+  flagged.data.apps["demo 1.0"].show_in_applist = false;
+  const initial = buildCatalog([flagged], { catalog: {} });
+  assert.equal(initial.demo.apps["demo 1.0"].show_in_menu, false);
+  const rebuilt = structuredClone(flagged);
+  rebuilt.data.apps["demo 1.0"].version = "20260922";
+  rebuilt.data.apps["demo 1.0"].show_in_menu = true;
+  rebuilt.data.apps["demo 1.0"].show_in_applist = true;
+  const next = buildCatalog([rebuilt], { catalog: initial });
+  assert.equal(next.demo.apps["demo 1.0"].show_in_menu, false);
+  assert.equal(next.demo.apps["demo 1.0"].show_in_applist, false);
 });
 
 test("DOI and recipe license enrich the same app versions", async () => {
@@ -97,4 +115,5 @@ test("reads release files and writes all generated files", async () => {
     assert.equal(await readFile(join(root, name), "utf8"), content);
   }
   assert.equal(JSON.parse(files["apps.json"]).demo.apps["demo 1.0"].show_in_menu, false);
+  await assert.rejects(stat(join(root, "applist.json")), { code: "ENOENT" });
 });
