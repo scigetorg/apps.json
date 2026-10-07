@@ -2015,7 +2015,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261001",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2362,6 +2362,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "datalad 1.7.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -2413,6 +2423,16 @@
             },
             "datalad_arm64 1.6.5": {
                 "version": "20261001",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "datalad_arm64 1.7.0": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2760,6 +2780,16 @@
                     "MIT"
                 ]
             },
+            "dicompare 0.15.3": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -2780,6 +2810,16 @@
         "apps": {
             "dicompare_arm64 0.15.2": {
                 "version": "20260921",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "dicompare_arm64 0.15.3": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6051,7 +6091,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261004",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6082,7 +6122,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261004",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6831,6 +6871,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "pydeface 2.1.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -6865,10 +6915,21 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "qmrlab 3.0.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
-            "quantitative imaging"
+            "quantitative imaging",
+            "image reconstruction"
         ]
     },
     "qsiprep": {
@@ -6909,6 +6970,16 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "qsirecon 26.0.1": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -6919,6 +6990,16 @@
         "apps": {
             "qsmbly 0.11.0": {
                 "version": "20260506",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "qsmbly 0.29.0": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
