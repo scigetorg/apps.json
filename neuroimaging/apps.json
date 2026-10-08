@@ -581,6 +581,17 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "b0mapromeo 1.1.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -3566,6 +3577,23 @@
         },
         "categories": [
             "functional imaging",
+            "image reconstruction"
+        ]
+    },
+    "frisgokspace": {
+        "apps": {
+            "frisgokspace 0.1.0": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
             "image reconstruction"
         ]
     },
@@ -6783,6 +6811,16 @@
     },
     "petprep": {
         "apps": {
+            "petprep 0.0.10": {
+                "version": "20261005",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "petprep 0.0.5": {
                 "version": "20260519",
                 "exec": "",
@@ -6950,6 +6988,16 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.338817",
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            },
+            "qsiprep 26.0.0": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "BSD-3-Clause"
                 ]
