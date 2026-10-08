@@ -1,8 +1,8 @@
 # Neurodesk apps catalog
 
-This directory is the root of the future public `NeuroDesk/apps.json` GitHub
+This directory is the root of the future public `Neurodesk/apps.json` GitHub
 repository. The active domain is `neuroimaging`, sourced from
-`NeuroDesk/neurocontainers`. The seed `neuroimaging/apps.json` has per-app
+`Neurodesk/neurocontainers`. The seed `neuroimaging/apps.json` has per-app
 `show_in_menu` and `show_in_applist` flags set by a **one-time comparison**
 with the historical `cvmfs/applist.json`: an exact `<image>_<builddate>` match
 set both flags to `true`; absence set both to `false`. That historical list is
@@ -54,16 +54,16 @@ when it differs from the current recipe.
 
 ## Enable the schedule
 
-1. Create a public `NeuroDesk/apps.json` repository with a `main` branch and
+1. Create a public `Neurodesk/apps.json` repository with a `main` branch and
    place the **contents** of this directory at its root, including
    `.github/workflows/` and `neuroimaging/apps.json`. For a local checkout,
    use `cp -a catalog/apps-json-repo/. /path/to/apps.json/`.
 2. Create a Zenodo access token for `zenodo.org` and save it as the
-   `ZENODO_TOKEN` Actions secret in `NeuroDesk/apps.json`. The workflow uses
+   `ZENODO_TOKEN` Actions secret in `Neurodesk/apps.json`. The workflow uses
    it only for DOI lookup requests. A sandbox Zenodo token is separate and will
    not work for production Zenodo.
 3. Update the website's app catalog source to
-   `https://raw.githubusercontent.com/NeuroDesk/apps.json/main/neuroimaging/apps.json`.
+   `https://raw.githubusercontent.com/Neurodesk/apps.json/main/neuroimaging/apps.json`.
    Website consumers should read the catalog directly and use
    `show_in_applist` to select visible entries. The catalog workflow sends
    no dispatch event and needs no website token.
