@@ -1,4 +1,4 @@
-# NeuroDesk apps catalog
+# Neurodesk apps catalog
 
 This directory is the root of the future public `NeuroDesk/apps.json` GitHub
 repository. The active domain is `neuroimaging`, sourced from
