@@ -592,6 +592,50 @@
                     "GPL-3.0-only",
                     "MIT"
                 ]
+            },
+            "b0mapromeo 1.2.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
+            },
+            "b0mapromeo 1.3.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
+            },
+            "b0mapromeo 1.4.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
+            },
+            "b0mapromeo 1.4.1": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -3565,7 +3609,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261005",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3583,7 +3627,7 @@
     "frisgokspace": {
         "apps": {
             "frisgokspace 0.1.0": {
-                "version": "20261007",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4631,6 +4675,23 @@
         },
         "categories": [
             "programming"
+        ]
+    },
+    "kspacefilter": {
+        "apps": {
+            "kspacefilter 0.1.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "kul-vbg": {
@@ -7771,6 +7832,26 @@
         "categories": [
             "structural imaging",
             "image segmentation"
+        ]
+    },
+    "shim-toolbox": {
+        "apps": {
+            "shim-toolbox 1.5.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "quantitative imaging",
+            "image reconstruction",
+            "phase processing"
         ]
     },
     "sigviewer": {
