@@ -3609,7 +3609,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261008",
+                "version": "20261009",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8399,7 +8399,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20260902",
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8561,7 +8561,7 @@
                 ]
             },
             "topofit 0.6.0": {
-                "version": "20260917",
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8737,6 +8737,24 @@
         },
         "categories": [
             "visualization"
+        ]
+    },
+    "vessynth": {
+        "apps": {
+            "vessynth 2026.10.9": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     },
     "vina": {
