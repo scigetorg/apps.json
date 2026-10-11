@@ -210,6 +210,26 @@
                 "license": [
                     "GPL-3.0"
                 ]
+            },
+            "afni 26.3.02": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "sumaGUI-afni 26.3.02": {
+                "version": "20261010",
+                "exec": "suma",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
             }
         },
         "categories": [
@@ -636,6 +656,17 @@
                     "GPL-3.0-only",
                     "MIT"
                 ]
+            },
+            "b0mapromeo 1.4.3": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only",
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -696,11 +727,30 @@
                 ]
             },
             "batchheudiconv 1.0.0": {
-                "version": "20250628",
+                "version": "20261010",
                 "exec": "",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.338929",
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "workflows",
+            "data organisation"
+        ]
+    },
+    "batchheudiconv_arm64": {
+        "apps": {
+            "batchheudiconv_arm64 1.0.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "GPL-3.0-only"
                 ]
@@ -2070,7 +2120,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261006",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2427,6 +2477,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "datalad 1.7.1": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -2488,6 +2548,16 @@
             },
             "datalad_arm64 1.7.0": {
                 "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "datalad_arm64 1.7.1": {
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5188,6 +5258,16 @@
                 "license": [
                     "GPL-3.0-only"
                 ]
+            },
+            "meganorm 0.2.2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only"
+                ]
             }
         },
         "categories": [
@@ -5609,7 +5689,7 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261004",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6180,7 +6260,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261006",
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6211,7 +6291,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261006",
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7557,6 +7637,13 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.386674"
+            },
+            "rabies 0.6.2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
@@ -7575,6 +7662,16 @@
                 "license": [
                     "Apache-2.0"
                 ]
+            },
+            "radtract 0.2.4": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
             }
         },
         "categories": [
@@ -7585,6 +7682,16 @@
         "apps": {
             "rapidtide 3.1.11": {
                 "version": "20260714",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "rapidtide 3.2.0": {
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7660,6 +7767,16 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.338743",
+                "license": [
+                    "LGPL-2.1+"
+                ]
+            },
+            "root 6.24.06": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "LGPL-2.1+"
                 ]
@@ -7770,6 +7887,26 @@
                 "license": [
                     "AGPL-3.0"
                 ]
+            },
+            "rstudio 2026.09.0": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "AGPL-3.0"
+                ]
+            },
+            "rstudioGUI-rstudio 2026.09.0": {
+                "version": "20261009",
+                "exec": "rstudio",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "AGPL-3.0"
+                ]
             }
         },
         "categories": [
@@ -7778,6 +7915,16 @@
     },
     "samri": {
         "apps": {
+            "samri 0.5.4": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            },
             "samri 0.5": {
                 "version": "20260608",
                 "exec": "",
@@ -7837,7 +7984,7 @@
     "shim-toolbox": {
         "apps": {
             "shim-toolbox 1.5.0": {
-                "version": "20261008",
+                "version": "20261009",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7979,6 +8126,20 @@
                 "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true
+            },
+            "slicer 5.12.4": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "slicerGUI-slicer 5.12.4": {
+                "version": "20261010",
+                "exec": "Slicer",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
@@ -8003,10 +8164,19 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339173"
+            },
+            "slicersalt 6.0.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
-            "shape analysis"
+            "shape analysis",
+            "quantitative imaging",
+            "structural imaging"
         ]
     },
     "sodiumgriddingptpi": {
@@ -8051,16 +8221,52 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339241"
+            },
+            "sovabids 0.4.7": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "electrophysiology",
+            "bids apps"
         ]
     },
     "spant": {
         "apps": {
             "spant 3.7.0": {
                 "version": "20260319",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            },
+            "spant 4.5.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "spectroscopy"
+        ]
+    },
+    "spant_arm64": {
+        "apps": {
+            "spant_arm64 4.5.0": {
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8279,6 +8485,40 @@
         },
         "categories": [
             "functional imaging",
+            "structural imaging"
+        ]
+    },
+    "spmpython": {
+        "apps": {
+            "spmpython 25.1.2.post2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image segmentation",
+            "image registration",
+            "structural imaging"
+        ]
+    },
+    "spmpython_arm64": {
+        "apps": {
+            "spmpython_arm64 25.1.2.post2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image segmentation",
+            "image registration",
             "structural imaging"
         ]
     },
