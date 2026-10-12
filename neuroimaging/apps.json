@@ -2120,7 +2120,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261008",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3318,6 +3318,16 @@
             },
             "fastsurfer 2.5.4": {
                 "version": "20260910",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "fastsurfer 2.6.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5689,7 +5699,7 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261008",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6260,7 +6270,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261007",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6291,7 +6301,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261007",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8588,6 +8598,26 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.336005",
+                "license": [
+                    "BSD-2-Clause"
+                ]
+            },
+            "surfice 1.0.20211006": {
+                "version": "20261011",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-2-Clause"
+                ]
+            },
+            "surficeGUI-surfice 1.0.20211006": {
+                "version": "20261011",
+                "exec": "surfice",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "BSD-2-Clause"
                 ]
