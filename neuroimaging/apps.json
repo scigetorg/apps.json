@@ -405,7 +405,26 @@
                 ]
             },
             "ants 2.6.5": {
-                "version": "20260602",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging",
+            "image segmentation"
+        ]
+    },
+    "ants_arm64": {
+        "apps": {
+            "ants_arm64 2.6.5": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -447,7 +466,7 @@
                 ]
             },
             "apptainer 1.5.3": {
-                "version": "20260910",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -464,7 +483,7 @@
     "apptainer_arm64": {
         "apps": {
             "apptainer_arm64 1.5.3": {
-                "version": "20260910",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -698,7 +717,24 @@
                 ]
             },
             "bart 1.0.00": {
-                "version": "20260911",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "bart_arm64": {
+        "apps": {
+            "bart_arm64 1.0.00": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -775,6 +811,16 @@
             },
             "bcbtoolkit 5.3.0": {
                 "version": "20261002",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            },
+            "bcbtoolkit 5.4.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1439,7 +1485,26 @@
     "brainles-aurora": {
         "apps": {
             "brainles-aurora 0.2.7": {
-                "version": "20260825",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging",
+            "machine learning"
+        ]
+    },
+    "brainles-aurora_arm64": {
+        "apps": {
+            "brainles-aurora_arm64 0.2.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1527,7 +1592,24 @@
                 ]
             },
             "brainlifecli 1.8.2": {
-                "version": "20260913",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "workflows"
+        ]
+    },
+    "brainlifecli_arm64": {
+        "apps": {
+            "brainlifecli_arm64 1.8.2": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1767,6 +1849,16 @@
                     "Apache-2.0"
                 ]
             },
+            "brats 0.1.13": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "brats 0.1.8": {
                 "version": "20260822",
                 "exec": "",
@@ -1807,7 +1899,24 @@
                 ]
             },
             "brkraw 0.5.7": {
-                "version": "20260914",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "brkraw_arm64": {
+        "apps": {
+            "brkraw_arm64 0.5.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2005,7 +2114,25 @@
                 ]
             },
             "clearswi 1.7.0": {
-                "version": "20260914",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "phase processing",
+            "structural imaging"
+        ]
+    },
+    "clearswi_arm64": {
+        "apps": {
+            "clearswi_arm64 1.7.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2135,6 +2262,27 @@
         "apps": {
             "condaenvs 1.0.1": {
                 "version": "20260513",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "condaenvs 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "condaenvs_arm64": {
+        "apps": {
+            "condaenvs_arm64 1.1.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2308,6 +2456,37 @@
             "functional imaging",
             "workflows",
             "bids apps"
+        ]
+    },
+    "cryosparc": {
+        "apps": {
+            "cryosparc 1.0.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ]
+    },
+    "ctffind": {
+        "apps": {
+            "ctffind 4.1.14": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "dafne": {
@@ -2662,7 +2841,26 @@
     "deep-quality-estimation": {
         "apps": {
             "deep-quality-estimation 0.0.3": {
-                "version": "20260822",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "quality control",
+            "image segmentation",
+            "machine learning"
+        ]
+    },
+    "deep-quality-estimation_arm64": {
+        "apps": {
+            "deep-quality-estimation_arm64 0.0.3": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2802,6 +3000,16 @@
             },
             "deepretinotopy 1.0.19": {
                 "version": "20260727",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "deepretinotopy 1.1.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2967,6 +3175,27 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.199560"
+            },
+            "dicomtools 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "dicomtools_arm64": {
+        "apps": {
+            "dicomtools_arm64 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
@@ -3085,7 +3314,7 @@
     "dwidenoise2": {
         "apps": {
             "dwidenoise2 1.0.0": {
-                "version": "20260727",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3096,6 +3325,23 @@
             },
             "dwidenoise2 20260603": {
                 "version": "20260604",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "PolyForm-Noncommercial-1.0.0"
+                ]
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "dwidenoise2_arm64": {
+        "apps": {
+            "dwidenoise2_arm64 1.0.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3139,7 +3385,21 @@
     "eharmonize": {
         "apps": {
             "eharmonize 1.0.0": {
-                "version": "20260611",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "eharmonize_arm64": {
+        "apps": {
+            "eharmonize_arm64 1.0.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3169,6 +3429,43 @@
         },
         "categories": [
             "image registration"
+        ]
+    },
+    "eman2": {
+        "apps": {
+            "eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
+            },
+            "e2projectmanagerGUI-eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "e2projectmanager.py",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
+            },
+            "e2displayGUI-eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "e2display.py",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "emuses": {
@@ -3922,7 +4219,24 @@
     "fsqc": {
         "apps": {
             "fsqc 2.1.7": {
-                "version": "20261002",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "quality control"
+        ]
+    },
+    "fsqc_arm64": {
+        "apps": {
+            "fsqc_arm64 2.1.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3964,14 +4278,47 @@
             "diffusion imaging"
         ]
     },
+    "gautomatch": {
+        "apps": {
+            "gautomatch 0.56.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ]
+    },
     "gigaconnectome": {
         "apps": {
             "gigaconnectome 0.6.0": {
-                "version": "20250630",
+                "version": "20261012",
                 "exec": "",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339115",
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "bids apps"
+        ]
+    },
+    "gigaconnectome_arm64": {
+        "apps": {
+            "gigaconnectome_arm64 0.6.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "MIT"
                 ]
@@ -4048,7 +4395,21 @@
                 "doi": "https://doi.org/10.5072/zenodo.338989"
             },
             "gingerale 4.0.0": {
-                "version": "20260928",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
+    "gingerale_arm64": {
+        "apps": {
+            "gingerale_arm64 4.0.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4250,7 +4611,21 @@
                 "doi": "https://doi.org/10.5072/zenodo.338725"
             },
             "hdbet 2.0.1": {
-                "version": "20260629",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "hdbet_arm64": {
+        "apps": {
+            "hdbet_arm64 2.0.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4646,7 +5021,7 @@
                 ]
             },
             "julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4656,7 +5031,7 @@
                 ]
             },
             "vscodeGUI-julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "code",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4666,7 +5041,7 @@
                 ]
             },
             "REPLGUI-julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "julia",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4723,7 +5098,7 @@
     "julia_arm64": {
         "apps": {
             "julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4733,7 +5108,7 @@
                 ]
             },
             "vscodeGUI-julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "code",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4743,7 +5118,7 @@
                 ]
             },
             "REPLGUI-julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "julia",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4834,7 +5209,7 @@
     "laynii": {
         "apps": {
             "laynii 2.10.0": {
-                "version": "20260929",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4849,6 +5224,23 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.336083",
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
+    "laynii_arm64": {
+        "apps": {
+            "laynii_arm64 2.10.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -5068,7 +5460,21 @@
     "lqt": {
         "apps": {
             "lqt 0.1.0": {
-                "version": "20260603",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "lqt_arm64": {
+        "apps": {
+            "lqt_arm64 0.1.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5270,7 +5676,26 @@
                 ]
             },
             "meganorm 0.2.2": {
-                "version": "20261010",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "electrophysiology",
+            "statistics",
+            "machine learning"
+        ]
+    },
+    "meganorm_arm64": {
+        "apps": {
+            "meganorm_arm64 0.2.2": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5544,7 +5969,7 @@
                 ]
             },
             "mipview 0.6.2": {
-                "version": "20261001",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5554,7 +5979,34 @@
                 ]
             },
             "MipViewGUI-mipview 0.6.2": {
-                "version": "20261001",
+                "version": "20261013",
+                "exec": "mipview",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "visualization"
+        ]
+    },
+    "mipview_arm64": {
+        "apps": {
+            "mipview_arm64 0.6.2": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "MipViewGUI-mipview_arm64 0.6.2": {
+                "version": "20261013",
                 "exec": "mipview",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5680,6 +6132,33 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "mne 1.13.2": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
+    },
+    "mne_arm64": {
+        "apps": {
+            "mne_arm64 1.13.2": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -5717,7 +6196,7 @@
     "modsort": {
         "apps": {
             "modsort 0.0.2": {
-                "version": "20260822",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5727,7 +6206,7 @@
                 ]
             },
             "modsort-modsort 0.0.2": {
-                "version": "20260822",
+                "version": "20261012",
                 "exec": "modsort",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5739,6 +6218,50 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "modsort_arm64": {
+        "apps": {
+            "modsort_arm64 0.0.2": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "modsort-modsort_arm64 0.0.2": {
+                "version": "20261012",
+                "exec": "modsort",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "motioncor3": {
+        "apps": {
+            "motioncor3 1.2.4": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "mricrogl": {
@@ -6270,7 +6793,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261011",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6301,7 +6824,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261011",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6650,6 +7173,24 @@
             "diffusion imaging"
         ]
     },
+    "nomis": {
+        "apps": {
+            "nomis 20220225": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "structural imaging",
+            "statistics"
+        ]
+    },
     "openads": {
         "apps": {
             "openads 1.0.0": {
@@ -6918,7 +7459,25 @@
                 ]
             },
             "panoptica 2.1.7": {
-                "version": "20260822",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "quality control",
+            "image segmentation"
+        ]
+    },
+    "panoptica_arm64": {
+        "apps": {
+            "panoptica_arm64 2.1.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6946,7 +7505,24 @@
                 ]
             },
             "pcntoolkit 1.3.0": {
-                "version": "20260731",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
+    "pcntoolkit_arm64": {
+        "apps": {
+            "pcntoolkit_arm64 1.3.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7106,7 +7682,25 @@
                 ]
             },
             "qmrlab 3.0.0": {
-                "version": "20261006",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "quantitative imaging",
+            "image reconstruction"
+        ]
+    },
+    "qmrlab_arm64": {
+        "apps": {
+            "qmrlab_arm64 3.0.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7483,7 +8077,7 @@
                 ]
             },
             "qsmxt 9.22.0": {
-                "version": "20260923",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7560,7 +8154,24 @@
                 ]
             },
             "quickshear 1.2.0": {
-                "version": "20260629",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "quickshear_arm64": {
+        "apps": {
+            "quickshear_arm64 1.2.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7674,7 +8285,24 @@
                 ]
             },
             "radtract 0.2.4": {
-                "version": "20261007",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "radtract_arm64": {
+        "apps": {
+            "radtract_arm64 0.2.4": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7701,7 +8329,24 @@
                 ]
             },
             "rapidtide 3.2.0": {
-                "version": "20261008",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
+    "rapidtide_arm64": {
+        "apps": {
+            "rapidtide_arm64 3.2.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7729,6 +8374,16 @@
             },
             "relion 4.0.1.sm75": {
                 "version": "20260606",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0-only"
+                ]
+            },
+            "relion 5.1.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7799,7 +8454,25 @@
     "rshrf": {
         "apps": {
             "rshrf 1.7.0": {
-                "version": "20260529",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "bids apps"
+        ]
+    },
+    "rshrf_arm64": {
+        "apps": {
+            "rshrf_arm64 1.7.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7973,6 +8646,24 @@
             "functional imaging"
         ]
     },
+    "scipion": {
+        "apps": {
+            "scipion 3.8.3": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "workflows"
+        ]
+    },
     "segmentator": {
         "apps": {
             "segmentator 1.6.1": {
@@ -8014,8 +8705,9 @@
     "sigviewer": {
         "apps": {
             "sigviewer 0.6.4": {
-                "version": "20220315",
+                "version": "20261013",
                 "exec": "",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339127",
@@ -8024,11 +8716,39 @@
                 ]
             },
             "sigviewerGUI-sigviewer 0.6.4": {
-                "version": "20220315",
+                "version": "20261013",
                 "exec": "sigviewer",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339127",
+                "license": [
+                    "GPL-3.0"
+                ]
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
+    },
+    "sigviewer_arm64": {
+        "apps": {
+            "sigviewer_arm64 0.6.4": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "sigviewerGUI-sigviewer_arm64 0.6.4": {
+                "version": "20261013",
+                "exec": "sigviewer",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "GPL-3.0"
                 ]
@@ -8233,7 +8953,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.339241"
             },
             "sovabids 0.4.7": {
-                "version": "20261010",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8242,6 +8962,21 @@
         },
         "categories": [
             "data organisation",
+            "electrophysiology",
+            "bids apps"
+        ]
+    },
+    "sovabids_arm64": {
+        "apps": {
+            "sovabids_arm64 0.4.7": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
             "electrophysiology",
             "bids apps"
         ]
@@ -8706,6 +9441,16 @@
                 "license": [
                     "FreeSurfer Software License Agreement"
                 ]
+            },
+            "synthstrip 8.2.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "FreeSurfer Software License Agreement"
+                ]
             }
         },
         "categories": [
@@ -8767,10 +9512,33 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.338855"
+            },
+            "topaz 0.3.20": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
-            "cryo EM"
+            "cryo EM",
+            "machine learning"
+        ]
+    },
+    "topaz_arm64": {
+        "apps": {
+            "topaz_arm64 0.3.20": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "machine learning"
         ]
     },
     "topofit": {
@@ -8850,8 +9618,35 @@
     },
     "totalsegmentator": {
         "apps": {
+            "totalsegmentator 2.18.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "totalsegmentator 2.5.0": {
                 "version": "20260323",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "totalsegmentator_arm64": {
+        "apps": {
+            "totalsegmentator_arm64 2.18.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9126,6 +9921,42 @@
             "phase processing"
         ]
     },
+    "workshopdemo": {
+        "apps": {
+            "workshopdemo 1.0.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
+    },
+    "workshopdemo_arm64": {
+        "apps": {
+            "workshopdemo_arm64 1.0.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
+    },
     "xcpd": {
         "apps": {
             "xcpd 0.10.7": {
@@ -9141,6 +9972,26 @@
         },
         "categories": [
             "functional imaging"
+        ]
+    },
+    "xmipp": {
+        "apps": {
+            "xmipp 6.0.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "BSD-3-Clause",
+                    "GPL-3.0-or-later"
+                ]
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "xnat": {
