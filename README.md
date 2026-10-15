@@ -67,7 +67,7 @@ when it differs from the current recipe.
    it only for DOI lookup requests. A sandbox Zenodo token is separate and will
    not work for production Zenodo.
 3. Update the website's app catalog source to
-   `https://neurodesk-apps.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`
+   `https://apps-json.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`
    after configuring the Cloudflare publishing described below.
    Website consumers should read the catalog directly and use
    `show_in_applist` to select visible entries. The catalog workflow sends
@@ -123,7 +123,7 @@ catalog.
    permission for that account.
 2. In this repository's GitHub Actions settings, add `CLOUDFLARE_API_TOKEN` as
    a secret and `CLOUDFLARE_ACCOUNT_ID` as a variable. Optionally set the
-   `CLOUDFLARE_WORKER_NAME` variable; it defaults to `neurodesk-apps`.
+   `CLOUDFLARE_WORKER_NAME` variable; it defaults to `apps-json`.
 3. Run **Consolidate apps catalog** manually. The publishing step creates or
    updates the Worker and enables its `workers.dev` address. Check
    `https://<worker-name>.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`.
