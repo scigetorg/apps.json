@@ -8,7 +8,7 @@ import { consolidate } from "./catalog.mjs";
 const exec = promisify(execFile);
 const DOMAIN_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const GENERATED = ["apps.json", "logs.txt", "manifest.json"];
+const GENERATED = ["apps.json", "logs.txt", "manifest.json", "retired-images.json"];
 
 export async function readDomains(root) {
   const document = JSON.parse(await readFile(join(root, "domains.json"), "utf8"));
@@ -69,6 +69,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     await consolidateDomains(root, domains);
   } else if (command === "output-paths") {
     process.stdout.write(`${outputPaths(domains).join("\n")}\n`);
+  } else if (command === "source-repository") {
+    const domain = process.argv[3];
+    if (!Object.hasOwn(domains, domain)) throw new Error(`Unknown domain: ${domain}`);
+    process.stdout.write(`${domains[domain].source_repository}\n`);
   } else {
     throw new Error(`Unknown command: ${command}`);
   }
