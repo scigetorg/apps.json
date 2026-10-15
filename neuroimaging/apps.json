@@ -260,6 +260,18 @@
                     "GPL-3.0-only"
                 ]
             },
+            "aidamri 3.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause",
+                    "CC-BY-NC-SA-4.0",
+                    "GPL-3.0-only"
+                ]
+            },
             "aidamri 3.0": {
                 "version": "20260910",
                 "exec": "",
@@ -268,6 +280,28 @@
                 "show_in_applist": true,
                 "license": [
                     "BSD-3-Clause",
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "rodent imaging",
+            "structural imaging",
+            "diffusion imaging",
+            "functional imaging"
+        ]
+    },
+    "aidamri_arm64": {
+        "apps": {
+            "aidamri_arm64 3.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause",
+                    "CC-BY-NC-SA-4.0",
                     "GPL-3.0-only"
                 ]
             }
@@ -2275,7 +2309,21 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261011",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
+    "code_arm64": {
+        "apps": {
+            "code_arm64 240320": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3786,7 +3834,25 @@
     "flames": {
         "apps": {
             "flames 1.0.0": {
-                "version": "20260612",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
+        ]
+    },
+    "flames_arm64": {
+        "apps": {
+            "flames_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5343,7 +5409,21 @@
     "lesionquantificationtoolkit": {
         "apps": {
             "lesionquantificationtoolkit 0.1.0": {
-                "version": "20260727",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "lesionquantificationtoolkit_arm64": {
+        "apps": {
+            "lesionquantificationtoolkit_arm64 0.1.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5733,7 +5813,24 @@
     "mede": {
         "apps": {
             "mede 0.0.12": {
-                "version": "20260521",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "LicenseRef-Apache-2.0-Commons-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "mede_arm64": {
+        "apps": {
+            "mede_arm64 0.0.12": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5852,7 +5949,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7017,6 +7114,48 @@
             "functional imaging"
         ]
     },
+    "neurocommand": {
+        "apps": {
+            "neurocommand 1.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [
+                    "--bind",
+                    "/dev/fuse"
+                ],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "workflows",
+            "programming"
+        ]
+    },
+    "neurocommand_arm64": {
+        "apps": {
+            "neurocommand_arm64 1.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [
+                    "--bind",
+                    "/dev/fuse"
+                ],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "workflows",
+            "programming"
+        ]
+    },
     "neurodesktop-lite": {
         "apps": {
             "neurodesktop-lite 20260428 arm64": {
@@ -7457,7 +7596,21 @@
     "openadscpu": {
         "apps": {
             "openadscpu 1.0.0": {
-                "version": "20260518",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "openadscpu_arm64": {
+        "apps": {
+            "openadscpu_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7672,7 +7825,24 @@
     "pals": {
         "apps": {
             "pals 2.0.1": {
-                "version": "20260518",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "custom"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "pals_arm64": {
+        "apps": {
+            "pals_arm64 2.0.1": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8032,7 +8202,7 @@
                 ]
             },
             "qsmbly 0.29.0": {
-                "version": "20261006",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8079,8 +8249,37 @@
             "structural imaging"
         ]
     },
+    "qsmbly_arm64": {
+        "apps": {
+            "qsmbly_arm64 0.29.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "qsmxt": {
         "apps": {
+            "qsmxt 10.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "GPL-3.0-only"
+                ]
+            },
             "qsmxt 5.1.0": {
                 "version": "20230905",
                 "exec": "",
@@ -8340,11 +8539,11 @@
             }
         },
         "categories": [
+            "image reconstruction",
             "phase processing",
             "quantitative imaging",
             "structural imaging",
-            "workflows",
-            "image reconstruction"
+            "workflows"
         ]
     },
     "quantiphyse": {
@@ -8688,6 +8887,33 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.336027",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "romeo 4.9.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            }
+        },
+        "categories": [
+            "phase processing"
+        ]
+    },
+    "romeo_arm64": {
+        "apps": {
+            "romeo_arm64 4.9.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "MIT"
                 ]
@@ -9685,6 +9911,33 @@
                 "license": [
                     "BSD-2-Clause"
                 ]
+            },
+            "syncro 0.2.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-2-Clause"
+                ]
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "syncro_arm64": {
+        "apps": {
+            "syncro_arm64 0.2.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-2-Clause"
+                ]
             }
         },
         "categories": [
@@ -9694,7 +9947,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9733,7 +9986,25 @@
                 ]
             },
             "synthstrip 8.2.0": {
-                "version": "20261012",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "FreeSurfer Software License Agreement"
+                ]
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "synthstrip_arm64": {
+        "apps": {
+            "synthstrip_arm64 8.2.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10269,7 +10540,22 @@
     "wftfi": {
         "apps": {
             "wftfi 1.0.0": {
-                "version": "20260629",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "quantitative imaging",
+            "phase processing"
+        ]
+    },
+    "wftfi_arm64": {
+        "apps": {
+            "wftfi_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10376,11 +10662,26 @@
     "xnat": {
         "apps": {
             "xnat 1.9.2.1": {
-                "version": "20250805",
+                "version": "20261014",
                 "exec": "",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339129"
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "xnat_arm64": {
+        "apps": {
+            "xnat_arm64 1.9.2.1": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
