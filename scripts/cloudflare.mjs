@@ -136,7 +136,7 @@ export async function publishCatalogs(
   const metadata = {
     main_module: WORKER_MODULE,
     compatibility_date: "2026-10-15",
-    assets: { jwt: completionToken, config: { headers: CORS_HEADERS } },
+    assets: { jwt: completionToken, config: { _headers: CORS_HEADERS } },
   };
   const form = new FormData();
   form.append(
@@ -186,18 +186,21 @@ export async function verifyPublishedCatalogs(
       try {
         const response = await fetchImpl(`${baseUrl}${path}`);
         const bytes = Buffer.from(await response.arrayBuffer());
-        if (
-          !response.ok ||
-          !bytes.equals(asset.bytes) ||
-          !response.headers
-            .get("content-type")
-            ?.startsWith("application/json") ||
-          response.headers.get("access-control-allow-origin") !== "*"
-        ) {
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        if (!bytes.equals(asset.bytes))
           throw new Error(
-            `status ${response.status}, content or headers mismatch`,
+            `content mismatch (${bytes.length} bytes, expected ${asset.bytes.length})`,
           );
-        }
+        const contentType = response.headers.get("content-type");
+        if (!contentType?.startsWith("application/json"))
+          throw new Error(
+            `content-type mismatch (${contentType || "missing"})`,
+          );
+        const cors = response.headers.get("access-control-allow-origin");
+        if (cors !== "*")
+          throw new Error(
+            `access-control-allow-origin mismatch (${cors || "missing"})`,
+          );
         failure = null;
         break;
       } catch (error) {

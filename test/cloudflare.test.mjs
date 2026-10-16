@@ -89,7 +89,7 @@ test("publishes configured domain paths and requested asset batches", async () =
   assert.equal(calls[3].options.body.get("metadata").type, "application/json");
   assert.equal(metadata.assets.jwt, "completion-token");
   assert.match(
-    metadata.assets.config.headers,
+    metadata.assets.config._headers,
     /Access-Control-Allow-Origin: \*/,
   );
   assert.equal(calls[4].url.endsWith("/subdomain"), true);
@@ -218,6 +218,20 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
               headers: { "content-type": "application/json" },
             }),
     }),
-    /Could not verify .*content or headers mismatch/,
+    /Could not verify .*content mismatch/,
+  );
+  await assert.rejects(
+    verifyPublishedCatalogs(root, {
+      accountId: "account",
+      apiToken: "api-token",
+      attempts: 1,
+      fetchImpl: async (url) =>
+        url.includes("api.cloudflare.com")
+          ? ok({ subdomain: "example" })
+          : new Response(assets.get(new URL(url).pathname).bytes, {
+              headers: { "content-type": "application/json" },
+            }),
+    }),
+    /Could not verify .*access-control-allow-origin mismatch \(missing\)/,
   );
 });
