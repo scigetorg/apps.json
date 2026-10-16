@@ -2447,16 +2447,6 @@
     },
     "connectomeworkbench": {
         "apps": {
-            "connectomeworkbench 1.4.2": {
-                "version": "20201119",
-                "exec": "",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.338857",
-                "license": [
-                    "GPL-2.0"
-                ]
-            },
             "connectomeworkbench 1.5.0": {
                 "version": "20220919",
                 "exec": "",
@@ -3199,17 +3189,6 @@
     },
     "dicompare": {
         "apps": {
-            "dicompare 0.1.2": {
-                "version": "20260127",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.432995",
-                "license": [
-                    "MIT"
-                ]
-            },
             "dicompare 0.1.3": {
                 "version": "20260211",
                 "exec": "",
@@ -3673,20 +3652,6 @@
             "electrophysiology"
         ]
     },
-    "exploreasl": {
-        "apps": {
-            "exploreasl 1.11.0": {
-                "version": "20260514",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            }
-        },
-        "categories": [
-            "workflows"
-        ]
-    },
     "ezbids": {
         "apps": {
             "ezbids 1.1.0": {
@@ -4135,6 +4100,28 @@
             "structural imaging"
         ]
     },
+    "freesurfer6": {
+        "apps": {
+            "freesurfer6 6.0.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "Freeview (FreeSurfer 6)-freesurfer6 6.0.0": {
+                "version": "20261016",
+                "exec": "freeview",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "structural imaging",
+            "image segmentation"
+        ]
+    },
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
@@ -4329,20 +4316,6 @@
                 "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true
-            },
-            "fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": "",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.339047"
-            },
-            "fsleyesGUI-fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": "fsleyes",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.339047"
             },
             "fsl 6.0.7.8": {
                 "version": "20240913",
@@ -6139,26 +6112,6 @@
     },
     "minc": {
         "apps": {
-            "minc 1.9.17": {
-                "version": "20210105",
-                "exec": "",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.338977",
-                "license": [
-                    "GPL-3.0"
-                ]
-            },
-            "registerGUI-minc 1.9.17": {
-                "version": "20210105",
-                "exec": "register",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.338977",
-                "license": [
-                    "GPL-3.0"
-                ]
-            },
             "minc 1.9.18": {
                 "version": "20230208",
                 "exec": "",
@@ -8324,17 +8277,6 @@
                 "show_in_applist": true,
                 "license": [
                     "Apache-2.0",
-                    "BSD-2-Clause",
-                    "GPL-3.0-only"
-                ]
-            },
-            "qsmxt 5.1.0": {
-                "version": "20230905",
-                "exec": "",
-                "show_in_menu": true,
-                "show_in_applist": true,
-                "doi": "https://doi.org/10.5072/zenodo.338969",
-                "license": [
                     "BSD-2-Clause",
                     "GPL-3.0-only"
                 ]
