@@ -187,7 +187,8 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
   const requests = [];
   const fetchImpl = async (url) => {
     requests.push(url);
-    if (url.includes("api.cloudflare.com")) return ok({ subdomain: "example" });
+    if (url.includes("api.cloudflare.com"))
+      return ok({ subdomain: { url: "https://apps-json.example.workers.dev" } });
     const path = new URL(url).pathname;
     return new Response(assets.get(path).bytes, {
       headers: {
@@ -206,6 +207,10 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
     "https://apps-json.example.workers.dev",
   );
   assert.equal(requests.length, 3);
+  assert.equal(
+    requests[0],
+    "https://api.cloudflare.com/client/v4/accounts/account/workers/workers/apps-json",
+  );
   await assert.rejects(
     verifyPublishedCatalogs(root, {
       accountId: "account",
@@ -213,7 +218,7 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
       attempts: 1,
       fetchImpl: async (url) =>
         url.includes("api.cloudflare.com")
-          ? ok({ subdomain: "example" })
+          ? ok({ subdomain: { url: "https://apps-json.example.workers.dev" } })
           : new Response("{}", {
               headers: { "content-type": "application/json" },
             }),
@@ -227,7 +232,7 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
       attempts: 1,
       fetchImpl: async (url) =>
         url.includes("api.cloudflare.com")
-          ? ok({ subdomain: "example" })
+          ? ok({ subdomain: { url: "https://apps-json.example.workers.dev" } })
           : new Response(assets.get(new URL(url).pathname).bytes, {
               headers: { "content-type": "application/json" },
             }),

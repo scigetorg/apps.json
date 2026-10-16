@@ -172,14 +172,14 @@ export async function verifyPublishedCatalogs(
     delayMs = 1000,
   },
 ) {
-  const accountPath = `/accounts/${encodeURIComponent(accountId)}/workers`;
-  const account = await apiRequest(fetchImpl, `${accountPath}/subdomain`, {
+  const workerPath = `/accounts/${encodeURIComponent(accountId)}/workers/workers/${workerName}`;
+  const worker = await apiRequest(fetchImpl, workerPath, {
     method: "GET",
     token: apiToken,
   });
-  if (!account?.subdomain)
-    throw new Error("Cloudflare account has no workers.dev subdomain");
-  const baseUrl = `https://${workerName}.${account.subdomain}.workers.dev`;
+  const baseUrl = worker?.subdomain?.url;
+  if (!baseUrl)
+    throw new Error(`Cloudflare Worker ${workerName} has no workers.dev URL`);
   for (const [path, asset] of await catalogAssets(root)) {
     let failure;
     for (let attempt = 0; attempt < attempts; attempt++) {
