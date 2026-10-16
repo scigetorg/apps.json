@@ -61,9 +61,10 @@ test("generates isolated catalogs for two configured domains", async () => {
   assert.equal((await readFile(join(root, "microscopy", "logs.txt"), "utf8")),
     "demo_1.0_20260922 categories:microscopy,\n");
   assert.equal(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8")).source_commit.length, 40);
+  assert.deepEqual(JSON.parse(await readFile(join(root, "microscopy", "retired-images.json"), "utf8")), { images: [] });
   assert.deepEqual(outputPaths(domains), [
-    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json",
-    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json",
+    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json", "microscopy/retired-images.json",
+    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json", "neuroimaging/retired-images.json",
   ]);
 });
 

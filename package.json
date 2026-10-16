@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "consolidate": "node scripts/workflow.mjs run",
-    "test": "node test/catalog.test.mjs && node test/workflow.test.mjs"
+    "publish:cloudflare": "node scripts/cloudflare.mjs",
+    "test": "node test/catalog.test.mjs && node test/workflow.test.mjs && node test/retire.test.mjs && node test/cloudflare.test.mjs"
   },
   "dependencies": {
     "yaml": "^2.8.1"

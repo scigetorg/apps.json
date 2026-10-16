@@ -4,6 +4,7 @@ import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const IMAGE = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
+const IMAGE_BUILD = /^[A-Za-z0-9][A-Za-z0-9._+-]*_\d{8}$/;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function jsonText(value) {
@@ -58,6 +59,37 @@ function imageKey(tool, release, app) {
   return image;
 }
 
+export function imageBuild(tool, release, app) {
+  return `${imageKey(tool, release, app)}_${app.version}`;
+}
+
+export async function readRetiredImages(root) {
+  let document;
+  try {
+    document = JSON.parse(await readFile(join(root, "retired-images.json"), "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return new Set();
+    throw error;
+  }
+  if (!document || typeof document !== "object" || Array.isArray(document) ||
+      Object.keys(document).length !== 1 || !Array.isArray(document.images)) {
+    throw new Error("retired-images.json must contain only an images array");
+  }
+  const images = new Set();
+  for (const id of document.images) {
+    if (typeof id !== "string" || !IMAGE_BUILD.test(id) || images.has(id) ||
+        !validBuildDate(id.slice(-8))) {
+      throw new Error(`Invalid or duplicate retired image: ${id}`);
+    }
+    images.add(id);
+  }
+  return images;
+}
+
+export function retiredImagesText(images) {
+  return jsonText({ images: [...images].sort() });
+}
+
 function validBuildDate(value) {
   if (typeof value !== "string" || !/^\d{8}$/.test(value)) return false;
   const year = Number(value.slice(0, 4));
@@ -71,7 +103,7 @@ function validBuildDate(value) {
   );
 }
 
-export function buildCatalog(releases, previous) {
+export function buildCatalog(releases, previous, retiredImages = new Set()) {
   if (!releases.length) throw new Error("No releases to consolidate");
   const catalog = {};
   for (const { path, data } of [...releases].sort((a, b) =>
@@ -106,14 +138,14 @@ export function buildCatalog(releases, previous) {
       ) {
         throw new Error(`Invalid app ${name} in ${path}`);
       }
-      imageKey(tool, release, app);
+      const retired = retiredImages.has(imageBuild(tool, release, app));
       const prior = old.apps?.[name] ?? {};
       const combined = { ...app };
       for (const flag of ["show_in_menu", "show_in_applist"]) {
         const value = prior[flag] ?? app[flag] ?? old[flag] ?? true;
         if (typeof value !== "boolean")
           throw new Error(`${flag} must be boolean for ${name}`);
-        combined[flag] = value;
+        combined[flag] = retired ? false : value;
       }
       for (const field of ["doi", "license"]) {
         if (combined[field] === undefined && prior[field] !== undefined)
@@ -135,24 +167,23 @@ export function buildCatalog(releases, previous) {
   );
 }
 
-export async function makeFiles(catalog, sourceCommit, releases) {
+export async function makeFiles(catalog, sourceCommit, releases, retiredImages = new Set()) {
   const rows = new Map();
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
     for (const app of Object.values(data.apps)) {
-      const image = imageKey(tool, release, app);
-      const application = `${image}_${app.version}`;
+      const application = imageBuild(tool, release, app);
+      if (retiredImages.has(application)) continue;
       rows.set(
         application,
         `${application} categories:${catalog[tool].categories.join(",")},`,
       );
     }
   }
-  if (!rows.size) throw new Error("Catalog has no container images");
-  const logs = `${[...rows]
+  const logs = rows.size ? `${[...rows]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([, row]) => row)
-    .join("\n")}\n`;
+    .join("\n")}\n` : "";
   const sha256 = createHash("sha256").update(logs).digest("hex");
   return {
     "apps.json": jsonText(catalog),
@@ -288,11 +319,12 @@ export async function consolidate({
   doiDelayMs = 2100,
   zenodoToken = process.env.ZENODO_TOKEN,
 }) {
-  const [previous, releases] = await Promise.all([
+  const [previous, releases, retiredImages] = await Promise.all([
     readPreviousCatalog(root),
     readReleases(sourceRoot),
+    readRetiredImages(root),
   ]);
-  const base = buildCatalog(releases, previous);
+  const base = buildCatalog(releases, previous, retiredImages);
   const [dois, licenses] = await Promise.all([
     collectDoiMetadata(base, releases, {
       delayMs: doiDelayMs,
@@ -304,7 +336,9 @@ export async function consolidate({
     applyMetadata(base, dois, licenses),
     sourceCommit,
     releases,
+    retiredImages,
   );
+  files["retired-images.json"] = retiredImagesText(retiredImages);
   await mkdir(root, { recursive: true });
   for (const [name, content] of Object.entries(files)) {
     const destination = join(root, name);
