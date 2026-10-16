@@ -230,6 +230,26 @@
                 "license": [
                     "GPL-3.0"
                 ]
+            },
+            "afni 26.3.04": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "sumaGUI-afni 26.3.04": {
+                "version": "20261015",
+                "exec": "suma",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
             }
         },
         "categories": [
@@ -3774,7 +3794,23 @@
     "fetalsynthseg": {
         "apps": {
             "fetalsynthseg 1.0.0": {
-                "version": "20260722",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "fetal imaging",
+            "image segmentation",
+            "machine learning"
+        ]
+    },
+    "fetalsynthseg_arm64": {
+        "apps": {
+            "fetalsynthseg_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -5436,6 +5472,16 @@
     },
     "lesymap": {
         "apps": {
+            "lesymap 0.0.0.9221": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "lesymap 0.0.0.9222": {
                 "version": "20250730",
                 "exec": "",
@@ -7100,8 +7146,9 @@
     "networkcorrespondancetoolkit": {
         "apps": {
             "networkcorrespondancetoolkit 0.3.3": {
-                "version": "20250826",
+                "version": "20261014",
                 "exec": "",
+                "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.338733",
@@ -7111,7 +7158,8 @@
             }
         },
         "categories": [
-            "functional imaging"
+            "image registration",
+            "data organisation"
         ]
     },
     "neurocommand": {
@@ -9947,7 +9995,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261014",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10212,7 +10260,7 @@
                 ]
             },
             "topofit 0.6.0": {
-                "version": "20261010",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10571,6 +10619,17 @@
         "apps": {
             "whitematterlesions 0.2.20261009": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0",
+                    "CC-BY-4.0"
+                ]
+            },
+            "whitematterlesions 0.3.20261015": {
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
