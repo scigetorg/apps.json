@@ -1190,6 +1190,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "bidsmanager 1.5.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -1231,6 +1241,16 @@
             },
             "bidsmanager_arm64 1.4.1": {
                 "version": "20260927",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "bidsmanager_arm64 1.5.0": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1614,6 +1634,16 @@
                     "Apache-2.0"
                 ]
             },
+            "brainles-preprocessing 0.6.14": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "brainles-preprocessing 0.8.0": {
                 "version": "20260916",
                 "exec": "",
@@ -1643,7 +1673,7 @@
                 ]
             },
             "brainlesion 1.1.0": {
-                "version": "20260916",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2329,7 +2359,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2343,7 +2373,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3594,6 +3624,16 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "enigma-pd-wml 1.2.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -3980,6 +4020,16 @@
                 "license": [
                     "Apache-2.0"
                 ]
+            },
+            "fmriprep 25.2.7": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
             }
         },
         "categories": [
@@ -3998,6 +4048,20 @@
             },
             "freeviewGUI-freesurfer 5.3.0": {
                 "version": "20260818",
+                "exec": "freeview",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "freesurfer 6.0.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "freeviewGUI-freesurfer 6.0.0": {
+                "version": "20261016",
                 "exec": "freeview",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4098,28 +4162,6 @@
         "categories": [
             "image segmentation",
             "structural imaging"
-        ]
-    },
-    "freesurfer6": {
-        "apps": {
-            "freesurfer6 6.0.0": {
-                "version": "20261016",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            },
-            "Freeview (FreeSurfer 6)-freesurfer6 6.0.0": {
-                "version": "20261016",
-                "exec": "freeview",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            }
-        },
-        "categories": [
-            "structural imaging",
-            "image segmentation"
         ]
     },
     "frisgo": {
@@ -5201,6 +5243,36 @@
                     "MIT"
                 ]
             },
+            "julia 1.13.2": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "vscodeGUI-julia 1.13.2": {
+                "version": "20261016",
+                "exec": "code",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "REPLGUI-julia 1.13.2": {
+                "version": "20261016",
+                "exec": "julia",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": "",
@@ -5270,6 +5342,36 @@
             },
             "REPLGUI-julia_arm64 1.13.1": {
                 "version": "20261012",
+                "exec": "julia",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "julia_arm64 1.13.2": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "vscodeGUI-julia_arm64 1.13.2": {
+                "version": "20261016",
+                "exec": "code",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "REPLGUI-julia_arm64 1.13.2": {
+                "version": "20261016",
                 "exec": "julia",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6351,7 +6453,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6368,7 +6470,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7635,7 +7737,7 @@
                 ]
             },
             "openmsk 0.2.0": {
-                "version": "20261004",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8157,6 +8259,16 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "qsiprep 26.1.0": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -8270,7 +8382,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8845,7 +8957,7 @@
                 ]
             },
             "relion 5.1.1": {
-                "version": "20261012",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9089,6 +9201,26 @@
             },
             "rstudioGUI-rstudio 2026.09.0": {
                 "version": "20261009",
+                "exec": "rstudio",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "AGPL-3.0"
+                ]
+            },
+            "rstudio 2026.10.0": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "AGPL-3.0"
+                ]
+            },
+            "rstudioGUI-rstudio 2026.10.0": {
+                "version": "20261015",
                 "exec": "rstudio",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9732,6 +9864,16 @@
                 "license": [
                     "GPL-2.0-or-later"
                 ]
+            },
+            "spm25 26.10.01": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
             }
         },
         "categories": [
@@ -9937,7 +10079,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261015",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10312,6 +10454,16 @@
                 "license": [
                     "GPL-3.0"
                 ]
+            },
+            "vertexwiser 1.5.4": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
             }
         },
         "categories": [
@@ -10323,6 +10475,16 @@
         "apps": {
             "vertexwiser_arm64 1.5.1": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "vertexwiser_arm64 1.5.4": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10351,6 +10513,16 @@
             },
             "vesselboost 2.0.1": {
                 "version": "20260309",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "vesselboost 2.0.2": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10571,7 +10743,7 @@
                 ]
             },
             "whitematterlesions 0.3.20261015": {
-                "version": "20261015",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
