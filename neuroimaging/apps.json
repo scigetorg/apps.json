@@ -1635,7 +1635,7 @@
                 ]
             },
             "brainles-preprocessing 0.6.14": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1646,6 +1646,24 @@
             },
             "brainles-preprocessing 0.8.0": {
                 "version": "20260916",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging"
+        ]
+    },
+    "brainles-preprocessing_arm64": {
+        "apps": {
+            "brainles-preprocessing_arm64 0.6.14": {
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2082,6 +2100,26 @@
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.336051",
+                "license": [
+                    "GPL-2.0"
+                ]
+            },
+            "cat12 26.0.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0"
+                ]
+            },
+            "cat12GUI-cat12 26.0.0": {
+                "version": "20261016",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "GPL-2.0"
                 ]
@@ -2577,7 +2615,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261012",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -3250,6 +3288,16 @@
                     "MIT"
                 ]
             },
+            "dicompare 0.15.4": {
+                "version": "20261017",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -3280,6 +3328,16 @@
             },
             "dicompare_arm64 0.15.3": {
                 "version": "20261006",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "dicompare_arm64 0.15.4": {
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6070,7 +6128,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20261016",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6453,7 +6511,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261014",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6470,7 +6528,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261014",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6497,7 +6555,7 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6515,7 +6573,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6755,6 +6813,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "mritools 4.9.1": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -6765,6 +6833,16 @@
         "apps": {
             "mritools_arm64 4.9.0": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "mritools_arm64 4.9.1": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6955,7 +7033,7 @@
     "mrtrix3src": {
         "apps": {
             "mrtrix3src latest": {
-                "version": "20260527",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7275,7 +7353,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261012",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7306,7 +7384,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261012",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10428,12 +10506,39 @@
     },
     "tractseg": {
         "apps": {
+            "tractseg 2.10.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
             "tractseg 2.9": {
                 "version": "20250702",
                 "exec": "",
                 "show_in_menu": true,
                 "show_in_applist": true,
                 "doi": "https://doi.org/10.5072/zenodo.339245",
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "tractseg_arm64": {
+        "apps": {
+            "tractseg_arm64 2.10.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
                 "license": [
                     "Apache-2.0"
                 ]
@@ -10743,7 +10848,7 @@
                 ]
             },
             "whitematterlesions 0.3.20261015": {
-                "version": "20261016",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
