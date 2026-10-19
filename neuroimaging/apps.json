@@ -2615,7 +2615,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261017",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7353,7 +7353,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261016",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7384,7 +7384,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261016",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7614,6 +7614,16 @@
                 "license": [
                     "BSD-2-Clause"
                 ]
+            },
+            "niimath 1.0.20261016": {
+                "version": "20261018",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-2-Clause"
+                ]
             }
         },
         "categories": [
@@ -7634,6 +7644,16 @@
             },
             "niimath_arm64 1.0.20260924": {
                 "version": "20261004",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-2-Clause"
+                ]
+            },
+            "niimath_arm64 1.0.20261016": {
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8347,6 +8367,16 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "qsiprep 26.1.1": {
+                "version": "20261018",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -8460,7 +8490,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261017",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9035,7 +9065,7 @@
                 ]
             },
             "relion 5.1.1": {
-                "version": "20261015",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
