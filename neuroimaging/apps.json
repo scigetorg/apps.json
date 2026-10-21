@@ -1,32 +1,4 @@
 {
-    "acsrss": {
-        "apps": {
-            "acsrss 0.1.1": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            },
-            "acsrss 0.1.2": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            },
-            "acsrss 0.1.4": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": [],
-                "show_in_menu": true,
-                "show_in_applist": true
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "afni": {
         "apps": {
             "afni 21.2.00": {
@@ -8335,6 +8307,13 @@
         "apps": {
             "prostatefiducialseg 8.0.1": {
                 "version": "20261020",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "prostatefiducialseg 8.0.2": {
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
