@@ -3731,6 +3731,26 @@
             "structural imaging"
         ]
     },
+    "ep3d": {
+        "apps": {
+            "ep3d 1.0.0": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "GPL-3.0-only"
+                ]
+            }
+        },
+        "categories": [
+            "image reconstruction",
+            "phase processing"
+        ]
+    },
     "epirecon": {
         "apps": {
             "epirecon 0.0.4": {
@@ -8311,6 +8331,21 @@
             "quality control"
         ]
     },
+    "prostatefiducialseg": {
+        "apps": {
+            "prostatefiducialseg 8.0.1": {
+                "version": "20261020",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "body"
+        ]
+    },
     "pydeface": {
         "apps": {
             "pydeface 2.0.2": {
@@ -8582,7 +8617,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261018",
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
