@@ -8318,6 +8318,13 @@
                 "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true
+            },
+            "prostatefiducialseg 8.0.3": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
