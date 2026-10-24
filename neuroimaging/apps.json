@@ -1162,6 +1162,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "bidsmanager 1.5.1": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -1213,6 +1223,16 @@
             },
             "bidsmanager_arm64 1.5.0": {
                 "version": "20261016",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "bidsmanager_arm64 1.5.1": {
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -1470,6 +1490,26 @@
             },
             "blenderGUI-blender 5.2.2": {
                 "version": "20260916",
+                "exec": "blender",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            },
+            "blender 5.2.3": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            },
+            "blenderGUI-blender 5.2.3": {
+                "version": "20261023",
                 "exec": "blender",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2086,6 +2126,26 @@
                     "GPL-2.0"
                 ]
             },
+            "cat12 26.0.1": {
+                "version": "20261022",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0"
+                ]
+            },
+            "cat12GUI-cat12 26.0.1": {
+                "version": "20261022",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-2.0"
+                ]
+            },
             "cat12 26.0.rc3": {
                 "version": "20260521",
                 "exec": "",
@@ -2359,7 +2419,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261016",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2373,7 +2433,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261016",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4719,7 +4779,7 @@
                 ]
             },
             "glmsingle 1.2.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4746,7 +4806,7 @@
     "glmsingle_arm64": {
         "apps": {
             "glmsingle_arm64 1.2.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -4803,6 +4863,20 @@
                 "apptainer_args": [],
                 "show_in_menu": true,
                 "show_in_applist": true
+            },
+            "globus 3.3.2": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "globusGUI-globus 3.3.2": {
+                "version": "20261023",
+                "exec": "globusconnectpersonal -gui",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
             }
         },
         "categories": [
@@ -4820,6 +4894,20 @@
             },
             "globusGUI-globus_arm64 3.3.1": {
                 "version": "20261013",
+                "exec": "globusconnectpersonal -gui",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "globus_arm64 3.3.2": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
+            "globusGUI-globus_arm64 3.3.2": {
+                "version": "20261023",
                 "exec": "globusconnectpersonal -gui",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6186,6 +6274,42 @@
             "workflows"
         ]
     },
+    "meica-rs": {
+        "apps": {
+            "meica-rs 0.1.20261021": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "LGPL-2.1-only"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "quality control"
+        ]
+    },
+    "meica-rs_arm64": {
+        "apps": {
+            "meica-rs_arm64 0.1.20261021": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "LGPL-2.1-only"
+                ]
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "quality control"
+        ]
+    },
     "metabody": {
         "apps": {
             "metabody 1.0.3": {
@@ -6552,7 +6676,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261017",
+                "version": "20261022",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6569,7 +6693,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261017",
+                "version": "20261022",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7329,6 +7453,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "networkcorrespondancetoolkit 0.4.1": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -7394,7 +7528,7 @@
                 ]
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -7425,7 +7559,7 @@
     "neurodesktop-lite_arm64": {
         "apps": {
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8310,7 +8444,7 @@
                 "show_in_applist": true
             },
             "prostatefiducialseg 8.0.3": {
-                "version": "20261021",
+                "version": "20261023",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -9311,6 +9445,16 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "rshrf 1.8.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -9322,6 +9466,16 @@
         "apps": {
             "rshrf_arm64 1.7.0": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "MIT"
+                ]
+            },
+            "rshrf_arm64 1.8.0": {
+                "version": "20261023",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -11051,6 +11205,17 @@
                     "Apache-2.0",
                     "CC-BY-4.0"
                 ]
+            },
+            "whitematterlesions 0.5.20261022": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "Apache-2.0",
+                    "CC-BY-4.0"
+                ]
             }
         },
         "categories": [
@@ -11105,6 +11270,16 @@
                 "license": [
                     "BSD-3-Clause"
                 ]
+            },
+            "xcpd 26.2.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "BSD-3-Clause"
+                ]
             }
         },
         "categories": [
@@ -11133,6 +11308,13 @@
     },
     "xnat": {
         "apps": {
+            "xnat 1.10.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
             "xnat 1.9.2.1": {
                 "version": "20261014",
                 "exec": "",
@@ -11148,6 +11330,13 @@
     },
     "xnat_arm64": {
         "apps": {
+            "xnat_arm64 1.10.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true
+            },
             "xnat_arm64 1.9.2.1": {
                 "version": "20261014",
                 "exec": "",
