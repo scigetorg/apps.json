@@ -222,6 +222,26 @@
                 "license": [
                     "GPL-3.0"
                 ]
+            },
+            "afni 26.3.05": {
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
+            },
+            "sumaGUI-afni 26.3.05": {
+                "version": "20261024",
+                "exec": "suma",
+                "apptainer_args": [],
+                "show_in_menu": true,
+                "show_in_applist": true,
+                "license": [
+                    "GPL-3.0"
+                ]
             }
         },
         "categories": [
@@ -2419,7 +2439,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261020",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -2433,7 +2453,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261020",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6676,7 +6696,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261022",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6693,7 +6713,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261022",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -8727,7 +8747,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261021",
+                "version": "20261023",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
