@@ -6360,7 +6360,7 @@
     "meica-rs": {
         "apps": {
             "meica-rs 0.1.20261021": {
-                "version": "20261023",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -6378,7 +6378,7 @@
     "meica-rs_arm64": {
         "apps": {
             "meica-rs_arm64 0.1.20261021": {
-                "version": "20261023",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10521,7 +10521,7 @@
                 ]
             },
             "surfice 1.0.20211006": {
-                "version": "20261011",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": [],
                 "show_in_menu": true,
@@ -10531,7 +10531,7 @@
                 ]
             },
             "surficeGUI-surfice 1.0.20211006": {
-                "version": "20261011",
+                "version": "20261027",
                 "exec": "surfice",
                 "apptainer_args": [],
                 "show_in_menu": true,
