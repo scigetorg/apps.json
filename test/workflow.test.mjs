@@ -3,98 +3,121 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import {
-  consolidateDomains,
-  outputPaths,
-  readDomains,
-} from "../scripts/workflow.mjs";
+import { consolidateDomains, outputPaths, readDomains, sourcePath } from "../scripts/workflow.mjs";
+import { readReleases, readSourceDomains } from "../scripts/catalog.mjs";
 
-const configs = {
-  neuroimaging: { source_repository: "NeuroDesk/neurocontainers" },
-  microscopy: { source_repository: "Example/microcontainers" },
+const repo = "Example/containers";
+const domains = {
+  neuroimaging: { source_repositories: [repo] },
+  microscopy: { source_repositories: [repo] },
 };
+const sha = "a".repeat(40);
 
 async function fixture() {
-  const root = await mkdtemp(join(tmpdir(), "neurodesk-domains-"));
-  await writeFile(join(root, "domains.json"), JSON.stringify({ domains: configs }));
-  for (const [id, build] of [["neuroimaging", "20260921"], ["microscopy", "20260922"]]) {
-    const source = join(root, ".catalog-sources", id);
-    await mkdir(join(source, "releases", "demo"), { recursive: true });
-    await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
-      apps: { "demo 1.0": { version: build, doi: `https://doi.org/10.123/${id}` } },
-      categories: [id],
-    }));
-  }
+  const root = await mkdtemp(join(tmpdir(), "catalog-workflow-"));
+  await writeFile(join(root, "domains.json"), JSON.stringify({ domains }));
+  const source = sourcePath(root, repo);
+  await mkdir(join(source, "releases", "demo"), { recursive: true });
+  await mkdir(join(source, "recipes", "demo"), { recursive: true });
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921", doi: "https://doi.org/10.123/demo" } },
+    categories: ["visualization"],
+  }));
+  await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [neuroimaging]\n");
   await mkdir(join(root, "neuroimaging"));
   await writeFile(join(root, "neuroimaging", "apps.json"), JSON.stringify({
-    demo: { apps: { "demo 1.0": { show_in_applist: false } } },
+    demo: { apps: { "demo 1.0": { doi: "https://doi.org/10.123/old", license: ["MIT"] } } },
   }));
-  return root;
+  return { root, source };
 }
 
-test("validates domain IDs and repositories", async () => {
-  const root = await fixture();
-  assert.deepEqual(await readDomains(root), configs);
-  await writeFile(join(root, "domains.json"), JSON.stringify({
-    domains: { "../escape": { source_repository: "Example/repo" } },
-  }));
-  await assert.rejects(readDomains(root), /Invalid domain ID/);
-  await writeFile(join(root, "domains.json"), JSON.stringify({
-    domains: { neuroimaging: { source_repository: "NeuroDesk/neurocontainers", dispatch_repository: "NeuroDesk/neurodesk.github.io" } },
-  }));
-  await assert.rejects(readDomains(root), /Unknown configuration field/);
-});
-
-test("generates isolated catalogs for two configured domains", async () => {
-  const root = await fixture();
-  const domains = await readDomains(root);
-  await consolidateDomains(root, domains, {
-    doiDelayMs: 0,
-    sourceCommits: { neuroimaging: "a".repeat(40), microscopy: "b".repeat(40) },
-  });
-  const neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
-  const micro = JSON.parse(await readFile(join(root, "microscopy", "apps.json"), "utf8"));
-  assert.equal(neuro.demo.apps["demo 1.0"].show_in_applist, false);
-  assert.equal(micro.demo.apps["demo 1.0"].show_in_applist, true);
-  assert.equal(neuro.demo.apps["demo 1.0"].version, "20260921");
-  assert.equal(micro.demo.apps["demo 1.0"].version, "20260922");
-  assert.equal((await readFile(join(root, "microscopy", "logs.txt"), "utf8")),
-    "demo_1.0_20260922 categories:microscopy,\n");
-  assert.equal(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8")).source_commit.length, 40);
-  assert.deepEqual(JSON.parse(await readFile(join(root, "microscopy", "retired-images.json"), "utf8")), { images: [] });
+test("validates source lists and generated paths", async () => {
+  const { root } = await fixture();
+  assert.deepEqual(await readDomains(root), domains);
   assert.deepEqual(outputPaths(domains), [
-    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json", "microscopy/retired-images.json",
-    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json", "neuroimaging/retired-images.json",
+    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json",
+    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json",
   ]);
+  await writeFile(join(root, "domains.json"), JSON.stringify({ domains: {
+    neuroimaging: { source_repositories: [repo, repo] },
+  } }));
+  await assert.rejects(readDomains(root), /Invalid source_repositories/);
 });
 
-test("passes ZENODO_TOKEN from the workflow to DOI requests", async () => {
-  const root = await fixture();
-  const path = join(root, ".catalog-sources", "neuroimaging", "releases", "demo", "1.0.json");
-  const release = JSON.parse(await readFile(path, "utf8"));
-  delete release.apps["demo 1.0"].doi;
-  await writeFile(path, JSON.stringify(release));
-  const previousToken = process.env.ZENODO_TOKEN;
-  const previousFetch = globalThis.fetch;
-  process.env.ZENODO_TOKEN = "test-token";
-  let requests = 0;
-  globalThis.fetch = async (_url, options) => {
-    requests++;
-    assert.equal(options.headers.Authorization, "Bearer test-token");
-    return { ok: true, json: async () => ({ hits: { hits: [{
-      id: 12, doi: "10.123/demo", metadata: { title: "demo_1.0_20260921" },
-    }] } }) };
+test("domain move routes every version and carries established license", async () => {
+  const { root, source } = await fixture();
+  await consolidateDomains(root, domains, { doiDelayMs: 0, sourceCommits: { [repo]: sha } });
+  let neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.deepEqual(neuro.demo.apps["demo 1.0"].license, ["MIT"]);
+  assert.equal(Object.hasOwn(neuro.demo.apps["demo 1.0"], "show_in_menu"), false);
+  await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [microscopy]\n");
+  await consolidateDomains(root, domains, { doiDelayMs: 0, sourceCommits: { [repo]: sha } });
+  neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  const micro = JSON.parse(await readFile(join(root, "microscopy", "apps.json"), "utf8"));
+  assert.deepEqual(neuro, {});
+  assert.deepEqual(micro.demo.apps["demo 1.0"].license, ["MIT"]);
+  assert.equal((await readFile(join(root, "neuroimaging", "logs.txt"), "utf8")), "");
+  assert.equal((await readFile(join(root, "microscopy", "logs.txt"), "utf8")),
+    "demo_1.0_20260921 categories:visualization,\n");
+  assert.deepEqual(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8"))
+    .source_commits, { [repo]: sha });
+});
+
+test("catalog generation can run before DOI publication", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921" } }, categories: ["visualization"],
+  }));
+  await writeFile(join(root, "neuroimaging", "apps.json"), "{}\n");
+
+  await consolidateDomains(root, domains, {
+    doiDelayMs: 0, sourceCommits: { [repo]: sha },
+  });
+
+  const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.equal(Object.hasOwn(catalog.demo.apps["demo 1.0"], "doi"), false);
+});
+
+test("a source missing from its declared domain fails", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [microscopy]\n");
+  await assert.rejects(readSourceDomains(source, await readReleases(source), {
+    neuroimaging: { source_repositories: [repo] },
+    microscopy: { source_repositories: ["Other/repo"] },
+  }, repo), /does not list/);
+});
+
+test("two repositories publishing the same app fail with both source names", async () => {
+  const { root } = await fixture();
+  const second = "Other/containers";
+  const source = sourcePath(root, second);
+  await mkdir(join(source, "releases", "demo"), { recursive: true });
+  await mkdir(join(source, "recipes", "demo"), { recursive: true });
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921" } }, categories: ["visualization"],
+  }));
+  await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [neuroimaging]\n");
+  const configured = { neuroimaging: { source_repositories: [repo, second] } };
+  await assert.rejects(consolidateDomains(root, configured, {
+    sourceCommits: { [repo]: sha, [second]: "b".repeat(40) }, doiDelayMs: 0,
+  }), /Duplicate app.*Example\/containers.*Other\/containers/);
+});
+
+test("duplicate app identity across separate domains fails", async () => {
+  const { root } = await fixture();
+  const second = "Other/containers";
+  const source = sourcePath(root, second);
+  await mkdir(join(source, "releases", "demo"), { recursive: true });
+  await mkdir(join(source, "recipes", "demo"), { recursive: true });
+  await writeFile(join(source, "releases", "demo", "2.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20261010" } }, categories: ["visualization"],
+  }));
+  await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [microscopy]\n");
+  const configured = {
+    neuroimaging: { source_repositories: [repo] },
+    microscopy: { source_repositories: [second] },
   };
-  try {
-    await consolidateDomains(root, { neuroimaging: configs.neuroimaging }, {
-      doiDelayMs: 0, sourceCommits: { neuroimaging: "a".repeat(40) },
-    });
-    const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
-    assert.equal(catalog.demo.apps["demo 1.0"].doi, "https://doi.org/10.123/demo");
-    assert.equal(requests, 1);
-  } finally {
-    globalThis.fetch = previousFetch;
-    if (previousToken === undefined) delete process.env.ZENODO_TOKEN;
-    else process.env.ZENODO_TOKEN = previousToken;
-  }
+  await assert.rejects(consolidateDomains(root, configured, {
+    sourceCommits: { [repo]: sha, [second]: "b".repeat(40) }, doiDelayMs: 0,
+  }), /Duplicate app.*Example\/containers.*Other\/containers/);
 });

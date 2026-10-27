@@ -1,0 +1,101 @@
+name: Publish apps catalog DOIs
+
+on:
+  schedule:
+    - cron: '25 4 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: apps-catalog
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      batches: ${{ steps.plan.outputs.batches }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests 'pyyaml>=6.0.2'
+      - name: Test DOI publication logic
+        run: python -m unittest discover -s test -p 'test_*.py'
+      - name: Plan missing Zenodo depositions
+        id: plan
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+          MAX_PUBLICATIONS: ${{ vars.ZENODO_MAX_PUBLICATIONS || '16' }}
+        run: |
+          test -n "$ZENODO_TOKEN" || { echo 'ZENODO_TOKEN is required' >&2; exit 1; }
+          batches="$(python -m scripts.zenodo_catalog plan \
+            --catalog-root . --max-artifacts "$MAX_PUBLICATIONS")"
+          echo "batches=$batches" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        artifacts: ${{ fromJSON(needs.plan.outputs.batches) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests 'pyyaml>=6.0.2'
+      - name: Publish missing DOI records for this batch
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ARTIFACTS_JSON: ${{ toJSON(matrix.artifacts) }}
+        run: |
+          python -m scripts.zenodo_catalog publish \
+            --catalog-root . --artifacts-json "$ARTIFACTS_JSON"
+
+  finalize:
+    needs: [plan, publish]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests 'pyyaml>=6.0.2'
+      - name: Add published DOIs to all launchers
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+        run: python -m scripts.zenodo_catalog enrich --catalog-root .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.0.0'
+          cache: npm
+      - run: npm ci
+      - name: Publish enriched catalogs to Cloudflare
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
+        run: npm run publish:cloudflare
+      - name: Commit DOI enriched catalogs
+        run: |
+          git add -- */apps.json
+          if git diff --cached --quiet; then
+            echo 'No DOI changes to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Add published DOI metadata to domain apps catalogs'
+          git push origin HEAD:main
