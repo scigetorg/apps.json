@@ -16,8 +16,8 @@ async function fixture() {
     join(root, "domains.json"),
     JSON.stringify({
       domains: {
-        neuroimaging: { source_repository: "NeuroDesk/neurocontainers" },
-        microscopy: { source_repository: "Example/microcontainers" },
+        neuroimaging: { source_repositories: ["NeuroDesk/neurocontainers"] },
+        microscopy: { source_repositories: ["Example/microcontainers"] },
       },
     }),
   );

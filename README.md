@@ -2,11 +2,9 @@
 
 This directory is the root of the future public `Neurodesk/apps.json` GitHub
 repository. The active domain is `neuroimaging`, sourced from
-`Neurodesk/neurocontainers`. The seed `neuroimaging/apps.json` has per-app
-`show_in_menu` and `show_in_applist` flags set by a **one-time comparison**
-with the historical `cvmfs/applist.json`: an exact `<image>_<builddate>` match
-set both flags to `true`; absence set both to `false`. That historical list is
-not part of this repository or the scheduled workflow.
+`Neurodesk/neurocontainers`. Catalogs and inventories are generated from
+configured source repositories; edit their recipe metadata and release files,
+not generated `apps.json` files.
 
 ## Naming and layout
 
@@ -16,44 +14,54 @@ hyphens, beginning with a letter. Examples are `neuroimaging` and
 Keep it stable when a containers repository is renamed. Tool and app names
 remain scoped inside each domain's `apps.json`.
 
-`domains.json` maps each ID to its `source_repository` in `owner/repository`
-form. The workflow reads this map; it does not derive a repository name from
-a domain ID.
+`domains.json` maps each ID to a nonempty `source_repositories` list in
+`owner/repository` form. It is the allowed domain list. A source recipe declares
+`domains: [neuroimaging]` in `recipes/<recipe>/build.yaml`; retired recipes
+declare domains in `workflows/retired_recipes.yaml`. Every release must resolve
+to one of those declarations. The source must be listed for every domain it
+declares.
 
 ```text
 domains.json
-neuroimaging/apps.json       # seeded visibility; updated by workflow
+neuroimaging/apps.json       # generated catalog
 neuroimaging/logs.txt        # generated CVMFS inventory
-neuroimaging/manifest.json   # generated log checksum and source commit
-neuroimaging/retired-images.json # persistent CVMFS retirement IDs
+neuroimaging/manifest.json   # generated log checksum and source commits
 microscopy/apps.json         # generated after its source is configured
 microscopy/logs.txt          # generated
 microscopy/manifest.json     # generated
 ```
 
-Microscopy is an example only. Its containers repository has not been created,
-so it is not in `domains.json` and cannot interrupt the daily neuroimaging run.
-To add it later, create the source repository with `releases/*/*.json` and add
-a `microscopy` entry to `domains.json`. The workflow creates the directory
-and files on its first run.
+Microscopy is an example only. To add it later, list the source repositories
+under `microscopy` in `domains.json` before recipes declare that domain. An
+empty configured domain publishes an empty catalog and inventory until its
+first app arrives.
 
 ## Consolidation rules
 
-Each domain's `apps.json` is consolidated from its containers repository's
-release JSON. For matching app names, the existing `show_in_menu` and
-`show_in_applist` values in `apps.json` are retained independently. New apps
-use flags supplied by release JSON, or default to `true` if none are supplied.
-Edit `apps.json` to change visibility after the initial seed. Existing DOI
-and license values are retained when release JSON does not supply them.
+Each domain's `apps.json` contains releases from configured repositories whose
+current recipe or retirement metadata names that domain. All versions move
+together when a declaration changes. A recipe may name multiple domains. The
+generated catalog omits the `domains` field because its path identifies the
+domain. Duplicate app or image identities across repositories fail generation.
+Each generated app carries the exact `image` name of its SIF, including GUI
+launchers whose release has no primary app entry.
+`show_in_menu` and `show_in_applist` appear only when release JSON explicitly
+supplies them, at the app or release level. Existing DOI and license values
+follow an app across domain moves when release metadata cannot supply them.
 
-`logs.txt` contains every non-retired release image and build, including hidden and
-GUI-only releases. `retired-images.json` lists exact `<image>_<builddate>` IDs
-that must remain absent from the CVMFS inventory. Every catalog app backed by
-a retired ID has both visibility flags forced to `false` on each rebuild.
-The release JSON and the app entry remain available. `manifest.json` records the log's SHA-256, entry count,
-and source commit. DOI lookups by exact image and build title use the Zenodo
-Records API with a bearer token and run alongside local recipe license
-extraction. Historical releases should state their license
+`logs.txt` contains every release image and build in the domain, including
+GUI-only releases. Deleting a release JSON retires that version from the next
+catalog and log while retaining other versions. `manifest.json` records the
+log's SHA-256, image count, and source commits. The catalog workflow builds
+domain catalogs and extracts licenses from current recipes. A separate DOI
+workflow publishes missing SIF records to production Zenodo and adds their DOIs
+to every launcher for the image. Before publication it validates the license
+against Zenodo's live license catalog and checks the recipe at the image's
+OCI build revision. It fails if `apps.json` licenses differ from that recipe.
+The DOI description records every declared license and the build recipe revision.
+A weekly read-only audit compares published Zenodo licenses and catalog licenses
+with those same build-time recipes, and uploads a JSON report. A Zenodo failure
+does not block catalog updates. Historical releases should state their license
 when it differs from the current recipe.
 
 ## Enable the schedule
@@ -62,59 +70,42 @@ when it differs from the current recipe.
    place the **contents** of this directory at its root, including
    `.github/workflows/` and `neuroimaging/apps.json`. For a local checkout,
    use `cp -a catalog/apps-json-repo/. /path/to/apps.json/`.
-2. Create a Zenodo access token for `zenodo.org` and save it as the
-   `ZENODO_TOKEN` Actions secret in `Neurodesk/apps.json`. The workflow uses
-   it only for DOI lookup requests. A sandbox Zenodo token is separate and will
-   not work for production Zenodo.
+2. Create a production `zenodo.org` access token with `deposit:write` and
+   `deposit:actions` scopes, and save it as the `ZENODO_TOKEN` Actions secret in
+   `Neurodesk/apps.json`. The workflow uses it to list and publish depositions.
+   A sandbox Zenodo token is separate and will not work for production Zenodo.
+   By default, at most 16 missing SIFs are published per run, newest first;
+   set the `ZENODO_MAX_PUBLICATIONS` repository variable to change that limit.
 3. Update the website's app catalog source to
    `https://apps-json.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`
    after configuring the Cloudflare publishing described below.
    Website consumers should read the catalog directly and use
    `show_in_applist` to select visible entries. The catalog workflow sends
    no dispatch event and needs no website token.
-4. Run **Consolidate apps catalog** manually, then check the files under
-   `neuroimaging/`, website consumption, and CVMFS log retrieval before
+4. Run **Consolidate apps catalog**, then **Publish apps catalog DOIs** manually.
+   Check the files under `neuroimaging/`, website consumption, and CVMFS log
+   retrieval before
    archiving `neurocommand` or disabling its old queue.
 
-The workflow runs daily at 02:25 UTC and commits generated files using its
-repository `GITHUB_TOKEN`. GitHub may disable scheduled workflows in public
+The catalog workflow runs daily at 02:25 UTC; DOI publication runs at 04:25 UTC.
+The DOI license audit runs Sundays at 05:00 UTC.
+Both commit generated files using the repository `GITHUB_TOKEN`. GitHub may
+disable scheduled workflows in public
 repositories after a long period without activity; check that the schedule
 remains enabled.
 
-## Retire an image from CVMFS
+## Retire an image
 
-Run the manual command on the CVMFS Stratum 0 server after the catalog
-repository and the updated `neurocommand` sync code have been deployed. The
-server needs Node.js 24, npm, Git, `flock`, and an SSH key with write access to
-`NeuroDesk/apps.json`. Configure `CATALOG_REMOTE` if the catalog has a
-different Git remote. The sync checkout must be at `$HOME/neurocommand`.
-The server's existing CVMFS and catalog download credentials must also work.
-
-```bash
-bash scripts/retire-on-stratum0.sh neuroimaging afni_21.2.00_20210714
-```
-
-Run this script from a checkout of this repository. It clones the latest
-catalog and the exact source commit recorded in the domain manifest, shows
-every affected app, then commits the retirement ID, hidden flags, log, and
-manifest to GitHub. If another commit lands first, it retries from current
-`main`. It waits until GitHub serves the validated new log before invoking
-the CVMFS sync. The sync uses an atomic lock shared with cron, removes the
-retired `.simg` payload, and disables its command wrappers. The command checks
-that the payload is gone; rerunning it is safe. It does not delete either GHCR
-copy or any release JSON.
-
-A normal push of changed catalog files triggers **Publish updated apps
-catalog** to update Cloudflare. The daily consolidation still publishes from
-its own workflow because a commit made with [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token) does not start a
-push workflow. The Stratum 0 sync currently manages only `neuroimaging`.
-Before the first retirement, run the consolidation workflow so
-the domain has a `logs.txt` and `manifest.json` in GitHub.
+Delete its versioned release JSON in the source repository. After the daily
+catalog run publishes the new domain logs, the CVMFS sync can remove the image
+if no domain still references it. The object-store cleaner applies its retention
+period after the image is absent from all published inventories and source
+release files. Published Docker registry cleanup is a separate task.
 
 ## Publish on Cloudflare Workers
 
 The workflow publishes every configured domain as a Worker static asset at
-`/<domain>/apps.json` after committing the generated catalogs. The GitHub
+`/<domain>/apps.json` and commits the generated catalogs. The GitHub
 repository remains the source of truth. Cloudflare serves the latest deployed
 catalog.
 
@@ -138,12 +129,13 @@ public Worker.
 
 ## Local checks
 
-Use Node.js 24.0.0, then run `npm ci` and `npm test`. For a local consolidation
-of all configured domains, set `ZENODO_TOKEN` in your environment and run:
+Use Node.js 24.0.0, then run `npm ci` and `npm test`. The DOI helper tests use
+Python with `requests`: `python -m unittest discover -s test -p test_zenodo_catalog.py`.
+For a local consolidation of all configured domains, run:
 
 ```bash
 node scripts/workflow.mjs checkout
 npm run consolidate
 ```
 
-The clone step writes to ignored `.catalog-sources/<domain>/` directories.
+The clone step writes to ignored `.catalog-sources/<repository>/` directories.
