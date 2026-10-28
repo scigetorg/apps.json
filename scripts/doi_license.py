@@ -82,9 +82,13 @@ def fetch_catalogue():
     while True:
         response = _get_with_retry(CATALOGUE_URL, params={"page": page, "size": 100})
         payload = response.json()
+        print(f"Fetched Zenodo license catalogue page {page} with {len(payload.get('hits', []))} entries: {response.url}")
         if isinstance(payload, dict):
             raw_hits = payload.get("hits")
             total = payload.get("total")
+            if isinstance(raw_hits, dict):
+                total = raw_hits.get("total")
+                raw_hits = raw_hits.get("hits")
             if isinstance(total, dict):
                 total = total.get("value")
         else:
