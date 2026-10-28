@@ -8,7 +8,7 @@ import { consolidate, imageBuild, readReleases, readSourceDomains, readPreviousC
 const exec = promisify(execFile);
 const DOMAIN_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const REPOSITORY = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-const GENERATED = ["apps.json", "logs.txt", "manifest.json"];
+const GENERATED = ["apps.json", "manifest.json"];
 export const sourcePath = (root, repository) =>
   join(root, ".catalog-sources", encodeURIComponent(repository));
 

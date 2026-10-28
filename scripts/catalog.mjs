@@ -1,5 +1,4 @@
 import YAML from "yaml";
-import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -194,7 +193,6 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
 }
 
 export async function makeFiles(catalog, sourceCommits, releases) {
-  const rows = new Map();
   const imageOwners = new Map();
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
@@ -204,17 +202,8 @@ export async function makeFiles(catalog, sourceCommits, releases) {
       if (priorOwner && priorOwner !== data.repository)
         throw new Error(`Duplicate image ${application} from ${priorOwner} and ${data.repository}`);
       imageOwners.set(application, data.repository);
-      rows.set(
-        application,
-        `${application} categories:${catalog[tool].categories.join(",")},`,
-      );
     }
   }
-  const logs = rows.size ? `${[...rows]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, row]) => row)
-    .join("\n")}\n` : "";
-  const sha256 = createHash("sha256").update(logs).digest("hex");
   const appSources = {};
   for (const { path, data } of releases) {
     const tool = path.split("/")[1];
@@ -225,10 +214,8 @@ export async function makeFiles(catalog, sourceCommits, releases) {
   }
   return {
     "apps.json": jsonText(catalog),
-    "logs.txt": logs,
     "manifest.json": jsonText({
-      sha256,
-      entries: rows.size,
+      entries: imageOwners.size,
       source_commits: sourceCommits,
       app_sources: appSources,
     }),
