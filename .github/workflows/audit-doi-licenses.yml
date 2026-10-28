@@ -32,7 +32,6 @@ jobs:
       - name: Audit published software licenses and catalog entries
         env:
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.audit_doi_licenses \
             --catalog-root . \

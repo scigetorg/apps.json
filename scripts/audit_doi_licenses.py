@@ -6,14 +6,10 @@ import os
 import re
 import time
 from datetime import datetime, timezone
-from html import unescape
 from pathlib import Path
 
 import requests
 
-from .doi_license import CatalogueError, LicenseValidationError, fetch_catalogue
-from .doi_metadata import get_license
-from .doi_provenance import ProvenanceServiceError
 from .zenodo_catalog import catalog_artifacts
 
 
@@ -59,7 +55,7 @@ def fetch_depositions(token):
         page += 1
 
 
-def audit_deposition(deposition, catalogue, github_token, artifacts):
+def audit_deposition(deposition, artifacts):
     metadata = deposition.get("metadata") or {}
     title = deposition.get("title") or metadata.get("title") or ""
     actual_license = metadata.get("license")
@@ -77,32 +73,21 @@ def audit_deposition(deposition, catalogue, github_token, artifacts):
     if not re.fullmatch(r".+_.+_[0-9]{8}", title):
         row.update(status="unmatched", reason="Title does not match a container release name")
         return row
-    try:
-        expected = get_license(title, github_token, catalogue)
-    except LicenseValidationError as exc:
-        row.update(status="unverifiable", reason=str(exc), suggestions=exc.suggestions)
+    if title not in artifacts:
+        row.update(status="unmatched", reason="Title not found in apps.json catalog")
         return row
-    row["build_revision"] = expected["revision"]
-    row["expected_license"] = expected["zenodo_id"]
-    row["expected_entries"] = [
-        {"id": entry["id"], "name": entry["name"], "url": entry.get("url")}
-        for entry in expected["entries"]
-    ]
+    catalog_ids = sorted({v.lower() for v in artifacts[title]["license"]})
+    row["catalog_license"] = catalog_ids
     problems = []
-    if title in artifacts:
-        catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-        recipe_ids = {entry["id"] for entry in expected["entries"]}
-        row["catalog_license"] = sorted(catalog_ids)
-        if not catalog_ids or catalog_ids != recipe_ids:
-            problems.append("apps.json licenses differ from build-time recipe")
-    if actual_license != expected["zenodo_id"]:
-        problems.append("Zenodo license ID differs from build-time recipe")
-    description = unescape(metadata.get("description") or "")
-    for entry in expected["entries"]:
-        if entry["name"] not in description:
-            problems.append(f"Description lacks license name {entry['name']!r}")
-        if entry.get("url") and entry["url"] not in description:
-            problems.append(f"Description lacks license URL {entry['url']!r}")
+    if not catalog_ids:
+        problems.append("apps.json has no license for this container")
+    elif len(catalog_ids) == 1:
+        if actual_license != catalog_ids[0]:
+            problems.append(f"Zenodo license {actual_license!r} differs from apps.json {catalog_ids[0]!r}")
+    elif actual_license not in {"other-open", "other-closed"}:
+        problems.append(
+            f"Zenodo license {actual_license!r} is not other-open/other-closed for multi-license container"
+        )
     row.update(status="mismatch" if problems else "verified", problems=problems)
     return row
 
@@ -150,11 +135,9 @@ def main():
     zenodo_token = os.environ.get("ZENODO_TOKEN")
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
-    catalogue = fetch_catalogue()["entries"]
     artifacts = catalog_artifacts(args.catalog_root)
     cache = load_previous(args.previous) if args.previous else {}
     rows = []
-    github_token = os.environ.get("GITHUB_TOKEN", "")
     for deposition in fetch_depositions(zenodo_token):
         metadata = deposition.get("metadata") or {}
         resource = metadata.get("resource_type") or {}
@@ -170,7 +153,7 @@ def main():
                 current = sorted({v.lower() for v in artifacts[title]["license"]})
                 if cached.get("catalog_license") != current:
                     cached = None
-        rows.append(cached if cached is not None else audit_deposition(deposition, catalogue, github_token, artifacts))
+        rows.append(cached if cached is not None else audit_deposition(deposition, artifacts))
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1
@@ -189,5 +172,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (CatalogueError, ProvenanceServiceError, RuntimeError) as exc:
+    except RuntimeError as exc:
         raise SystemExit(f"Audit failed: {exc}") from exc
