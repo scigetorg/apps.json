@@ -126,17 +126,35 @@ def write_summary(path, report):
         stream.write("\n".join(lines) + "\n")
 
 
+def load_previous(path):
+    """Return verified rows from a previous audit keyed by deposition ID."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            prev = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {
+        row["id"]: row
+        for row in prev.get("records", [])
+        if row.get("status") == "verified" and row.get("id") is not None
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--output", required=True)
+    parser.add_argument("--previous", metavar="PATH",
+                        help="Previous audit JSON; verified records are reused unless catalog licenses changed")
     args = parser.parse_args()
     zenodo_token = os.environ.get("ZENODO_TOKEN")
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     catalogue = fetch_catalogue()["entries"]
     artifacts = catalog_artifacts(args.catalog_root)
+    cache = load_previous(args.previous) if args.previous else {}
     rows = []
+    github_token = os.environ.get("GITHUB_TOKEN", "")
     for deposition in fetch_depositions(zenodo_token):
         metadata = deposition.get("metadata") or {}
         resource = metadata.get("resource_type") or {}
@@ -144,7 +162,15 @@ def main():
             resource = {}
         if metadata.get("upload_type") != "software" and resource.get("type") != "software":
             continue
-        rows.append(audit_deposition(deposition, catalogue, os.environ.get("GITHUB_TOKEN", ""), artifacts))
+        dep_id = deposition.get("id")
+        cached = cache.get(dep_id)
+        if cached is not None:
+            title = cached.get("title", "")
+            if title in artifacts:
+                current = sorted({v.lower() for v in artifacts[title]["license"]})
+                if cached.get("catalog_license") != current:
+                    cached = None
+        rows.append(cached if cached is not None else audit_deposition(deposition, catalogue, github_token, artifacts))
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1

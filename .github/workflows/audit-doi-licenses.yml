@@ -23,6 +23,12 @@ jobs:
       - run: python -m pip install requests 'pyyaml>=6.0.2'
       - name: Test DOI license checks
         run: python -m unittest discover -s test -p 'test_doi_licenses.py'
+      - name: Restore previous audit cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/previous-audit.json
+          key: zenodo-audit-never-match
+          restore-keys: zenodo-audit-
       - name: Audit published software licenses and catalog entries
         env:
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
@@ -30,7 +36,14 @@ jobs:
         run: |
           python -m scripts.audit_doi_licenses \
             --catalog-root . \
+            --previous "$RUNNER_TEMP/previous-audit.json" \
             --output "$RUNNER_TEMP/zenodo-license-audit.json"
+      - name: Save audit cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/zenodo-license-audit.json
+          key: zenodo-audit-${{ github.run_id }}
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4

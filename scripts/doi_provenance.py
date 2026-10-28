@@ -69,9 +69,11 @@ class RegistryReader:
                 response = requests.get(url, headers=headers, timeout=(15, 60))
         except requests.RequestException as exc:
             raise ProvenanceServiceError(f"Could not read GHCR image metadata: {exc}") from exc
-        if response.status_code == 429:
+        for attempt in range(3):
+            if response.status_code != 429:
+                break
             delay = response.headers.get("Retry-After", "")
-            time.sleep(min(int(delay), 120) if delay.isdigit() else 60)
+            time.sleep(min(int(delay), 120) if delay.isdigit() else 2 ** (attempt + 4))
             response = requests.get(url, headers=headers, timeout=(15, 60))
         if response.status_code in (401, 403, 404):
             raise LicenseValidationError(
