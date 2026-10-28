@@ -78,20 +78,21 @@ class DoiLicenseTests(unittest.TestCase):
         publish.assert_not_called()
 
     def test_audit_flags_zenodo_and_apps_json_mismatches(self):
-        expected = {
-            "zenodo_id": "mit", "revision": "a" * 40,
-            "entries": [{"id": "mit", "name": "MIT", "url": "https://spdx.org/licenses/MIT.html"}],
-        }
-        record = {"id": 12, "title": "demo_1.0_20260101", "metadata": {
-            "license": "apache-2.0", "description": "demo",
-        }}
-        with patch("scripts.audit_doi_licenses.get_license", return_value=expected):
-            row = audit_deposition(record, catalogue(), "token", {
-                "demo_1.0_20260101": {"license": ["Apache-2.0"]},
-            })
+        record = {"id": 12, "title": "demo_1.0_20260101", "metadata": {"license": "apache-2.0"}}
+        row = audit_deposition(record, {"demo_1.0_20260101": {"license": ["MIT"]}})
         self.assertEqual(row["status"], "mismatch")
-        self.assertIn("apps.json licenses differ from build-time recipe", row["problems"])
-        self.assertIn("Zenodo license ID differs from build-time recipe", row["problems"])
+        self.assertTrue(any("apache-2.0" in p and "mit" in p for p in row["problems"]))
+
+    def test_audit_verified_when_licenses_match(self):
+        record = {"id": 13, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
+        row = audit_deposition(record, {"demo_1.0_20260101": {"license": ["MIT"]}})
+        self.assertEqual(row["status"], "verified")
+        self.assertEqual(row["problems"], [])
+
+    def test_audit_unmatched_when_title_absent_from_catalog(self):
+        record = {"id": 14, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
+        row = audit_deposition(record, {})
+        self.assertEqual(row["status"], "unmatched")
 
 
 if __name__ == "__main__":
