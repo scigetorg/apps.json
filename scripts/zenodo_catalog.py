@@ -52,8 +52,9 @@ def domain_paths(root: Path) -> list[Path]:
     return [root / domain / "apps.json" for domain in sorted(domains)]
 
 
-def artifact_name(app: dict[str, Any]) -> str:
-    image, date = app.get("image"), app.get("version")
+def artifact_name(name: str, app: dict[str, Any]) -> str:
+    image = name.replace(" ", "_")
+    date = app.get("version")
     if not isinstance(image, str) or not IMAGE.fullmatch(image):
         raise ValueError(f"Invalid catalog image: {image!r}")
     if not isinstance(date, str) or not BUILDDATE.fullmatch(date):
@@ -73,7 +74,7 @@ def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
             for name, app in entry["apps"].items():
                 if not isinstance(app, dict):
                     raise ValueError(f"Invalid app in {path}: {tool}/{name}")
-                title = artifact_name(app)
+                title = artifact_name(name, app)
                 current = artifacts.setdefault(title, {"doi": "", "license": []})
                 doi = app.get("doi") or ""
                 if doi and current["doi"] and doi != current["doi"]:
@@ -236,8 +237,8 @@ def enrich_catalogs(root: Path, published: dict[str, dict[str, Any]]) -> int:
     for path in domain_paths(root):
         catalog = json.loads(path.read_text(encoding="utf-8"))
         for entry in catalog.values():
-            for app in entry["apps"].values():
-                title = artifact_name(app)
+            for name, app in entry["apps"].items():
+                title = artifact_name(name, app)
                 doi = published.get(title, {}).get("doi")
                 if not isinstance(doi, str) or not doi:
                     continue
