@@ -15,6 +15,13 @@ from .zenodo_catalog import catalog_artifacts
 
 DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
 
+# Old Zenodo license IDs that have been renamed to their current canonical form.
+LICENSE_ALIASES = {
+    "mit-license": "mit",
+    "apache2.0": "apache-2.0",
+    "gpl-3.0": "gpl-3.0-only"
+}
+
 
 def fetch_depositions(token):
     depositions = []
@@ -61,6 +68,8 @@ def audit_deposition(deposition, artifacts):
     actual_license = metadata.get("license")
     if isinstance(actual_license, dict):
         actual_license = actual_license.get("id")
+    if isinstance(actual_license, str):
+        actual_license = LICENSE_ALIASES.get(actual_license, actual_license)
     doi_url = deposition.get("doi_url")
     if not doi_url and deposition.get("doi"):
         doi_url = f"https://doi.org/{deposition['doi']}"
