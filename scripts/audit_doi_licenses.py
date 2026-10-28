@@ -15,11 +15,17 @@ from .zenodo_catalog import catalog_artifacts
 
 DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
 
-# Old Zenodo license IDs that have been renamed to their current canonical form.
+# Zenodo license IDs that differ from what apps.json stores (old renames, typos, notation variants).
 LICENSE_ALIASES = {
     "mit-license": "mit",
     "apache2.0": "apache-2.0",
-    "gpl-3.0": "gpl-3.0-only"
+    "gpl-3.0-only": "gpl-3.0",
+    "bsd-2-clause-netbsd": "bsd-2-clause",
+    "gpl-2.0": "gpl-2.0-only",
+    "lgpl-3.0": "lgpl-3.0-only",
+    "apgl-v3": "agpl-3.0",
+    "lgpl-2.1-or-later": "lgpl-2.1+",
+    "lgpl-2.1": "lgpl-2.1-only",
 }
 
 
