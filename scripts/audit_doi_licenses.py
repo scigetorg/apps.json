@@ -19,7 +19,6 @@ DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
 LICENSE_ALIASES = {
     "mit-license": "mit",
     "apache2.0": "apache-2.0",
-    "gpl-3.0": "gpl-3.0-only",
     "gpl-3.0-only": "gpl-3.0",
     "bsd-2-clause-netbsd": "bsd-2-clause",
     "gpl-2.0": "gpl-2.0-only",
