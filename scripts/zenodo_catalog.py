@@ -213,22 +213,32 @@ def publish_batch(
 ) -> int:
     existing = published_depositions(session)
     count = 0
-    for title in selected:
+    total = len(selected)
+    for i, title in enumerate(selected, 1):
+        prefix = f"[{i}/{total}] {title}"
         if title not in artifacts:
-            raise ValueError(f"Artifact is absent from domain catalogs: {title}")
+            raise ValueError(f"{prefix}: absent from domain catalogs")
         if has_production_doi(artifacts[title]["doi"]) or title in existing:
+            print(f"{prefix}: already published, skipping", flush=True)
             continue
-        license_info = get_license(title, github_token, catalogue)
-        catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-        recipe_ids = {entry["id"] for entry in license_info["entries"]}
-        if not catalog_ids or catalog_ids != recipe_ids:
-            raise ValueError(
-                f"Catalog licenses for {title} {sorted(catalog_ids)!r} differ from "
-                f"build-time recipe {sorted(recipe_ids)!r}"
-            )
-        doi = publish_deposition(title, license_info, session)
-        existing[title] = {"doi": doi}
-        count += 1
+        try:
+            print(f"{prefix}: resolving license ...", flush=True)
+            license_info = get_license(title, github_token, catalogue)
+            catalog_ids = {value.lower() for value in artifacts[title]["license"]}
+            recipe_ids = {entry["id"] for entry in license_info["entries"]}
+            if not catalog_ids or catalog_ids != recipe_ids:
+                raise ValueError(
+                    f"Catalog licenses {sorted(catalog_ids)!r} differ from "
+                    f"build-time recipe {sorted(recipe_ids)!r}"
+                )
+            print(f"{prefix}: uploading to Zenodo ...", flush=True)
+            doi = publish_deposition(title, license_info, session)
+            existing[title] = {"doi": doi}
+            count += 1
+            print(f"{prefix}: published {doi}", flush=True)
+        except Exception as exc:
+            print(f"{prefix}: FAILED - {exc}", file=sys.stderr, flush=True)
+            raise
     return count
 
 
