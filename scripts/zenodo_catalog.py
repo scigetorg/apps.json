@@ -213,6 +213,7 @@ def publish_batch(
 ) -> int:
     existing = published_depositions(session)
     count = 0
+    failures = []
     total = len(selected)
     for i, title in enumerate(selected, 1):
         prefix = f"[{i}/{total}] {title}"
@@ -238,7 +239,9 @@ def publish_batch(
             print(f"{prefix}: published {doi}", flush=True)
         except Exception as exc:
             print(f"{prefix}: FAILED - {exc}", file=sys.stderr, flush=True)
-            raise
+            failures.append(title)
+    if failures:
+        raise RuntimeError(f"Failed to publish {len(failures)} artifact(s): {failures}")
     return count
 
 
