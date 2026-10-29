@@ -1,5 +1,1665 @@
 {
-    "sha256": "73063314c17b0c9ffbace99793b699fec68bb19f08310c64240e9f42593cc13f",
-    "entries": 743,
-    "source_commit": "7b44e86f1ffa9b043b5c9a37c7c997b6c9738eb2"
+    "entries": 742,
+    "source_commits": {
+        "NeuroDesk/neurocontainers": "3dff2576a597f8eb099897f8e860d79cdda319de"
+    },
+    "app_sources": {
+        "afni": {
+            "afni 21.2.00": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 21.2.00": "NeuroDesk/neurocontainers",
+            "afni 22.3.07": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 22.3.07": "NeuroDesk/neurocontainers",
+            "afni 23.0.07": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 23.0.07": "NeuroDesk/neurocontainers",
+            "afni 23.3.02": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 23.3.02": "NeuroDesk/neurocontainers",
+            "afni 24.1.02": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 24.1.02": "NeuroDesk/neurocontainers",
+            "afni 24.3.00": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 24.3.00": "NeuroDesk/neurocontainers",
+            "afni 25.2.03": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 25.2.03": "NeuroDesk/neurocontainers",
+            "afni 26.0.07": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.0.07": "NeuroDesk/neurocontainers",
+            "afni 26.2.0": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.2.0": "NeuroDesk/neurocontainers",
+            "afni 26.3.02": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.02": "NeuroDesk/neurocontainers",
+            "afni 26.3.04": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.04": "NeuroDesk/neurocontainers",
+            "afni 26.3.05": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.05": "NeuroDesk/neurocontainers"
+        },
+        "aidamri": {
+            "aidamri 1.1": "NeuroDesk/neurocontainers",
+            "aidamri 2.0": "NeuroDesk/neurocontainers",
+            "aidamri 3.0.0": "NeuroDesk/neurocontainers",
+            "aidamri 3.0": "NeuroDesk/neurocontainers"
+        },
+        "aidamri_arm64": {
+            "aidamri_arm64 3.0.0": "NeuroDesk/neurocontainers"
+        },
+        "alpaca": {
+            "alpaca 1.1.4": "NeuroDesk/neurocontainers"
+        },
+        "amico": {
+            "amico 2.1.0 arm64": "NeuroDesk/neurocontainers",
+            "amico 2.1.0": "NeuroDesk/neurocontainers",
+            "amico 2.1.1": "NeuroDesk/neurocontainers"
+        },
+        "amico_arm64": {
+            "amico_arm64 2.1.1": "NeuroDesk/neurocontainers"
+        },
+        "ants": {
+            "ants 2.3.1": "NeuroDesk/neurocontainers",
+            "ants 2.3.5": "NeuroDesk/neurocontainers",
+            "ants 2.5.1": "NeuroDesk/neurocontainers",
+            "ants 2.5.3": "NeuroDesk/neurocontainers",
+            "ants 2.5.4": "NeuroDesk/neurocontainers",
+            "ants 2.6.0": "NeuroDesk/neurocontainers",
+            "ants 2.6.5": "NeuroDesk/neurocontainers"
+        },
+        "ants_arm64": {
+            "ants_arm64 2.6.5": "NeuroDesk/neurocontainers"
+        },
+        "apptainer": {
+            "apptainer 1.4.4 arm64": "NeuroDesk/neurocontainers",
+            "apptainer 1.4.4": "NeuroDesk/neurocontainers",
+            "apptainer 1.5.3": "NeuroDesk/neurocontainers"
+        },
+        "apptainer_arm64": {
+            "apptainer_arm64 1.5.3": "NeuroDesk/neurocontainers"
+        },
+        "arfimapping": {
+            "arfimapping 1.0.12": "NeuroDesk/neurocontainers"
+        },
+        "arfirecon": {
+            "arfirecon 1.0.1": "NeuroDesk/neurocontainers"
+        },
+        "ashs": {
+            "ashs 2.0.0": "NeuroDesk/neurocontainers"
+        },
+        "aslprep": {
+            "aslprep 0.2.7": "NeuroDesk/neurocontainers",
+            "aslprep 0.4.0": "NeuroDesk/neurocontainers",
+            "aslprep 0.5.0": "NeuroDesk/neurocontainers",
+            "aslprep 0.6.0": "NeuroDesk/neurocontainers",
+            "aslprep 0.7.0": "NeuroDesk/neurocontainers",
+            "aslprep 0.7.2": "NeuroDesk/neurocontainers",
+            "aslprep 0.7.5": "NeuroDesk/neurocontainers",
+            "aslprep 26.0.2": "NeuroDesk/neurocontainers",
+            "aslprep 26.0.3": "NeuroDesk/neurocontainers"
+        },
+        "b0mapromeo": {
+            "b0mapromeo 1.0.0": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.1.0": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.2.0": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.3.0": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.4.0": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.4.1": "NeuroDesk/neurocontainers",
+            "b0mapromeo 1.4.3": "NeuroDesk/neurocontainers"
+        },
+        "bart": {
+            "bart 0.7.00": "NeuroDesk/neurocontainers",
+            "bart 0.9.00": "NeuroDesk/neurocontainers",
+            "bart 1.0.00": "NeuroDesk/neurocontainers"
+        },
+        "bart_arm64": {
+            "bart_arm64 1.0.00": "NeuroDesk/neurocontainers"
+        },
+        "batchheudiconv": {
+            "batchheudiconv 1.0.0 arm64": "NeuroDesk/neurocontainers",
+            "batchheudiconv 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "batchheudiconv_arm64": {
+            "batchheudiconv_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "bcbtoolkit": {
+            "bcbtoolkit 0.0.0": "NeuroDesk/neurocontainers",
+            "bcbtoolkit 5.4.1": "NeuroDesk/neurocontainers"
+        },
+        "bidsappaa": {
+            "bidsappaa 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "bidsappbaracus": {
+            "bidsappbaracus 1.1.4": "NeuroDesk/neurocontainers"
+        },
+        "bidsappbrainsuite": {
+            "bidsappbrainsuite 21a": "NeuroDesk/neurocontainers",
+            "bidsappbrainsuite 23a": "NeuroDesk/neurocontainers"
+        },
+        "bidsapphcppipelines": {
+            "bidsapphcppipelines 4.3.0": "NeuroDesk/neurocontainers"
+        },
+        "bidsappmrtrix3connectome": {
+            "bidsappmrtrix3connectome 0.5.3": "NeuroDesk/neurocontainers",
+            "bidsappmrtrix3connectome 0.6.0": "NeuroDesk/neurocontainers"
+        },
+        "bidsapppymvpa": {
+            "bidsapppymvpa 2.0.2": "NeuroDesk/neurocontainers",
+            "bidsapppymvpa 4.0.4": "NeuroDesk/neurocontainers"
+        },
+        "bidsappspm": {
+            "bidsappspm 0.0.20": "NeuroDesk/neurocontainers"
+        },
+        "bidscoin": {
+            "bidscoin 3.7.0": "NeuroDesk/neurocontainers",
+            "bidscoin 4.2.0": "NeuroDesk/neurocontainers",
+            "bidscoin 4.2.1": "NeuroDesk/neurocontainers",
+            "bidscoin 4.3.0": "NeuroDesk/neurocontainers",
+            "bidscoin 4.3.2": "NeuroDesk/neurocontainers",
+            "bidscoin 4.3.3": "NeuroDesk/neurocontainers",
+            "bidscoin 4.4.0": "NeuroDesk/neurocontainers",
+            "bidscoin 4.5.0": "NeuroDesk/neurocontainers",
+            "bidscoin 4.6.1": "NeuroDesk/neurocontainers",
+            "bidscoin 4.6.2 arm64": "NeuroDesk/neurocontainers",
+            "bidscoin 4.6.2": "NeuroDesk/neurocontainers"
+        },
+        "bidsmanager": {
+            "bidsmanager 1.2.3": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.2.6.1": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.3.0": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.4.0": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.4.1": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.5.0": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.5.1": "NeuroDesk/neurocontainers"
+        },
+        "bidsmanager_arm64": {
+            "bidsmanager_arm64 1.2.6.1": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.3.0": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.4.0": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.4.1": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.5.0": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.5.1": "NeuroDesk/neurocontainers"
+        },
+        "bidsme": {
+            "bidsme 1.11.0": "NeuroDesk/neurocontainers",
+            "bidsme 1.9.3": "NeuroDesk/neurocontainers"
+        },
+        "bidsme_arm64": {
+            "bidsme_arm64 1.11.0": "NeuroDesk/neurocontainers"
+        },
+        "bidstools": {
+            "bidstools 1.0.1": "NeuroDesk/neurocontainers",
+            "bidstools 1.0.2": "NeuroDesk/neurocontainers",
+            "bidstools 1.0.3": "NeuroDesk/neurocontainers",
+            "bidstools 1.0.4": "NeuroDesk/neurocontainers",
+            "bidstools 1.2.0": "NeuroDesk/neurocontainers",
+            "bidstools 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "bidstools_arm64": {
+            "bidstools_arm64 1.2.0": "NeuroDesk/neurocontainers",
+            "bidstools_arm64 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "bidsvue": {
+            "bidsvue 0.1.20260704": "NeuroDesk/neurocontainers",
+            "BIDSvue-bidsvue 0.1.20260704": "NeuroDesk/neurocontainers"
+        },
+        "bidsvue_arm64": {
+            "bidsvue_arm64 0.1.20260704": "NeuroDesk/neurocontainers",
+            "BIDSvue-bidsvue_arm64 0.1.20260704": "NeuroDesk/neurocontainers"
+        },
+        "blastct": {
+            "blastct 2.0.0": "NeuroDesk/neurocontainers"
+        },
+        "blender": {
+            "blender 5.0.1": "NeuroDesk/neurocontainers",
+            "blenderGUI-blender 5.0.1": "NeuroDesk/neurocontainers",
+            "blender 5.2.1": "NeuroDesk/neurocontainers",
+            "blenderGUI-blender 5.2.1": "NeuroDesk/neurocontainers",
+            "blender 5.2.2": "NeuroDesk/neurocontainers",
+            "blenderGUI-blender 5.2.2": "NeuroDesk/neurocontainers",
+            "blender 5.2.3": "NeuroDesk/neurocontainers",
+            "blenderGUI-blender 5.2.3": "NeuroDesk/neurocontainers"
+        },
+        "blochsiegertb1mapping": {
+            "blochsiegertb1mapping 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "braid": {
+            "braid 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "brainager": {
+            "brainager 2.1.0": "NeuroDesk/neurocontainers",
+            "brainager 2.3.0": "NeuroDesk/neurocontainers"
+        },
+        "brainles-aurora": {
+            "brainles-aurora 0.2.7": "NeuroDesk/neurocontainers"
+        },
+        "brainles-aurora_arm64": {
+            "brainles-aurora_arm64 0.2.7": "NeuroDesk/neurocontainers"
+        },
+        "brainles-preprocessing": {
+            "brainles-preprocessing 0.6.10": "NeuroDesk/neurocontainers",
+            "brainles-preprocessing 0.6.14": "NeuroDesk/neurocontainers",
+            "brainles-preprocessing 0.8.0": "NeuroDesk/neurocontainers"
+        },
+        "brainles-preprocessing_arm64": {
+            "brainles-preprocessing_arm64 0.6.14": "NeuroDesk/neurocontainers"
+        },
+        "brainlesion": {
+            "brainlesion 1.0.0": "NeuroDesk/neurocontainers",
+            "brainlesion 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "brainlifecli": {
+            "brainlifecli 1.7.0": "NeuroDesk/neurocontainers",
+            "brainlifecli 1.8.2": "NeuroDesk/neurocontainers"
+        },
+        "brainlifecli_arm64": {
+            "brainlifecli_arm64 1.8.2": "NeuroDesk/neurocontainers"
+        },
+        "brainnetviewer": {
+            "brainnetviewer 1.7.20191031": "NeuroDesk/neurocontainers",
+            "brainnetviewerGUI-brainnetviewer 1.7.20191031": "NeuroDesk/neurocontainers"
+        },
+        "brainstemnavigator": {
+            "brainstemnavigator 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "brainstorm": {
+            "brainstorm 3.211130": "NeuroDesk/neurocontainers",
+            "brainstormGUI-brainstorm 3.211130": "NeuroDesk/neurocontainers"
+        },
+        "brainsuite": {
+            "brainsuite 23a": "NeuroDesk/neurocontainers"
+        },
+        "brainvisa": {
+            "brainvisa 6.0.36": "NeuroDesk/neurocontainers",
+            "brainvisaGUI-brainvisa 6.0.36": "NeuroDesk/neurocontainers",
+            "anatomistGUI-brainvisa 6.0.36": "NeuroDesk/neurocontainers",
+            "brainvisa 6.0.38": "NeuroDesk/neurocontainers",
+            "brainvisaGUI-brainvisa 6.0.38": "NeuroDesk/neurocontainers",
+            "anatomistGUI-brainvisa 6.0.38": "NeuroDesk/neurocontainers",
+            "brainvisa 6.0.40": "NeuroDesk/neurocontainers",
+            "brainvisaGUI-brainvisa 6.0.40": "NeuroDesk/neurocontainers",
+            "anatomistGUI-brainvisa 6.0.40": "NeuroDesk/neurocontainers"
+        },
+        "brats": {
+            "brats 0.1.11": "NeuroDesk/neurocontainers",
+            "brats 0.1.12": "NeuroDesk/neurocontainers",
+            "brats 0.1.13": "NeuroDesk/neurocontainers",
+            "brats 0.1.8": "NeuroDesk/neurocontainers"
+        },
+        "brkraw": {
+            "brkraw 0.3.11": "NeuroDesk/neurocontainers",
+            "brkrawGUI-brkraw 0.3.11": "NeuroDesk/neurocontainers",
+            "brkraw 0.5.7": "NeuroDesk/neurocontainers"
+        },
+        "brkraw_arm64": {
+            "brkraw_arm64 0.5.7": "NeuroDesk/neurocontainers"
+        },
+        "cartool": {
+            "cartool 5.06.04": "NeuroDesk/neurocontainers",
+            "cartool 5.06.05": "NeuroDesk/neurocontainers"
+        },
+        "cat12": {
+            "cat12GUI-cat12 12.9": "NeuroDesk/neurocontainers",
+            "cat12 12.9": "NeuroDesk/neurocontainers",
+            "cat12 26.0.0": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 26.0.0": "NeuroDesk/neurocontainers",
+            "cat12 26.0.1": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 26.0.1": "NeuroDesk/neurocontainers",
+            "cat12 26.0.rc3": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 26.0.rc3": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 r1933": "NeuroDesk/neurocontainers",
+            "cat12 r1933": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 r2166": "NeuroDesk/neurocontainers",
+            "cat12 r2166": "NeuroDesk/neurocontainers"
+        },
+        "cbsb0stats": {
+            "cbsb0stats 1.4.0": "NeuroDesk/neurocontainers"
+        },
+        "chimera-brainparcellation": {
+            "chimera-brainparcellation 0.4.1": "NeuroDesk/neurocontainers"
+        },
+        "civet": {
+            "civet 2.1.1": "NeuroDesk/neurocontainers"
+        },
+        "clearswi": {
+            "clearswi 1.0.0": "NeuroDesk/neurocontainers",
+            "clearswi 1.6.1": "NeuroDesk/neurocontainers",
+            "clearswi 1.7.0": "NeuroDesk/neurocontainers"
+        },
+        "clearswi_arm64": {
+            "clearswi_arm64 1.7.0": "NeuroDesk/neurocontainers"
+        },
+        "clinica": {
+            "clinica 0.10.0": "NeuroDesk/neurocontainers",
+            "clinica 0.11.3": "NeuroDesk/neurocontainers",
+            "clinica 0.12.0": "NeuroDesk/neurocontainers"
+        },
+        "clinicadl": {
+            "clinicadl 1.6.1": "NeuroDesk/neurocontainers",
+            "clinicadl 2.0.0": "NeuroDesk/neurocontainers",
+            "clinicadl 2.1.0": "NeuroDesk/neurocontainers"
+        },
+        "cmtk": {
+            "cmtk 3.4.0": "NeuroDesk/neurocontainers"
+        },
+        "code": {
+            "vscodeGUI-code 230315": "NeuroDesk/neurocontainers",
+            "code 230315": "NeuroDesk/neurocontainers",
+            "code 240320": "NeuroDesk/neurocontainers"
+        },
+        "code_arm64": {
+            "code_arm64 240320": "NeuroDesk/neurocontainers"
+        },
+        "condaenvs": {
+            "condaenvs 1.0.1": "NeuroDesk/neurocontainers",
+            "condaenvs 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "condaenvs_arm64": {
+            "condaenvs_arm64 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "conn": {
+            "connGUI-conn 20b": "NeuroDesk/neurocontainers",
+            "conn 20b": "NeuroDesk/neurocontainers",
+            "connGUI-conn 22a": "NeuroDesk/neurocontainers",
+            "conn 22a": "NeuroDesk/neurocontainers"
+        },
+        "connectomemapper3": {
+            "connectomemapper3 3.2.0": "NeuroDesk/neurocontainers"
+        },
+        "connectomeworkbench": {
+            "connectomeworkbench 1.5.0": "NeuroDesk/neurocontainers",
+            "connectomeworkbench 2.1.0": "NeuroDesk/neurocontainers"
+        },
+        "convert3d": {
+            "convert3d 1.0.0": "NeuroDesk/neurocontainers",
+            "convert3d 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "cosmomvpa": {
+            "cosmomvpa 1.1.0 arm64": "NeuroDesk/neurocontainers",
+            "cosmomvpa 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "cpac": {
+            "cpac 1.8.7": "NeuroDesk/neurocontainers"
+        },
+        "cryosparc": {
+            "cryosparc 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "ctffind": {
+            "ctffind 4.1.14": "NeuroDesk/neurocontainers"
+        },
+        "dafne": {
+            "dafne 1.10.0": "NeuroDesk/neurocontainers",
+            "dafne 1.8a4": "NeuroDesk/neurocontainers",
+            "dafne 2.1.1a0": "NeuroDesk/neurocontainers",
+            "dafne 2.1.1a2": "NeuroDesk/neurocontainers"
+        },
+        "dafne_arm64": {
+            "dafne_arm64 1.10.0": "NeuroDesk/neurocontainers",
+            "dafne_arm64 2.1.1a0": "NeuroDesk/neurocontainers",
+            "dafne_arm64 2.1.1a2": "NeuroDesk/neurocontainers"
+        },
+        "datalad": {
+            "datalad 1.1.5": "NeuroDesk/neurocontainers",
+            "datalad 1.3.1 arm64": "NeuroDesk/neurocontainers",
+            "datalad 1.3.1": "NeuroDesk/neurocontainers",
+            "datalad 1.6.2": "NeuroDesk/neurocontainers",
+            "datalad 1.6.3": "NeuroDesk/neurocontainers",
+            "datalad 1.6.4": "NeuroDesk/neurocontainers",
+            "datalad 1.6.5": "NeuroDesk/neurocontainers",
+            "datalad 1.7.0": "NeuroDesk/neurocontainers",
+            "datalad 1.7.1": "NeuroDesk/neurocontainers"
+        },
+        "datalad_arm64": {
+            "datalad_arm64 1.1.5": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.6.2": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.6.3": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.6.4": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.6.5": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.7.0": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.7.1": "NeuroDesk/neurocontainers"
+        },
+        "dcm2bids": {
+            "dcm2bids 3.2.0": "NeuroDesk/neurocontainers",
+            "dcm2bids 3.3.1": "NeuroDesk/neurocontainers"
+        },
+        "dcm2bids_arm64": {
+            "dcm2bids_arm64 3.3.1": "NeuroDesk/neurocontainers"
+        },
+        "dcm2niix": {
+            "dcm2niix v1.0.20240202 arm64": "NeuroDesk/neurocontainers",
+            "dcm2niix v1.0.20240202": "NeuroDesk/neurocontainers",
+            "dcm2niix v1.0.20260724": "NeuroDesk/neurocontainers"
+        },
+        "dcm2niix_arm64": {
+            "dcm2niix_arm64 v1.0.20260724": "NeuroDesk/neurocontainers"
+        },
+        "deep-quality-estimation": {
+            "deep-quality-estimation 0.0.3": "NeuroDesk/neurocontainers"
+        },
+        "deep-quality-estimation_arm64": {
+            "deep-quality-estimation_arm64 0.0.3": "NeuroDesk/neurocontainers"
+        },
+        "deepcombat": {
+            "deepcombat 0.0.0.9000": "NeuroDesk/neurocontainers"
+        },
+        "deepdisco": {
+            "deepdisco 20251008.1.0": "NeuroDesk/neurocontainers",
+            "DeepDisco-deepdisco 20251008.1.0": "NeuroDesk/neurocontainers",
+            "deepdisco 20251008": "NeuroDesk/neurocontainers",
+            "DeepDisco-deepdisco 20251008": "NeuroDesk/neurocontainers"
+        },
+        "deepdisco_arm64": {
+            "deepdisco_arm64 20251008": "NeuroDesk/neurocontainers",
+            "DeepDisco-deepdisco_arm64 20251008": "NeuroDesk/neurocontainers"
+        },
+        "deepisles": {
+            "deepisles 1.1": "NeuroDesk/neurocontainers"
+        },
+        "deeplabcut": {
+            "deeplabcut 2.3.11": "NeuroDesk/neurocontainers",
+            "deeplabcut 3.0.2": "NeuroDesk/neurocontainers"
+        },
+        "deepretinotopy": {
+            "deepretinotopy 1.0.11": "NeuroDesk/neurocontainers",
+            "deepretinotopy 1.0.18": "NeuroDesk/neurocontainers",
+            "deepretinotopy 1.0.19": "NeuroDesk/neurocontainers",
+            "deepretinotopy 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "deepsif": {
+            "deepsif 0.0.1": "NeuroDesk/neurocontainers"
+        },
+        "deepwmh": {
+            "deepwmh 1.0.1": "NeuroDesk/neurocontainers"
+        },
+        "dhcpstructuralpipeline": {
+            "dhcpstructuralpipeline 1.1": "NeuroDesk/neurocontainers"
+        },
+        "dicompare": {
+            "dicompare 0.1.3": "NeuroDesk/neurocontainers",
+            "dicompare 0.15.2": "NeuroDesk/neurocontainers",
+            "dicompare 0.15.3": "NeuroDesk/neurocontainers",
+            "dicompare 0.15.4": "NeuroDesk/neurocontainers",
+            "dicompare 0.5.4": "NeuroDesk/neurocontainers"
+        },
+        "dicompare_arm64": {
+            "dicompare_arm64 0.15.2": "NeuroDesk/neurocontainers",
+            "dicompare_arm64 0.15.3": "NeuroDesk/neurocontainers",
+            "dicompare_arm64 0.15.4": "NeuroDesk/neurocontainers"
+        },
+        "dicomtools": {
+            "dicomtools 1.0.0": "NeuroDesk/neurocontainers",
+            "dicomtools 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "dicomtools_arm64": {
+            "dicomtools_arm64 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "diffusiontoolkit": {
+            "diffusiontoolkit 0.6.4.1": "NeuroDesk/neurocontainers"
+        },
+        "dsistudio": {
+            "dsistudio 2020.10": "NeuroDesk/neurocontainers",
+            "dsistudioGUI-dsistudio 2020.10": "NeuroDesk/neurocontainers",
+            "dsistudio 2024.06.12": "NeuroDesk/neurocontainers",
+            "dsistudioGUI-dsistudio 2024.06.12": "NeuroDesk/neurocontainers",
+            "dsistudio 2026.7.25": "NeuroDesk/neurocontainers",
+            "dsistudioGUI-dsistudio 2026.7.25": "NeuroDesk/neurocontainers",
+            "dsistudio chen.2024.04.19": "NeuroDesk/neurocontainers",
+            "dsistudioGUI-dsistudio chen.2024.04.19": "NeuroDesk/neurocontainers"
+        },
+        "dwidenoise2": {
+            "dwidenoise2 1.0.0": "NeuroDesk/neurocontainers",
+            "dwidenoise2 20260603": "NeuroDesk/neurocontainers"
+        },
+        "dwidenoise2_arm64": {
+            "dwidenoise2_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "eeglab": {
+            "eeglab 2020.0": "NeuroDesk/neurocontainers",
+            "eeglabGUI-eeglab 2020.0": "NeuroDesk/neurocontainers"
+        },
+        "eharmonize": {
+            "eharmonize 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "eharmonize_arm64": {
+            "eharmonize_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "elastix": {
+            "elastix 5.1.0": "NeuroDesk/neurocontainers",
+            "elastix 5.3.1": "NeuroDesk/neurocontainers"
+        },
+        "elastix_arm64": {
+            "elastix_arm64 5.3.1": "NeuroDesk/neurocontainers"
+        },
+        "eman2": {
+            "eman2 2.99.85": "NeuroDesk/neurocontainers",
+            "e2projectmanagerGUI-eman2 2.99.85": "NeuroDesk/neurocontainers",
+            "e2displayGUI-eman2 2.99.85": "NeuroDesk/neurocontainers"
+        },
+        "emuses": {
+            "emuses 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "emuses_arm64": {
+            "emuses_arm64 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "enigma-pd-wml": {
+            "enigma-pd-wml 1.1.1": "NeuroDesk/neurocontainers",
+            "enigma-pd-wml 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "ep3d": {
+            "ep3d 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "epirecon": {
+            "epirecon 0.0.4": "NeuroDesk/neurocontainers"
+        },
+        "epu-group-afis": {
+            "epu-group-afis 0.3.0": "NeuroDesk/neurocontainers"
+        },
+        "esilpd": {
+            "esilpd 0.0.1": "NeuroDesk/neurocontainers",
+            "esilpd 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "ezbids": {
+            "ezbids 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "fastcsr": {
+            "fastcsr 1.0": "NeuroDesk/neurocontainers"
+        },
+        "fastsurfer": {
+            "fastsurfer 2.4.2": "NeuroDesk/neurocontainers",
+            "fastsurfer 2.5.4": "NeuroDesk/neurocontainers",
+            "fastsurfer 2.6.0": "NeuroDesk/neurocontainers"
+        },
+        "fatsegnet": {
+            "fatsegnet 1.0.gpu": "NeuroDesk/neurocontainers"
+        },
+        "fetalsegmentation": {
+            "fetalsegmentation 20241116": "NeuroDesk/neurocontainers"
+        },
+        "fetalsynthseg": {
+            "fetalsynthseg 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "fetalsynthseg_arm64": {
+            "fetalsynthseg_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "fieldtrip": {
+            "fieldtrip 20211114": "NeuroDesk/neurocontainers",
+            "fieldtrip 20220617": "NeuroDesk/neurocontainers"
+        },
+        "fitlins": {
+            "fitlins 0.11.0": "NeuroDesk/neurocontainers"
+        },
+        "flames": {
+            "flames 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "flames_arm64": {
+            "flames_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "fmriprep": {
+            "fmriprep 20.1.3": "NeuroDesk/neurocontainers",
+            "fmriprep 20.2.6": "NeuroDesk/neurocontainers",
+            "fmriprep 22.1.1": "NeuroDesk/neurocontainers",
+            "fmriprep 23.0.0": "NeuroDesk/neurocontainers",
+            "fmriprep 23.2.1": "NeuroDesk/neurocontainers",
+            "fmriprep 24.1.0": "NeuroDesk/neurocontainers",
+            "fmriprep 24.1.1": "NeuroDesk/neurocontainers",
+            "fmriprep 25.1.3": "NeuroDesk/neurocontainers",
+            "fmriprep 25.2.3": "NeuroDesk/neurocontainers",
+            "fmriprep 25.2.5": "NeuroDesk/neurocontainers",
+            "fmriprep 25.2.6": "NeuroDesk/neurocontainers",
+            "fmriprep 25.2.7": "NeuroDesk/neurocontainers"
+        },
+        "freesurfer": {
+            "freesurfer 5.3.0": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 5.3.0": "NeuroDesk/neurocontainers",
+            "freesurfer 6.0.0": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 6.0.0": "NeuroDesk/neurocontainers",
+            "freesurfer 7.1.1": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 7.1.1": "NeuroDesk/neurocontainers",
+            "freesurfer 7.2.0": "NeuroDesk/neurocontainers",
+            "freesurfer 7.3.2": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 7.3.2": "NeuroDesk/neurocontainers",
+            "freesurfer 7.4.1": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 7.4.1": "NeuroDesk/neurocontainers",
+            "freesurfer 8.0.0": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 8.0.0": "NeuroDesk/neurocontainers",
+            "freesurfer 8.1.0": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 8.1.0": "NeuroDesk/neurocontainers",
+            "freesurfer 8.2.0": "NeuroDesk/neurocontainers",
+            "freeviewGUI-freesurfer 8.2.0": "NeuroDesk/neurocontainers"
+        },
+        "frisgo": {
+            "frisgo 2.10.0": "NeuroDesk/neurocontainers"
+        },
+        "frisgokspace": {
+            "frisgokspace 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "fsl": {
+            "fsl 6.0.3": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.3": "NeuroDesk/neurocontainers",
+            "fsl 6.0.4": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.4": "NeuroDesk/neurocontainers",
+            "fsl 6.0.5.1": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.5.1": "NeuroDesk/neurocontainers",
+            "fsl 6.0.6.4": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.6.4": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.1": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.1": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.14": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.14": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.16": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.16": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.18": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.18": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.19": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.19": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.22": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.22": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.23": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.23": "NeuroDesk/neurocontainers",
+            "fsl 6.0.7.8": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl 6.0.7.8": "NeuroDesk/neurocontainers"
+        },
+        "fsl_arm64": {
+            "fsl_arm64 6.0.7.23": "NeuroDesk/neurocontainers",
+            "fsleyesGUI-fsl_arm64 6.0.7.23": "NeuroDesk/neurocontainers"
+        },
+        "fsqc": {
+            "fsqc 2.1.7": "NeuroDesk/neurocontainers"
+        },
+        "fsqc_arm64": {
+            "fsqc_arm64 2.1.7": "NeuroDesk/neurocontainers"
+        },
+        "functionnectome": {
+            "functionnectome 2.5.0": "NeuroDesk/neurocontainers",
+            "FunctionnectomeGUI-functionnectome 2.5.0": "NeuroDesk/neurocontainers"
+        },
+        "gautomatch": {
+            "gautomatch 0.56.0": "NeuroDesk/neurocontainers"
+        },
+        "gigaconnectome": {
+            "gigaconnectome 0.6.0": "NeuroDesk/neurocontainers"
+        },
+        "gigaconnectome_arm64": {
+            "gigaconnectome_arm64 0.6.0": "NeuroDesk/neurocontainers"
+        },
+        "gimp": {
+            "gimpGUI-gimp 2.10.18": "NeuroDesk/neurocontainers",
+            "gimp 2.10.18": "NeuroDesk/neurocontainers",
+            "gimp 2.10.36": "NeuroDesk/neurocontainers",
+            "gimpGUI-gimp 2.10.36": "NeuroDesk/neurocontainers"
+        },
+        "gimp_arm64": {
+            "gimp_arm64 2.10.36": "NeuroDesk/neurocontainers",
+            "gimpGUI-gimp_arm64 2.10.36": "NeuroDesk/neurocontainers"
+        },
+        "gingerale": {
+            "gingerale 3.0.2": "NeuroDesk/neurocontainers",
+            "gingerale 4.0.0": "NeuroDesk/neurocontainers"
+        },
+        "gingerale_arm64": {
+            "gingerale_arm64 4.0.0": "NeuroDesk/neurocontainers"
+        },
+        "gliomoda": {
+            "gliomoda 0.0.4": "NeuroDesk/neurocontainers"
+        },
+        "gliomoda_arm64": {
+            "gliomoda_arm64 0.0.4": "NeuroDesk/neurocontainers"
+        },
+        "glmsingle": {
+            "glmsingle 1.2 arm64": "NeuroDesk/neurocontainers",
+            "glmsingle 1.2.0": "NeuroDesk/neurocontainers",
+            "glmsingle 1.2": "NeuroDesk/neurocontainers"
+        },
+        "glmsingle_arm64": {
+            "glmsingle_arm64 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "globus": {
+            "globusGUI-globus 3.2.2": "NeuroDesk/neurocontainers",
+            "globus 3.2.2": "NeuroDesk/neurocontainers",
+            "globus 3.2.8": "NeuroDesk/neurocontainers",
+            "globusGUI-globus 3.2.8": "NeuroDesk/neurocontainers",
+            "globus 3.3.1": "NeuroDesk/neurocontainers",
+            "globusGUI-globus 3.3.1": "NeuroDesk/neurocontainers",
+            "globus 3.3.2": "NeuroDesk/neurocontainers",
+            "globusGUI-globus 3.3.2": "NeuroDesk/neurocontainers"
+        },
+        "globus_arm64": {
+            "globus_arm64 3.3.1": "NeuroDesk/neurocontainers",
+            "globusGUI-globus_arm64 3.3.1": "NeuroDesk/neurocontainers",
+            "globus_arm64 3.3.2": "NeuroDesk/neurocontainers",
+            "globusGUI-globus_arm64 3.3.2": "NeuroDesk/neurocontainers"
+        },
+        "gouhfi": {
+            "gouhfi 0.0.1": "NeuroDesk/neurocontainers"
+        },
+        "halfpipe": {
+            "halfpipe 1.2.3": "NeuroDesk/neurocontainers",
+            "halfpipe 1.3.2": "NeuroDesk/neurocontainers"
+        },
+        "hcpasl": {
+            "hcpasl 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "hdbet": {
+            "hdbet 1.0.0": "NeuroDesk/neurocontainers",
+            "hdbet 2.0.1": "NeuroDesk/neurocontainers"
+        },
+        "hdbet_arm64": {
+            "hdbet_arm64 2.0.1": "NeuroDesk/neurocontainers"
+        },
+        "heudiconv": {
+            "heudiconv 1.3.1": "NeuroDesk/neurocontainers",
+            "heudiconv 1.5.1": "NeuroDesk/neurocontainers"
+        },
+        "heudiconv_arm64": {
+            "heudiconv_arm64 1.5.1": "NeuroDesk/neurocontainers"
+        },
+        "hmri": {
+            "hmriGUI-hmri 0.6.0": "NeuroDesk/neurocontainers",
+            "hmri 0.6.0": "NeuroDesk/neurocontainers",
+            "hmriGUI-hmri 0.6.1": "NeuroDesk/neurocontainers",
+            "hmri 0.6.1": "NeuroDesk/neurocontainers",
+            "hmri 1.0.0": "NeuroDesk/neurocontainers",
+            "hmriGUI-hmri 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "hnncore": {
+            "hnncore 0.3": "NeuroDesk/neurocontainers"
+        },
+        "hypermapp3r": {
+            "hypermapp3r 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "ilastik": {
+            "ilastik 1.4.0": "NeuroDesk/neurocontainers",
+            "ilastikGUI-ilastik 1.4.0": "NeuroDesk/neurocontainers",
+            "ilastik 1.4.2": "NeuroDesk/neurocontainers",
+            "ilastikGUI-ilastik 1.4.2": "NeuroDesk/neurocontainers"
+        },
+        "irkernel": {
+            "irkernel 4.4.3 arm64": "NeuroDesk/neurocontainers"
+        },
+        "itksnap": {
+            "itksnapGUI-itksnap 3.8.0": "NeuroDesk/neurocontainers",
+            "itksnap 3.8.0": "NeuroDesk/neurocontainers",
+            "itksnapGUI-itksnap 4.0.1": "NeuroDesk/neurocontainers",
+            "itksnap 4.0.1": "NeuroDesk/neurocontainers",
+            "itksnapGUI-itksnap 4.0.2": "NeuroDesk/neurocontainers",
+            "itksnap 4.0.2": "NeuroDesk/neurocontainers",
+            "itksnap 4.2.2": "NeuroDesk/neurocontainers",
+            "itksnapGUI-itksnap 4.2.2": "NeuroDesk/neurocontainers",
+            "itksnap 4.4.0": "NeuroDesk/neurocontainers",
+            "itksnapGUI-itksnap 4.4.0": "NeuroDesk/neurocontainers"
+        },
+        "jamovi": {
+            "jamovi 2.7.4": "NeuroDesk/neurocontainers"
+        },
+        "jidt": {
+            "jidt 1.6.1": "NeuroDesk/neurocontainers",
+            "jidt 1.6": "NeuroDesk/neurocontainers"
+        },
+        "julia": {
+            "julia 1.10.1": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia 1.10.1": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia 1.10.1": "NeuroDesk/neurocontainers",
+            "julia 1.13.1": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia 1.13.1": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia 1.13.1": "NeuroDesk/neurocontainers",
+            "julia 1.13.2": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia 1.13.2": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia 1.13.2": "NeuroDesk/neurocontainers",
+            "julia 1.4.1": "NeuroDesk/neurocontainers",
+            "julia 1.9.4": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia 1.9.4": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia 1.9.4": "NeuroDesk/neurocontainers"
+        },
+        "julia_arm64": {
+            "julia_arm64 1.13.1": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia_arm64 1.13.1": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia_arm64 1.13.1": "NeuroDesk/neurocontainers",
+            "julia_arm64 1.13.2": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia_arm64 1.13.2": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia_arm64 1.13.2": "NeuroDesk/neurocontainers"
+        },
+        "kspacefilter": {
+            "kspacefilter 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "kul-vbg": {
+            "kul-vbg 0.61.0_23112021_beta": "NeuroDesk/neurocontainers"
+        },
+        "lashis": {
+            "lashis 1.0": "NeuroDesk/neurocontainers",
+            "lashis 2.0.0": "NeuroDesk/neurocontainers",
+            "lashis 2.0": "NeuroDesk/neurocontainers"
+        },
+        "laynii": {
+            "laynii 2.10.0": "NeuroDesk/neurocontainers",
+            "laynii 2.2.1": "NeuroDesk/neurocontainers"
+        },
+        "laynii_arm64": {
+            "laynii_arm64 2.10.0": "NeuroDesk/neurocontainers"
+        },
+        "lcmodel": {
+            "lcmodel 6.3": "NeuroDesk/neurocontainers"
+        },
+        "lesionquantificationtoolkit": {
+            "lesionquantificationtoolkit 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "lesionquantificationtoolkit_arm64": {
+            "lesionquantificationtoolkit_arm64 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "lesymap": {
+            "lesymap 0.0.0.9221": "NeuroDesk/neurocontainers",
+            "lesymap 0.0.0.9222": "NeuroDesk/neurocontainers"
+        },
+        "libreoffice": {
+            "libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeWriterGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeCalcGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeImpressGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeDrawGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeBaseGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreofficeMathGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers"
+        },
+        "linda": {
+            "linda 0.5.1": "NeuroDesk/neurocontainers"
+        },
+        "lipsia": {
+            "lipsia 3.1.1": "NeuroDesk/neurocontainers",
+            "lipsia 4.1.1": "NeuroDesk/neurocontainers"
+        },
+        "lipsia_arm64": {
+            "lipsia_arm64 4.1.1": "NeuroDesk/neurocontainers"
+        },
+        "loftcbf": {
+            "loftcbf 3.0.0": "NeuroDesk/neurocontainers"
+        },
+        "lqt": {
+            "lqt 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "lqt_arm64": {
+            "lqt_arm64 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "lstai": {
+            "lstai 1.1.0": "NeuroDesk/neurocontainers",
+            "lstai 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "maestro": {
+            "maestro 20260803": "NeuroDesk/neurocontainers"
+        },
+        "matlab": {
+            "matlab 2022a": "NeuroDesk/neurocontainers",
+            "matlabGUI-matlab 2022a": "NeuroDesk/neurocontainers",
+            "matlab 2022b": "NeuroDesk/neurocontainers",
+            "matlabGUI-matlab 2022b": "NeuroDesk/neurocontainers",
+            "matlab 2023b": "NeuroDesk/neurocontainers",
+            "matlabGUI-matlab 2023b": "NeuroDesk/neurocontainers",
+            "matlab 2024b": "NeuroDesk/neurocontainers",
+            "matlabGUI-matlab 2024b": "NeuroDesk/neurocontainers",
+            "matlab 2025b": "NeuroDesk/neurocontainers",
+            "matlab 2026b": "NeuroDesk/neurocontainers"
+        },
+        "matlabruntime": {
+            "matlabruntime 2024b": "NeuroDesk/neurocontainers",
+            "matlabruntime 2025b": "NeuroDesk/neurocontainers",
+            "matlabruntime 2026a": "NeuroDesk/neurocontainers"
+        },
+        "mede": {
+            "mede 0.0.12": "NeuroDesk/neurocontainers"
+        },
+        "mede_arm64": {
+            "mede_arm64 0.0.12": "NeuroDesk/neurocontainers"
+        },
+        "meganorm": {
+            "meganorm 0.2.0": "NeuroDesk/neurocontainers",
+            "meganorm 0.2.1": "NeuroDesk/neurocontainers",
+            "meganorm 0.2.2": "NeuroDesk/neurocontainers"
+        },
+        "meganorm_arm64": {
+            "meganorm_arm64 0.2.2": "NeuroDesk/neurocontainers"
+        },
+        "megnet": {
+            "megnet 1.0.1": "NeuroDesk/neurocontainers",
+            "megnet 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "megnet_arm64": {
+            "megnet_arm64 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "meica": {
+            "meica 4.0.1": "NeuroDesk/neurocontainers"
+        },
+        "meica-rs": {
+            "meica-rs 0.1.20261021": "NeuroDesk/neurocontainers"
+        },
+        "meica-rs_arm64": {
+            "meica-rs_arm64 0.1.20261021": "NeuroDesk/neurocontainers"
+        },
+        "metabody": {
+            "metabody 1.0.3": "NeuroDesk/neurocontainers",
+            "metabody 1.0.4": "NeuroDesk/neurocontainers",
+            "metabody 1.0.5": "NeuroDesk/neurocontainers"
+        },
+        "mfcsc": {
+            "mfcsc 1.0": "NeuroDesk/neurocontainers",
+            "mfcsc 1.1": "NeuroDesk/neurocontainers"
+        },
+        "mgltools": {
+            "mgltools 1.5.7": "NeuroDesk/neurocontainers",
+            "pmvGUI-mgltools 1.5.7": "NeuroDesk/neurocontainers",
+            "visionGUI-mgltools 1.5.7": "NeuroDesk/neurocontainers",
+            "adtGUI-mgltools 1.5.7": "NeuroDesk/neurocontainers"
+        },
+        "micapipe": {
+            "micapipe v0.2.3": "NeuroDesk/neurocontainers"
+        },
+        "mimosa": {
+            "mimosa 0.5.8": "NeuroDesk/neurocontainers"
+        },
+        "minc": {
+            "minc 1.9.18": "NeuroDesk/neurocontainers",
+            "registerGUI-minc 1.9.18": "NeuroDesk/neurocontainers"
+        },
+        "mipav": {
+            "mipav 11.3.3": "NeuroDesk/neurocontainers"
+        },
+        "mipview": {
+            "mipview 0.1.2": "NeuroDesk/neurocontainers",
+            "mipview 0.1.4": "NeuroDesk/neurocontainers",
+            "MipViewGUI-mipview 0.1.4": "NeuroDesk/neurocontainers",
+            "mipview 0.6.2": "NeuroDesk/neurocontainers",
+            "MipViewGUI-mipview 0.6.2": "NeuroDesk/neurocontainers"
+        },
+        "mipview_arm64": {
+            "mipview_arm64 0.6.2": "NeuroDesk/neurocontainers",
+            "MipViewGUI-mipview_arm64 0.6.2": "NeuroDesk/neurocontainers"
+        },
+        "mitkdiffusion": {
+            "mitkdiffusion 1.2.0": "NeuroDesk/neurocontainers",
+            "mitkdiffusionGUI-mitkdiffusion 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "mne": {
+            "mne 0.23.4": "NeuroDesk/neurocontainers",
+            "code-mne 0.23.4": "NeuroDesk/neurocontainers",
+            "mne 1.0.0": "NeuroDesk/neurocontainers",
+            "code-mne 1.0.0": "NeuroDesk/neurocontainers",
+            "mne 1.0.3": "NeuroDesk/neurocontainers",
+            "code-mne 1.0.3": "NeuroDesk/neurocontainers",
+            "mne 1.1.1": "NeuroDesk/neurocontainers",
+            "code-mne 1.1.1": "NeuroDesk/neurocontainers",
+            "mne 1.12.1": "NeuroDesk/neurocontainers",
+            "mne 1.13.2": "NeuroDesk/neurocontainers"
+        },
+        "mne_arm64": {
+            "mne_arm64 1.13.2": "NeuroDesk/neurocontainers"
+        },
+        "mneextended": {
+            "mneextended 1.1.0": "NeuroDesk/neurocontainers",
+            "mneextended 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "mneextended_arm64": {
+            "mneextended_arm64 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "modsort": {
+            "modsort 0.0.2": "NeuroDesk/neurocontainers",
+            "modsort-modsort 0.0.2": "NeuroDesk/neurocontainers"
+        },
+        "modsort_arm64": {
+            "modsort_arm64 0.0.2": "NeuroDesk/neurocontainers",
+            "modsort-modsort_arm64 0.0.2": "NeuroDesk/neurocontainers"
+        },
+        "motioncor3": {
+            "motioncor3 1.2.4": "NeuroDesk/neurocontainers"
+        },
+        "mricrogl": {
+            "mricrogl 1.2.20211006": "NeuroDesk/neurocontainers",
+            "mricroglGUI-mricrogl 1.2.20211006": "NeuroDesk/neurocontainers",
+            "mricrogl 1.2.20220720": "NeuroDesk/neurocontainers",
+            "mricroglGUI-mricrogl 1.2.20220720": "NeuroDesk/neurocontainers"
+        },
+        "mricron": {
+            "mricron 1.0.20190902": "NeuroDesk/neurocontainers",
+            "mricronGUI-mricron 1.0.20190902": "NeuroDesk/neurocontainers",
+            "mricron 1.2.20211006": "NeuroDesk/neurocontainers"
+        },
+        "mricron_arm64": {
+            "mricron_arm64 1.2.20211006": "NeuroDesk/neurocontainers"
+        },
+        "mriqc": {
+            "mriqc 0.16.1": "NeuroDesk/neurocontainers",
+            "mriqc 22.0.6": "NeuroDesk/neurocontainers",
+            "mriqc 24.0.2": "NeuroDesk/neurocontainers"
+        },
+        "mritools": {
+            "mritools 3.3.0": "NeuroDesk/neurocontainers",
+            "mritools 4.9.0": "NeuroDesk/neurocontainers",
+            "mritools 4.9.1": "NeuroDesk/neurocontainers"
+        },
+        "mritools_arm64": {
+            "mritools_arm64 4.9.0": "NeuroDesk/neurocontainers",
+            "mritools_arm64 4.9.1": "NeuroDesk/neurocontainers"
+        },
+        "mrsimetabolicconnectome": {
+            "mrsimetabolicconnectome 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "mrsiproc": {
+            "mrsiproc 0.0.1": "NeuroDesk/neurocontainers",
+            "mrsiproc 0.1.0": "NeuroDesk/neurocontainers",
+            "mrsiproc 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "mrtrix3": {
+            "mrtrix3 3.0.1": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.1": "NeuroDesk/neurocontainers",
+            "mrtrix3 3.0.2": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.2": "NeuroDesk/neurocontainers",
+            "mrtrix3 3.0.3": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.3": "NeuroDesk/neurocontainers",
+            "mrtrix3 3.0.4": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.4": "NeuroDesk/neurocontainers",
+            "mrtrix3 3.0.7": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.7": "NeuroDesk/neurocontainers",
+            "mrtrix3 3.0.8": "NeuroDesk/neurocontainers",
+            "mrviewGUI-mrtrix3 3.0.8": "NeuroDesk/neurocontainers"
+        },
+        "mrtrix3src": {
+            "mrtrix3src latest": "NeuroDesk/neurocontainers"
+        },
+        "mrtrix3tissue": {
+            "mrtrix3tissue 5.2.8": "NeuroDesk/neurocontainers"
+        },
+        "musclemap": {
+            "musclemap 1.2.8": "NeuroDesk/neurocontainers",
+            "musclemap 1.3.10": "NeuroDesk/neurocontainers",
+            "musclemap 1.4.0": "NeuroDesk/neurocontainers"
+        },
+        "napari": {
+            "napari 0.8.0": "NeuroDesk/neurocontainers",
+            "napari GUI-napari 0.8.0": "NeuroDesk/neurocontainers",
+            "VoxTell-napari 0.8.0": "NeuroDesk/neurocontainers",
+            "nnInteractive-napari 0.8.0": "NeuroDesk/neurocontainers",
+            "napari 0.9.2": "NeuroDesk/neurocontainers",
+            "napari GUI-napari 0.9.2": "NeuroDesk/neurocontainers",
+            "VoxTell-napari 0.9.2": "NeuroDesk/neurocontainers",
+            "nnInteractive-napari 0.9.2": "NeuroDesk/neurocontainers"
+        },
+        "napari_arm64": {
+            "napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
+            "napari GUI-napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
+            "VoxTell-napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
+            "nnInteractive-napari_arm64 0.9.2": "NeuroDesk/neurocontainers"
+        },
+        "nesvor": {
+            "nesvor 0.5.0": "NeuroDesk/neurocontainers"
+        },
+        "networkcorrespondancetoolkit": {
+            "networkcorrespondancetoolkit 0.3.3": "NeuroDesk/neurocontainers",
+            "networkcorrespondancetoolkit 0.4.1": "NeuroDesk/neurocontainers"
+        },
+        "neurocommand": {
+            "neurocommand 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "neurocommand_arm64": {
+            "neurocommand_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "neurodesktop-lite": {
+            "neurodesktop-lite 20260428 arm64": "NeuroDesk/neurocontainers",
+            "neurodesktop-lite 20260428.1.0": "NeuroDesk/neurocontainers",
+            "neurodesktop-lite 20260428": "NeuroDesk/neurocontainers"
+        },
+        "neurodesktop-lite_arm64": {
+            "neurodesktop-lite_arm64 20260428.1.0": "NeuroDesk/neurocontainers",
+            "neurodesktop-lite_arm64 20260428": "NeuroDesk/neurocontainers"
+        },
+        "neurodock": {
+            "neurodock 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "nftsim": {
+            "nftsim 1.0.2": "NeuroDesk/neurocontainers"
+        },
+        "nftsim_arm64": {
+            "nftsim_arm64 1.0.2": "NeuroDesk/neurocontainers"
+        },
+        "nibabies": {
+            "nibabies 24.0.0": "NeuroDesk/neurocontainers"
+        },
+        "niftymic": {
+            "niftymic 0.9": "NeuroDesk/neurocontainers"
+        },
+        "niftyreg": {
+            "niftyreg 1.4.0": "NeuroDesk/neurocontainers",
+            "niftyreg 2.1.2": "NeuroDesk/neurocontainers"
+        },
+        "niftyreg_arm64": {
+            "niftyreg_arm64 2.1.2": "NeuroDesk/neurocontainers"
+        },
+        "nighres": {
+            "nighres 1.5.1": "NeuroDesk/neurocontainers",
+            "nighres 1.5.2": "NeuroDesk/neurocontainers"
+        },
+        "niimath": {
+            "niimath 1.0.0": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20250529": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20250804 arm64": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20250804": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20260703": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20260924": "NeuroDesk/neurocontainers",
+            "niimath 1.0.20261016": "NeuroDesk/neurocontainers"
+        },
+        "niimath_arm64": {
+            "niimath_arm64 1.0.20260703": "NeuroDesk/neurocontainers",
+            "niimath_arm64 1.0.20260924": "NeuroDesk/neurocontainers",
+            "niimath_arm64 1.0.20261016": "NeuroDesk/neurocontainers"
+        },
+        "niistat": {
+            "niistat 1.0.20191216": "NeuroDesk/neurocontainers"
+        },
+        "nipype": {
+            "nipype 1.11.0": "NeuroDesk/neurocontainers",
+            "code-nipype 1.8.3": "NeuroDesk/neurocontainers",
+            "nipype 1.8.3": "NeuroDesk/neurocontainers"
+        },
+        "nobrainer": {
+            "nobrainer 1.2.1": "NeuroDesk/neurocontainers"
+        },
+        "noddi": {
+            "noddi 1.0": "NeuroDesk/neurocontainers"
+        },
+        "nomis": {
+            "nomis 20220225": "NeuroDesk/neurocontainers"
+        },
+        "openads": {
+            "openads 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "openadscpu": {
+            "openadscpu 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "openadscpu_arm64": {
+            "openadscpu_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "openmsk": {
+            "openmsk 0.1.11": "NeuroDesk/neurocontainers",
+            "openmsk 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "openreconacsrss": {
+            "openreconacsrss 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "openreconexample": {
+            "openreconexample 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "openreconi2iexample": {
+            "openreconi2iexample 1.0.89": "NeuroDesk/neurocontainers"
+        },
+        "openreconslicegrappa": {
+            "openreconslicegrappa 0.1.0": "NeuroDesk/neurocontainers"
+        },
+        "openrefine": {
+            "openrefine 3.10.1": "NeuroDesk/neurocontainers"
+        },
+        "oshyx": {
+            "oshyx 0.4": "NeuroDesk/neurocontainers"
+        },
+        "osprey": {
+            "osprey 2.9.0": "NeuroDesk/neurocontainers",
+            "ospreyGUI-osprey 2.9.0": "NeuroDesk/neurocontainers"
+        },
+        "ospreybids": {
+            "ospreybids 4.2.1": "NeuroDesk/neurocontainers"
+        },
+        "palm": {
+            "palm alpha119": "NeuroDesk/neurocontainers"
+        },
+        "palmettobug": {
+            "palmettobug 0.0.3": "NeuroDesk/neurocontainers",
+            "palmettobugGUI-palmettobug 0.0.3": "NeuroDesk/neurocontainers",
+            "palmettobug 0.2.11": "NeuroDesk/neurocontainers",
+            "palmettobugGUI-palmettobug 0.2.11": "NeuroDesk/neurocontainers"
+        },
+        "pals": {
+            "pals 2.0.1": "NeuroDesk/neurocontainers"
+        },
+        "pals_arm64": {
+            "pals_arm64 2.0.1": "NeuroDesk/neurocontainers"
+        },
+        "panoptica": {
+            "panoptica 2.1.6": "NeuroDesk/neurocontainers",
+            "panoptica 2.1.7": "NeuroDesk/neurocontainers"
+        },
+        "panoptica_arm64": {
+            "panoptica_arm64 2.1.7": "NeuroDesk/neurocontainers"
+        },
+        "pcntoolkit": {
+            "pcntoolkit 0.35": "NeuroDesk/neurocontainers",
+            "pcntoolkit 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "pcntoolkit_arm64": {
+            "pcntoolkit_arm64 1.3.0": "NeuroDesk/neurocontainers"
+        },
+        "petprep": {
+            "petprep 0.0.10": "NeuroDesk/neurocontainers",
+            "petprep 0.0.5": "NeuroDesk/neurocontainers"
+        },
+        "petu": {
+            "petu 0.0.7": "NeuroDesk/neurocontainers"
+        },
+        "petu_arm64": {
+            "petu_arm64 0.0.7": "NeuroDesk/neurocontainers"
+        },
+        "physio": {
+            "physio r2021a": "NeuroDesk/neurocontainers",
+            "physioGUI-physio r2021a": "NeuroDesk/neurocontainers"
+        },
+        "prequal": {
+            "prequal 1.1.0": "NeuroDesk/neurocontainers"
+        },
+        "prostatefiducialseg": {
+            "prostatefiducialseg 8.0.1": "NeuroDesk/neurocontainers",
+            "prostatefiducialseg 8.0.2": "NeuroDesk/neurocontainers",
+            "prostatefiducialseg 8.0.3": "NeuroDesk/neurocontainers"
+        },
+        "pydeface": {
+            "pydeface 2.0.2": "NeuroDesk/neurocontainers",
+            "pydeface 2.1.0": "NeuroDesk/neurocontainers"
+        },
+        "pydeface_arm64": {
+            "pydeface_arm64 2.1.0": "NeuroDesk/neurocontainers"
+        },
+        "pyem": {
+            "pyem 0.69.0": "NeuroDesk/neurocontainers"
+        },
+        "qmrlab": {
+            "qmrlab 2.4.2": "NeuroDesk/neurocontainers",
+            "qmrlab 3.0.0": "NeuroDesk/neurocontainers"
+        },
+        "qmrlab_arm64": {
+            "qmrlab_arm64 3.0.0": "NeuroDesk/neurocontainers"
+        },
+        "qsiprep": {
+            "qsiprep 0.20.0": "NeuroDesk/neurocontainers",
+            "qsiprep 1.0.1": "NeuroDesk/neurocontainers",
+            "qsiprep 26.0.0": "NeuroDesk/neurocontainers",
+            "qsiprep 26.1.0": "NeuroDesk/neurocontainers",
+            "qsiprep 26.1.1": "NeuroDesk/neurocontainers"
+        },
+        "qsirecon": {
+            "qsirecon 1.1.0": "NeuroDesk/neurocontainers",
+            "qsirecon 26.0.1": "NeuroDesk/neurocontainers"
+        },
+        "qsmbly": {
+            "qsmbly 0.11.0": "NeuroDesk/neurocontainers",
+            "qsmbly 0.29.0": "NeuroDesk/neurocontainers",
+            "qsmbly 0.3.0": "NeuroDesk/neurocontainers",
+            "qsmbly 0.4.0": "NeuroDesk/neurocontainers",
+            "qsmbly 0.8.4": "NeuroDesk/neurocontainers"
+        },
+        "qsmbly_arm64": {
+            "qsmbly_arm64 0.29.0": "NeuroDesk/neurocontainers"
+        },
+        "qsmxt": {
+            "qsmxt 10.0.0": "NeuroDesk/neurocontainers",
+            "qsmxt 6.3.2": "NeuroDesk/neurocontainers",
+            "qsmxt 6.4.4": "NeuroDesk/neurocontainers",
+            "qsmxt 7.3.3": "NeuroDesk/neurocontainers",
+            "qsmxt 8.0.7": "NeuroDesk/neurocontainers",
+            "qsmxt 8.1.0": "NeuroDesk/neurocontainers",
+            "qsmxt 8.1.1": "NeuroDesk/neurocontainers",
+            "qsmxt 8.1.3": "NeuroDesk/neurocontainers",
+            "qsmxt 8.2.0": "NeuroDesk/neurocontainers",
+            "qsmxt 8.2.1": "NeuroDesk/neurocontainers",
+            "qsmxt 8.2.2": "NeuroDesk/neurocontainers",
+            "qsmxt 8.3.2": "NeuroDesk/neurocontainers",
+            "qsmxt 9.0.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.11.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.14.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.15.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.16.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.17.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.19.1": "NeuroDesk/neurocontainers",
+            "qsmxt 9.21.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.21.1": "NeuroDesk/neurocontainers",
+            "qsmxt 9.22.0": "NeuroDesk/neurocontainers",
+            "qsmxt 9.8.0": "NeuroDesk/neurocontainers"
+        },
+        "quantiphyse": {
+            "quantiphyse 0.9.10": "NeuroDesk/neurocontainers",
+            "quantiphyseGUI-quantiphyse 0.9.10": "NeuroDesk/neurocontainers"
+        },
+        "quickshear": {
+            "quickshear 1.1.0": "NeuroDesk/neurocontainers",
+            "quickshear 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "quickshear_arm64": {
+            "quickshear_arm64 1.2.0": "NeuroDesk/neurocontainers"
+        },
+        "qupath": {
+            "qupath 0.6.0": "NeuroDesk/neurocontainers",
+            "qupathGUI-qupath 0.6.0": "NeuroDesk/neurocontainers",
+            "qupath 0.7.0": "NeuroDesk/neurocontainers",
+            "qupathGUI-qupath 0.7.0": "NeuroDesk/neurocontainers"
+        },
+        "qupath_arm64": {
+            "qupath_arm64 0.7.0": "NeuroDesk/neurocontainers",
+            "qupathGUI-qupath_arm64 0.7.0": "NeuroDesk/neurocontainers"
+        },
+        "rabies": {
+            "rabies 0.3.5": "NeuroDesk/neurocontainers",
+            "rabies 0.5.3": "NeuroDesk/neurocontainers",
+            "rabies 0.6.2": "NeuroDesk/neurocontainers"
+        },
+        "radtract": {
+            "radtract 0.2.3": "NeuroDesk/neurocontainers",
+            "radtract 0.2.4": "NeuroDesk/neurocontainers"
+        },
+        "radtract_arm64": {
+            "radtract_arm64 0.2.4": "NeuroDesk/neurocontainers"
+        },
+        "rapidtide": {
+            "rapidtide 3.1.11": "NeuroDesk/neurocontainers",
+            "rapidtide 3.2.0": "NeuroDesk/neurocontainers"
+        },
+        "rapidtide_arm64": {
+            "rapidtide_arm64 3.2.0": "NeuroDesk/neurocontainers"
+        },
+        "relion": {
+            "relion 4.0.1.sm61": "NeuroDesk/neurocontainers",
+            "relion 4.0.1.sm75": "NeuroDesk/neurocontainers",
+            "relion 5.1.1": "NeuroDesk/neurocontainers"
+        },
+        "romeo": {
+            "romeo 3.2.4": "NeuroDesk/neurocontainers",
+            "romeo 3.2.8": "NeuroDesk/neurocontainers",
+            "romeo 4.9.0": "NeuroDesk/neurocontainers",
+            "romeo 4.9.1": "NeuroDesk/neurocontainers"
+        },
+        "romeo_arm64": {
+            "romeo_arm64 4.9.0": "NeuroDesk/neurocontainers",
+            "romeo_arm64 4.9.1": "NeuroDesk/neurocontainers"
+        },
+        "root": {
+            "root 6.22.02": "NeuroDesk/neurocontainers",
+            "root 6.24.06": "NeuroDesk/neurocontainers"
+        },
+        "root_arm64": {
+            "root_arm64 6.24.06": "NeuroDesk/neurocontainers"
+        },
+        "rshrf": {
+            "rshrf 1.7.0": "NeuroDesk/neurocontainers",
+            "rshrf 1.8.0": "NeuroDesk/neurocontainers"
+        },
+        "rshrf_arm64": {
+            "rshrf_arm64 1.7.0": "NeuroDesk/neurocontainers",
+            "rshrf_arm64 1.8.0": "NeuroDesk/neurocontainers"
+        },
+        "rstudio": {
+            "rstudio 1.4.1106": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 1.4.1106": "NeuroDesk/neurocontainers",
+            "rstudio 2022.07.2": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2022.07.2": "NeuroDesk/neurocontainers",
+            "rstudio 2023.09.1": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2023.09.1": "NeuroDesk/neurocontainers",
+            "rstudio 2023.12.1": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2023.12.1": "NeuroDesk/neurocontainers",
+            "rstudio 2026.09.0": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2026.09.0": "NeuroDesk/neurocontainers",
+            "rstudio 2026.10.0": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2026.10.0": "NeuroDesk/neurocontainers"
+        },
+        "samri": {
+            "samri 0.5.4": "NeuroDesk/neurocontainers",
+            "samri 0.5": "NeuroDesk/neurocontainers"
+        },
+        "samsrfx": {
+            "samsrfx v10.004": "NeuroDesk/neurocontainers",
+            "samsrfxGUI-samsrfx v10.004": "NeuroDesk/neurocontainers"
+        },
+        "scipion": {
+            "scipion 3.8.3": "NeuroDesk/neurocontainers"
+        },
+        "segmentator": {
+            "segmentator 1.6.1": "NeuroDesk/neurocontainers"
+        },
+        "shim-toolbox": {
+            "shim-toolbox 1.5.0": "NeuroDesk/neurocontainers"
+        },
+        "sigviewer": {
+            "sigviewer 0.6.4": "NeuroDesk/neurocontainers",
+            "sigviewerGUI-sigviewer 0.6.4": "NeuroDesk/neurocontainers"
+        },
+        "sigviewer_arm64": {
+            "sigviewer_arm64 0.6.4": "NeuroDesk/neurocontainers",
+            "sigviewerGUI-sigviewer_arm64 0.6.4": "NeuroDesk/neurocontainers"
+        },
+        "skan": {
+            "skan 0.13.1": "NeuroDesk/neurocontainers"
+        },
+        "skan_arm64": {
+            "skan_arm64 0.13.1": "NeuroDesk/neurocontainers"
+        },
+        "slicegrappa": {
+            "slicegrappa 0.1.1": "NeuroDesk/neurocontainers",
+            "slicegrappa 0.1.2": "NeuroDesk/neurocontainers"
+        },
+        "slicer": {
+            "slicer 4.11.20200930": "NeuroDesk/neurocontainers",
+            "3DSlicerGUI-slicer 4.11.20200930": "NeuroDesk/neurocontainers",
+            "slicer 5.0.3": "NeuroDesk/neurocontainers",
+            "3DSlicerGUI-slicer 5.0.3": "NeuroDesk/neurocontainers",
+            "slicer 5.10.0": "NeuroDesk/neurocontainers",
+            "slicerGUI-slicer 5.10.0": "NeuroDesk/neurocontainers",
+            "slicer 5.12.4": "NeuroDesk/neurocontainers",
+            "slicerGUI-slicer 5.12.4": "NeuroDesk/neurocontainers"
+        },
+        "slicersalt": {
+            "slicersalt 3.0.0": "NeuroDesk/neurocontainers",
+            "3DSlicerGUI-slicersalt 3.0.0": "NeuroDesk/neurocontainers",
+            "slicersalt 6.0.0": "NeuroDesk/neurocontainers"
+        },
+        "sodiumgridding": {
+            "sodiumgridding 0.1.6": "NeuroDesk/neurocontainers"
+        },
+        "sodiumgriddingptpi": {
+            "sodiumgriddingptpi 0.1.10": "NeuroDesk/neurocontainers"
+        },
+        "sodiumnufft": {
+            "sodiumnufft 0.1.10": "NeuroDesk/neurocontainers"
+        },
+        "soopct": {
+            "soopct 0.0.0": "NeuroDesk/neurocontainers"
+        },
+        "sovabids": {
+            "sovabids 0.3.1a0": "NeuroDesk/neurocontainers",
+            "sovabids 0.4.7": "NeuroDesk/neurocontainers"
+        },
+        "sovabids_arm64": {
+            "sovabids_arm64 0.4.7": "NeuroDesk/neurocontainers"
+        },
+        "spant": {
+            "spant 3.7.0": "NeuroDesk/neurocontainers",
+            "spant 4.5.0": "NeuroDesk/neurocontainers"
+        },
+        "spant_arm64": {
+            "spant_arm64 4.5.0": "NeuroDesk/neurocontainers"
+        },
+        "spinalcordtoolbox": {
+            "spinalcordtoolbox 5.4": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 5.5": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 5.6": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 5.7": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 5.8": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 6.4": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 7.2": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 7.3.0": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 7.3.3": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox 7.3.4": "NeuroDesk/neurocontainers"
+        },
+        "spinalcordtoolbox_gpu": {
+            "spinalcordtoolbox_gpu 7.3.3": "NeuroDesk/neurocontainers",
+            "spinalcordtoolbox_gpu 7.3.4": "NeuroDesk/neurocontainers"
+        },
+        "spinalcordtoolbox_lite": {
+            "spinalcordtoolbox_lite 7.3.4": "NeuroDesk/neurocontainers"
+        },
+        "spm12": {
+            "spm12 r7771": "NeuroDesk/neurocontainers",
+            "spm12GUI-spm12 r7771": "NeuroDesk/neurocontainers"
+        },
+        "spm12bi": {
+            "spm12bi latest": "NeuroDesk/neurocontainers"
+        },
+        "spm25": {
+            "spm25 25.01.02": "NeuroDesk/neurocontainers",
+            "spm25 26.10.01": "NeuroDesk/neurocontainers"
+        },
+        "spmpython": {
+            "spmpython 25.1.2.post2": "NeuroDesk/neurocontainers"
+        },
+        "spmpython_arm64": {
+            "spmpython_arm64 25.1.2.post2": "NeuroDesk/neurocontainers"
+        },
+        "startrack": {
+            "startrack 20250920": "NeuroDesk/neurocontainers",
+            "StarTrack-startrack 20250920": "NeuroDesk/neurocontainers"
+        },
+        "stir": {
+            "stir 6.4.0": "NeuroDesk/neurocontainers"
+        },
+        "surfice": {
+            "surfice 1.0.20211006": "NeuroDesk/neurocontainers",
+            "surficeGUI-surfice 1.0.20211006": "NeuroDesk/neurocontainers"
+        },
+        "svrtk": {
+            "svrtk 20260626": "NeuroDesk/neurocontainers"
+        },
+        "syncro": {
+            "syncro 0.1.1": "NeuroDesk/neurocontainers",
+            "syncro 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "syncro_arm64": {
+            "syncro_arm64 0.2.0": "NeuroDesk/neurocontainers"
+        },
+        "synthseg": {
+            "synthseg 8.2.0": "NeuroDesk/neurocontainers",
+            "synthseg 8.2.1": "NeuroDesk/neurocontainers"
+        },
+        "synthstrip": {
+            "synthstrip 7.4.1": "NeuroDesk/neurocontainers",
+            "synthstrip 8.2.0": "NeuroDesk/neurocontainers"
+        },
+        "synthstrip_arm64": {
+            "synthstrip_arm64 8.2.0": "NeuroDesk/neurocontainers"
+        },
+        "synthstroke": {
+            "synthstroke 0.0.0": "NeuroDesk/neurocontainers"
+        },
+        "template": {
+            "template 1.1.5": "NeuroDesk/neurocontainers"
+        },
+        "template_arm64": {
+            "template_arm64 1.1.5": "NeuroDesk/neurocontainers"
+        },
+        "terastitcher": {
+            "terastitcher 1.11.10": "NeuroDesk/neurocontainers"
+        },
+        "terastitcher_arm64": {
+            "terastitcher_arm64 1.11.10": "NeuroDesk/neurocontainers"
+        },
+        "tgvqsm": {
+            "tgvqsm 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "topaz": {
+            "topaz 0.2.5": "NeuroDesk/neurocontainers",
+            "topaz 0.3.20": "NeuroDesk/neurocontainers"
+        },
+        "topaz_arm64": {
+            "topaz_arm64 0.3.20": "NeuroDesk/neurocontainers"
+        },
+        "topofit": {
+            "topofit 0.2.1": "NeuroDesk/neurocontainers",
+            "topofit 0.2": "NeuroDesk/neurocontainers",
+            "topofit 0.3.0": "NeuroDesk/neurocontainers",
+            "topofit 0.4.0": "NeuroDesk/neurocontainers",
+            "topofit 0.5.1": "NeuroDesk/neurocontainers",
+            "topofit 0.6.0": "NeuroDesk/neurocontainers"
+        },
+        "totalsegmentator": {
+            "totalsegmentator 2.18.0": "NeuroDesk/neurocontainers",
+            "totalsegmentator 2.5.0": "NeuroDesk/neurocontainers"
+        },
+        "totalsegmentator_arm64": {
+            "totalsegmentator_arm64 2.18.0": "NeuroDesk/neurocontainers"
+        },
+        "trackvis": {
+            "trackvis 0.6.1": "NeuroDesk/neurocontainers",
+            "trackvisGUI-trackvis 0.6.1": "NeuroDesk/neurocontainers"
+        },
+        "tractseg": {
+            "tractseg 2.10.0": "NeuroDesk/neurocontainers",
+            "tractseg 2.9": "NeuroDesk/neurocontainers"
+        },
+        "tractseg_arm64": {
+            "tractseg_arm64 2.10.0": "NeuroDesk/neurocontainers"
+        },
+        "vertexwiser": {
+            "vertexwiser 1.5.1": "NeuroDesk/neurocontainers",
+            "vertexwiser 1.5.4": "NeuroDesk/neurocontainers",
+            "vertexwiser 1.5.5": "NeuroDesk/neurocontainers"
+        },
+        "vertexwiser_arm64": {
+            "vertexwiser_arm64 1.5.1": "NeuroDesk/neurocontainers",
+            "vertexwiser_arm64 1.5.4": "NeuroDesk/neurocontainers",
+            "vertexwiser_arm64 1.5.5": "NeuroDesk/neurocontainers"
+        },
+        "vesselboost": {
+            "vesselboost 1.0.0": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.1": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.2": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.20": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.23": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.5": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.64": "NeuroDesk/neurocontainers",
+            "vesselboost 2.0.9": "NeuroDesk/neurocontainers"
+        },
+        "vesselvio": {
+            "vesselvio 1.1.2": "NeuroDesk/neurocontainers",
+            "vesselvioGUI-vesselvio 1.1.2": "NeuroDesk/neurocontainers"
+        },
+        "vessynth": {
+            "vessynth 2026.10.9": "NeuroDesk/neurocontainers"
+        },
+        "vina": {
+            "vina 1.2.3": "NeuroDesk/neurocontainers",
+            "vina 1.2.5": "NeuroDesk/neurocontainers"
+        },
+        "vina_arm64": {
+            "vina_arm64 1.2.5": "NeuroDesk/neurocontainers"
+        },
+        "vmtk": {
+            "vmtk 1.5.0": "NeuroDesk/neurocontainers",
+            "vmtk 1.5.2": "NeuroDesk/neurocontainers"
+        },
+        "voreen": {
+            "voreen 5.3.0": "NeuroDesk/neurocontainers",
+            "voreenGUI-voreen 5.3.0": "NeuroDesk/neurocontainers"
+        },
+        "wftfi": {
+            "wftfi 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "wftfi_arm64": {
+            "wftfi_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "whitematterlesions": {
+            "whitematterlesions 0.2.20261009": "NeuroDesk/neurocontainers",
+            "whitematterlesions 0.3.20261015": "NeuroDesk/neurocontainers",
+            "whitematterlesions 0.5.20261022": "NeuroDesk/neurocontainers"
+        },
+        "workshopdemo": {
+            "workshopdemo 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "workshopdemo_arm64": {
+            "workshopdemo_arm64 1.0.0": "NeuroDesk/neurocontainers"
+        },
+        "xcpd": {
+            "xcpd 0.10.7": "NeuroDesk/neurocontainers",
+            "xcpd 26.2.0": "NeuroDesk/neurocontainers"
+        },
+        "xmipp": {
+            "xmipp 6.0.0": "NeuroDesk/neurocontainers"
+        },
+        "xnat": {
+            "xnat 1.10.0": "NeuroDesk/neurocontainers",
+            "xnat 1.9.2.1": "NeuroDesk/neurocontainers"
+        },
+        "xnat_arm64": {
+            "xnat_arm64 1.10.0": "NeuroDesk/neurocontainers",
+            "xnat_arm64 1.9.2.1": "NeuroDesk/neurocontainers"
+        }
+    }
 }
