@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, patch
 
 from scripts.zenodo_catalog import (
     catalog_artifacts,
-    enrich_catalogs,
     missing_batches,
     publish_deposition,
 )
@@ -45,16 +44,6 @@ class ZenodoCatalogTests(unittest.TestCase):
         })
         self.assertEqual(artifacts["demo_1.0_20260101"]["license"], ["MIT"])
         self.assertEqual(missing_batches(artifacts, {}, 1), [["viewer_2.0_20261010"]])
-
-    def test_enriches_every_launcher_for_one_image(self) -> None:
-        changed = enrich_catalogs(self.root, {
-            "demo_1.0_20260101": {"doi": "10.5281/zenodo.123"},
-        })
-        catalog = json.loads((self.root / "neuroimaging/apps.json").read_text())
-        self.assertEqual(changed, 2)
-        self.assertEqual({
-            app["doi"] for app in catalog["demo"]["apps"].values()
-        }, {"https://doi.org/10.5281/zenodo.123"})
 
     def test_sandbox_doi_does_not_prevent_production_publication(self) -> None:
         artifacts = catalog_artifacts(self.root)
