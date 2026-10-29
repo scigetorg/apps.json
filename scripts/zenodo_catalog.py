@@ -222,16 +222,16 @@ def publish_batch(
         if has_production_doi(artifacts[title]["doi"]) or title in existing:
             print(f"{prefix}: already published, skipping", flush=True)
             continue
+        print(f"{prefix}: resolving license ...", flush=True)
+        license_info = get_license(title, github_token, catalogue)
+        catalog_ids = {value.lower() for value in artifacts[title]["license"]}
+        recipe_ids = {entry["id"] for entry in license_info["entries"]}
+        if not catalog_ids or catalog_ids != recipe_ids:
+            raise ValueError(
+                f"Catalog licenses {sorted(catalog_ids)!r} differ from "
+                f"build-time recipe {sorted(recipe_ids)!r}"
+            )
         try:
-            print(f"{prefix}: resolving license ...", flush=True)
-            license_info = get_license(title, github_token, catalogue)
-            catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-            recipe_ids = {entry["id"] for entry in license_info["entries"]}
-            if not catalog_ids or catalog_ids != recipe_ids:
-                raise ValueError(
-                    f"Catalog licenses {sorted(catalog_ids)!r} differ from "
-                    f"build-time recipe {sorted(recipe_ids)!r}"
-                )
             print(f"{prefix}: uploading to Zenodo ...", flush=True)
             doi = publish_deposition(title, license_info, session)
             existing[title] = {"doi": doi}
