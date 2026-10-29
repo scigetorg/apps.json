@@ -21,7 +21,7 @@ domains.json                 # allowed domains -> source_repositories (owner/rep
 scripts/workflow.mjs         # CLI: checkout | run | output-paths; multi-domain orchestration
 scripts/catalog.mjs          # reads releases, builds catalog/logs/manifest, license + DOI carry-over
 scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL verification
-scripts/zenodo_catalog.py    # DOI CLI: plan | publish | enrich
+scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
 scripts/doi_provenance.py    # reads OCI image build revision from the registry (GHCR, Docker Hub fallback)
 scripts/doi_metadata.py      # builds Zenodo deposition metadata
@@ -72,7 +72,7 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 | --- | --- | --- |
 | `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → Cloudflare publish → commit outputs |
 | `publish-catalog.yml` | push to `main` touching `*/apps.json` | Cloudflare publish only |
-| `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan batches (`ZENODO_MAX_PUBLICATIONS`, default 16) → matrix publish → enrich DOIs → Cloudflare → commit |
+| `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan batches (`ZENODO_MAX_PUBLICATIONS`, default 16) → matrix publish |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
 
 Secrets/vars: `ZENODO_TOKEN` (production zenodo.org, deposit:write +

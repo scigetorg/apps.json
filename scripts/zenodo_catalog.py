@@ -242,30 +242,10 @@ def publish_batch(
     return count
 
 
-def enrich_catalogs(root: Path, published: dict[str, dict[str, Any]]) -> int:
-    changed = 0
-    for path in domain_paths(root):
-        catalog = json.loads(path.read_text(encoding="utf-8"))
-        for entry in catalog.values():
-            for name, app in entry["apps"].items():
-                title = artifact_name(app, name)
-                doi = published.get(title, {}).get("doi")
-                if not isinstance(doi, str) or not doi:
-                    continue
-                current = app.get("doi")
-                if current and "10.5072/" not in current:
-                    continue
-                resolved = f"https://doi.org/{doi}"
-                if current != resolved:
-                    app["doi"] = resolved
-                    changed += 1
-        path.write_text(json.dumps(catalog, indent=4) + "\n", encoding="utf-8")
-    return changed
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["plan", "publish", "enrich"])
+    parser.add_argument("command", choices=["plan", "publish"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--max-artifacts", type=int, default=16)
     parser.add_argument("--artifacts-json")
@@ -288,8 +268,6 @@ def main() -> int:
         github_token = os.environ.get("GITHUB_TOKEN", "")
         catalogue = fetch_catalogue()["entries"]
         print(f"Published {publish_batch(artifacts, selected, session, catalogue, github_token)} Zenodo records")
-    else:
-        print(f"Enriched {enrich_catalogs(args.catalog_root, published_depositions(session))} apps")
     return 0
 
 
