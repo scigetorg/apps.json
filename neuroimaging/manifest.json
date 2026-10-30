@@ -1,7 +1,7 @@
 {
-    "entries": 742,
+    "entries": 753,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "3dff2576a597f8eb099897f8e860d79cdda319de"
+        "NeuroDesk/neurocontainers": "75792416a26ab44a93a1b387999999529d2c5ee3"
     },
     "app_sources": {
         "afni": {
@@ -162,7 +162,8 @@
             "bidsmanager 1.4.0": "NeuroDesk/neurocontainers",
             "bidsmanager 1.4.1": "NeuroDesk/neurocontainers",
             "bidsmanager 1.5.0": "NeuroDesk/neurocontainers",
-            "bidsmanager 1.5.1": "NeuroDesk/neurocontainers"
+            "bidsmanager 1.5.1": "NeuroDesk/neurocontainers",
+            "bidsmanager 1.5.2": "NeuroDesk/neurocontainers"
         },
         "bidsmanager_arm64": {
             "bidsmanager_arm64 1.2.6.1": "NeuroDesk/neurocontainers",
@@ -170,7 +171,8 @@
             "bidsmanager_arm64 1.4.0": "NeuroDesk/neurocontainers",
             "bidsmanager_arm64 1.4.1": "NeuroDesk/neurocontainers",
             "bidsmanager_arm64 1.5.0": "NeuroDesk/neurocontainers",
-            "bidsmanager_arm64 1.5.1": "NeuroDesk/neurocontainers"
+            "bidsmanager_arm64 1.5.1": "NeuroDesk/neurocontainers",
+            "bidsmanager_arm64 1.5.2": "NeuroDesk/neurocontainers"
         },
         "bidsme": {
             "bidsme 1.11.0": "NeuroDesk/neurocontainers",
@@ -276,6 +278,7 @@
             "brats 0.1.11": "NeuroDesk/neurocontainers",
             "brats 0.1.12": "NeuroDesk/neurocontainers",
             "brats 0.1.13": "NeuroDesk/neurocontainers",
+            "brats 0.1.14": "NeuroDesk/neurocontainers",
             "brats 0.1.8": "NeuroDesk/neurocontainers"
         },
         "brkraw": {
@@ -399,7 +402,8 @@
             "datalad 1.6.4": "NeuroDesk/neurocontainers",
             "datalad 1.6.5": "NeuroDesk/neurocontainers",
             "datalad 1.7.0": "NeuroDesk/neurocontainers",
-            "datalad 1.7.1": "NeuroDesk/neurocontainers"
+            "datalad 1.7.1": "NeuroDesk/neurocontainers",
+            "datalad 1.7.2": "NeuroDesk/neurocontainers"
         },
         "datalad_arm64": {
             "datalad_arm64 1.1.5": "NeuroDesk/neurocontainers",
@@ -408,7 +412,8 @@
             "datalad_arm64 1.6.4": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.6.5": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.7.0": "NeuroDesk/neurocontainers",
-            "datalad_arm64 1.7.1": "NeuroDesk/neurocontainers"
+            "datalad_arm64 1.7.1": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.7.2": "NeuroDesk/neurocontainers"
         },
         "dcm2bids": {
             "dcm2bids 3.2.0": "NeuroDesk/neurocontainers",
@@ -797,6 +802,9 @@
             "julia 1.13.2": "NeuroDesk/neurocontainers",
             "vscodeGUI-julia 1.13.2": "NeuroDesk/neurocontainers",
             "REPLGUI-julia 1.13.2": "NeuroDesk/neurocontainers",
+            "julia 1.13.3": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia 1.13.3": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia 1.13.3": "NeuroDesk/neurocontainers",
             "julia 1.4.1": "NeuroDesk/neurocontainers",
             "julia 1.9.4": "NeuroDesk/neurocontainers",
             "vscodeGUI-julia 1.9.4": "NeuroDesk/neurocontainers",
@@ -808,7 +816,10 @@
             "REPLGUI-julia_arm64 1.13.1": "NeuroDesk/neurocontainers",
             "julia_arm64 1.13.2": "NeuroDesk/neurocontainers",
             "vscodeGUI-julia_arm64 1.13.2": "NeuroDesk/neurocontainers",
-            "REPLGUI-julia_arm64 1.13.2": "NeuroDesk/neurocontainers"
+            "REPLGUI-julia_arm64 1.13.2": "NeuroDesk/neurocontainers",
+            "julia_arm64 1.13.3": "NeuroDesk/neurocontainers",
+            "vscodeGUI-julia_arm64 1.13.3": "NeuroDesk/neurocontainers",
+            "REPLGUI-julia_arm64 1.13.3": "NeuroDesk/neurocontainers"
         },
         "kspacefilter": {
             "kspacefilter 0.1.0": "NeuroDesk/neurocontainers"
@@ -1218,10 +1229,12 @@
         },
         "pcntoolkit": {
             "pcntoolkit 0.35": "NeuroDesk/neurocontainers",
-            "pcntoolkit 1.3.0": "NeuroDesk/neurocontainers"
+            "pcntoolkit 1.3.0": "NeuroDesk/neurocontainers",
+            "pcntoolkit 1.4.0": "NeuroDesk/neurocontainers"
         },
         "pcntoolkit_arm64": {
-            "pcntoolkit_arm64 1.3.0": "NeuroDesk/neurocontainers"
+            "pcntoolkit_arm64 1.3.0": "NeuroDesk/neurocontainers",
+            "pcntoolkit_arm64 1.4.0": "NeuroDesk/neurocontainers"
         },
         "petprep": {
             "petprep 0.0.10": "NeuroDesk/neurocontainers",
@@ -1332,7 +1345,8 @@
         "rabies": {
             "rabies 0.3.5": "NeuroDesk/neurocontainers",
             "rabies 0.5.3": "NeuroDesk/neurocontainers",
-            "rabies 0.6.2": "NeuroDesk/neurocontainers"
+            "rabies 0.6.2": "NeuroDesk/neurocontainers",
+            "rabies 0.6.3": "NeuroDesk/neurocontainers"
         },
         "radtract": {
             "radtract 0.2.3": "NeuroDesk/neurocontainers",
@@ -1648,7 +1662,8 @@
         },
         "xcpd": {
             "xcpd 0.10.7": "NeuroDesk/neurocontainers",
-            "xcpd 26.2.0": "NeuroDesk/neurocontainers"
+            "xcpd 26.2.0": "NeuroDesk/neurocontainers",
+            "xcpd 26.3.0": "NeuroDesk/neurocontainers"
         },
         "xmipp": {
             "xmipp 6.0.0": "NeuroDesk/neurocontainers"

@@ -1126,6 +1126,15 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "bidsmanager 1.5.2": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "bidsmanager_1.5.2",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -1185,6 +1194,15 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidsmanager_arm64_1.5.1",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "bidsmanager_arm64 1.5.2": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "bidsmanager_arm64_1.5.2",
                 "license": [
                     "MIT"
                 ]
@@ -1693,7 +1711,7 @@
     "brainstemnavigator": {
         "apps": {
             "brainstemnavigator 1.0.0": {
-                "version": "20261025",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "brainstemnavigator_1.0.0",
@@ -1878,6 +1896,15 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "brats_0.1.13",
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "brats 0.1.14": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "brats_0.1.14",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -2475,7 +2502,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261018",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cryosparc_1.0.0",
@@ -2661,6 +2688,15 @@
                 "license": [
                     "MIT"
                 ]
+            },
+            "datalad 1.7.2": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "datalad_1.7.2",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -2729,6 +2765,15 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "datalad_arm64_1.7.1",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "datalad_arm64 1.7.2": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "datalad_arm64_1.7.2",
                 "license": [
                     "MIT"
                 ]
@@ -3504,7 +3549,7 @@
     "ep3d": {
         "apps": {
             "ep3d 1.0.0": {
-                "version": "20261021",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "ep3d_1.0.0",
@@ -5080,6 +5125,33 @@
                     "MIT"
                 ]
             },
+            "julia 1.13.3": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "julia_1.13.3",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "vscodeGUI-julia 1.13.3": {
+                "version": "20261029",
+                "exec": "code",
+                "apptainer_args": [],
+                "image": "julia_1.13.3",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "REPLGUI-julia 1.13.3": {
+                "version": "20261029",
+                "exec": "julia",
+                "apptainer_args": [],
+                "image": "julia_1.13.3",
+                "license": [
+                    "MIT"
+                ]
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": "",
@@ -5173,6 +5245,33 @@
                 "exec": "julia",
                 "apptainer_args": [],
                 "image": "julia_arm64_1.13.2",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "julia_arm64 1.13.3": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "julia_arm64_1.13.3",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "vscodeGUI-julia_arm64 1.13.3": {
+                "version": "20261029",
+                "exec": "code",
+                "apptainer_args": [],
+                "image": "julia_arm64_1.13.3",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "REPLGUI-julia_arm64 1.13.3": {
+                "version": "20261029",
+                "exec": "julia",
+                "apptainer_args": [],
+                "image": "julia_arm64_1.13.3",
                 "license": [
                     "MIT"
                 ]
@@ -6278,7 +6377,7 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
@@ -6295,7 +6394,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
@@ -6771,7 +6870,7 @@
                 ]
             },
             "musclemap 1.4.0": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "musclemap_1.4.0",
@@ -7776,6 +7875,15 @@
                 "license": [
                     "GPL-3.0-only"
                 ]
+            },
+            "pcntoolkit 1.4.0": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "pcntoolkit_1.4.0",
+                "license": [
+                    "GPL-3.0-only"
+                ]
             }
         },
         "categories": [
@@ -7789,6 +7897,15 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "pcntoolkit_arm64_1.3.0",
+                "license": [
+                    "GPL-3.0-only"
+                ]
+            },
+            "pcntoolkit_arm64 1.4.0": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "pcntoolkit_arm64_1.4.0",
                 "license": [
                     "GPL-3.0-only"
                 ]
@@ -8596,6 +8713,12 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "rabies_0.6.2"
+            },
+            "rabies 0.6.3": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "rabies_0.6.3"
             }
         },
         "categories": [
@@ -8706,7 +8829,7 @@
                 ]
             },
             "relion 5.1.1": {
-                "version": "20261018",
+                "version": "20261028",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "relion_5.1.1",
@@ -10556,6 +10679,15 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "xcpd_26.2.0",
+                "license": [
+                    "BSD-3-Clause"
+                ]
+            },
+            "xcpd 26.3.0": {
+                "version": "20261029",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "xcpd_26.3.0",
                 "license": [
                     "BSD-3-Clause"
                 ]
