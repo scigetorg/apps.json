@@ -213,49 +213,42 @@ def publish_batch(
 ) -> int:
     existing = published_depositions(session)
     count = 0
-    for title in selected:
+    failures = []
+    total = len(selected)
+    for i, title in enumerate(selected, 1):
+        prefix = f"[{i}/{total}] {title}"
         if title not in artifacts:
-            raise ValueError(f"Artifact is absent from domain catalogs: {title}")
+            raise ValueError(f"{prefix}: absent from domain catalogs")
         if has_production_doi(artifacts[title]["doi"]) or title in existing:
+            print(f"{prefix}: already published, skipping", flush=True)
             continue
+        print(f"{prefix}: resolving license ...", flush=True)
         license_info = get_license(title, github_token, catalogue)
         catalog_ids = {value.lower() for value in artifacts[title]["license"]}
         recipe_ids = {entry["id"] for entry in license_info["entries"]}
         if not catalog_ids or catalog_ids != recipe_ids:
             raise ValueError(
-                f"Catalog licenses for {title} {sorted(catalog_ids)!r} differ from "
+                f"Catalog licenses {sorted(catalog_ids)!r} differ from "
                 f"build-time recipe {sorted(recipe_ids)!r}"
             )
-        doi = publish_deposition(title, license_info, session)
-        existing[title] = {"doi": doi}
-        count += 1
+        try:
+            print(f"{prefix}: uploading to Zenodo ...", flush=True)
+            doi = publish_deposition(title, license_info, session)
+            existing[title] = {"doi": doi}
+            count += 1
+            print(f"{prefix}: published {doi}", flush=True)
+        except Exception as exc:
+            print(f"{prefix}: FAILED - {exc}", file=sys.stderr, flush=True)
+            failures.append(title)
+    if failures:
+        raise RuntimeError(f"Failed to publish {len(failures)} artifact(s): {failures}")
     return count
 
-
-def enrich_catalogs(root: Path, published: dict[str, dict[str, Any]]) -> int:
-    changed = 0
-    for path in domain_paths(root):
-        catalog = json.loads(path.read_text(encoding="utf-8"))
-        for entry in catalog.values():
-            for name, app in entry["apps"].items():
-                title = artifact_name(app, name)
-                doi = published.get(title, {}).get("doi")
-                if not isinstance(doi, str) or not doi:
-                    continue
-                current = app.get("doi")
-                if current and "10.5072/" not in current:
-                    continue
-                resolved = f"https://doi.org/{doi}"
-                if current != resolved:
-                    app["doi"] = resolved
-                    changed += 1
-        path.write_text(json.dumps(catalog, indent=4) + "\n", encoding="utf-8")
-    return changed
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["plan", "publish", "enrich"])
+    parser.add_argument("command", choices=["plan", "publish"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--max-artifacts", type=int, default=16)
     parser.add_argument("--artifacts-json")
@@ -278,8 +271,6 @@ def main() -> int:
         github_token = os.environ.get("GITHUB_TOKEN", "")
         catalogue = fetch_catalogue()["entries"]
         print(f"Published {publish_batch(artifacts, selected, session, catalogue, github_token)} Zenodo records")
-    else:
-        print(f"Enriched {enrich_catalogs(args.catalog_root, published_depositions(session))} apps")
     return 0
 
 
