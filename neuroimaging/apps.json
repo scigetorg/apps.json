@@ -2302,7 +2302,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.338917"
             },
             "code 240320": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_240320"
@@ -2315,7 +2315,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_arm64_240320"
@@ -5126,7 +5126,7 @@
                 ]
             },
             "julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "julia_1.13.3",
@@ -5135,7 +5135,7 @@
                 ]
             },
             "vscodeGUI-julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "code",
                 "apptainer_args": [],
                 "image": "julia_1.13.3",
@@ -5144,7 +5144,7 @@
                 ]
             },
             "REPLGUI-julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "julia",
                 "apptainer_args": [],
                 "image": "julia_1.13.3",
@@ -5250,7 +5250,7 @@
                 ]
             },
             "julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "julia_arm64_1.13.3",
@@ -5259,7 +5259,7 @@
                 ]
             },
             "vscodeGUI-julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "code",
                 "apptainer_args": [],
                 "image": "julia_arm64_1.13.3",
@@ -5268,7 +5268,7 @@
                 ]
             },
             "REPLGUI-julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "julia",
                 "apptainer_args": [],
                 "image": "julia_arm64_1.13.3",
@@ -6336,7 +6336,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
@@ -6352,7 +6352,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
@@ -7453,7 +7453,7 @@
     "nipype": {
         "apps": {
             "nipype 1.11.0": {
-                "version": "20261005",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "nipype_1.11.0",
@@ -9480,7 +9480,7 @@
                 "doi": "https://doi.org/10.5072/zenodo.339241"
             },
             "sovabids 0.4.7": {
-                "version": "20261013",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "sovabids_0.4.7"
@@ -9495,7 +9495,7 @@
     "sovabids_arm64": {
         "apps": {
             "sovabids_arm64 0.4.7": {
-                "version": "20261013",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "sovabids_arm64_0.4.7"
