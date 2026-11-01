@@ -1,7 +1,7 @@
 {
-    "entries": 753,
+    "entries": 754,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "d78454b2512669a4a48acfb2160a102f55564bce"
+        "NeuroDesk/neurocontainers": "11d121880fdcaa1fe89e6ff85f3f07a73bd7eec3"
     },
     "app_sources": {
         "afni": {
@@ -252,6 +252,9 @@
         "brainnetviewer": {
             "brainnetviewer 1.7.20191031": "NeuroDesk/neurocontainers",
             "brainnetviewerGUI-brainnetviewer 1.7.20191031": "NeuroDesk/neurocontainers"
+        },
+        "brainqcnet": {
+            "brainqcnet 1.0.1": "NeuroDesk/neurocontainers"
         },
         "brainstemnavigator": {
             "brainstemnavigator 1.0.0": "NeuroDesk/neurocontainers"

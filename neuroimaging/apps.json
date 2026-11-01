@@ -1708,6 +1708,25 @@
             "visualization"
         ]
     },
+    "brainqcnet": {
+        "apps": {
+            "brainqcnet 1.0.1": {
+                "version": "20261031",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "brainqcnet_1.0.1",
+                "license": [
+                    "Apache-2.0"
+                ]
+            }
+        },
+        "categories": [
+            "quality control",
+            "structural imaging",
+            "machine learning",
+            "bids apps"
+        ]
+    },
     "brainstemnavigator": {
         "apps": {
             "brainstemnavigator 1.0.0": {
@@ -9993,7 +10012,7 @@
     "synthstroke": {
         "apps": {
             "synthstroke 0.0.0": {
-                "version": "20260518",
+                "version": "20261031",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "synthstroke_0.0.0",
