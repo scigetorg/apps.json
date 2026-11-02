@@ -1,7 +1,7 @@
 {
-    "entries": 754,
+    "entries": 765,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "11d121880fdcaa1fe89e6ff85f3f07a73bd7eec3"
+        "NeuroDesk/neurocontainers": "0b901a596e3b27bf68283c407a2c613e1791c032"
     },
     "app_sources": {
         "afni": {
@@ -28,7 +28,9 @@
             "afni 26.3.04": "NeuroDesk/neurocontainers",
             "sumaGUI-afni 26.3.04": "NeuroDesk/neurocontainers",
             "afni 26.3.05": "NeuroDesk/neurocontainers",
-            "sumaGUI-afni 26.3.05": "NeuroDesk/neurocontainers"
+            "sumaGUI-afni 26.3.05": "NeuroDesk/neurocontainers",
+            "afni 26.3.07": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.07": "NeuroDesk/neurocontainers"
         },
         "aidamri": {
             "aidamri 1.1": "NeuroDesk/neurocontainers",
@@ -303,6 +305,8 @@
             "cat12GUI-cat12 26.0.0": "NeuroDesk/neurocontainers",
             "cat12 26.0.1": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 26.0.1": "NeuroDesk/neurocontainers",
+            "cat12 26.0.2": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 26.0.2": "NeuroDesk/neurocontainers",
             "cat12 26.0.rc3": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 26.0.rc3": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 r1933": "NeuroDesk/neurocontainers",
@@ -406,7 +410,8 @@
             "datalad 1.6.5": "NeuroDesk/neurocontainers",
             "datalad 1.7.0": "NeuroDesk/neurocontainers",
             "datalad 1.7.1": "NeuroDesk/neurocontainers",
-            "datalad 1.7.2": "NeuroDesk/neurocontainers"
+            "datalad 1.7.2": "NeuroDesk/neurocontainers",
+            "datalad 1.7.3": "NeuroDesk/neurocontainers"
         },
         "datalad_arm64": {
             "datalad_arm64 1.1.5": "NeuroDesk/neurocontainers",
@@ -416,7 +421,8 @@
             "datalad_arm64 1.6.5": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.7.0": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.7.1": "NeuroDesk/neurocontainers",
-            "datalad_arm64 1.7.2": "NeuroDesk/neurocontainers"
+            "datalad_arm64 1.7.2": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.7.3": "NeuroDesk/neurocontainers"
         },
         "dcm2bids": {
             "dcm2bids 3.2.0": "NeuroDesk/neurocontainers",
@@ -428,10 +434,12 @@
         "dcm2niix": {
             "dcm2niix v1.0.20240202 arm64": "NeuroDesk/neurocontainers",
             "dcm2niix v1.0.20240202": "NeuroDesk/neurocontainers",
-            "dcm2niix v1.0.20260724": "NeuroDesk/neurocontainers"
+            "dcm2niix v1.0.20260724": "NeuroDesk/neurocontainers",
+            "dcm2niix v1.0.20261029": "NeuroDesk/neurocontainers"
         },
         "dcm2niix_arm64": {
-            "dcm2niix_arm64 v1.0.20260724": "NeuroDesk/neurocontainers"
+            "dcm2niix_arm64 v1.0.20260724": "NeuroDesk/neurocontainers",
+            "dcm2niix_arm64 v1.0.20261029": "NeuroDesk/neurocontainers"
         },
         "deep-quality-estimation": {
             "deep-quality-estimation 0.0.3": "NeuroDesk/neurocontainers"
@@ -863,7 +871,25 @@
             "libreofficeImpressGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
             "libreofficeDrawGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
             "libreofficeBaseGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
-            "libreofficeMathGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers"
+            "libreofficeMathGUI-libreoffice 26.2.4": "NeuroDesk/neurocontainers",
+            "libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeWriterGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeCalcGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeImpressGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeDrawGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeBaseGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeMathGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers"
+        },
+        "libreoffice_arm64": {
+            "libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeWriterGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeCalcGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeImpressGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeDrawGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeBaseGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreofficeMathGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers"
         },
         "linda": {
             "linda 0.5.1": "NeuroDesk/neurocontainers"
@@ -1076,6 +1102,10 @@
             "musclemap 1.4.0": "NeuroDesk/neurocontainers"
         },
         "napari": {
+            "napari 0.10.0": "NeuroDesk/neurocontainers",
+            "napari GUI-napari 0.10.0": "NeuroDesk/neurocontainers",
+            "VoxTell-napari 0.10.0": "NeuroDesk/neurocontainers",
+            "nnInteractive-napari 0.10.0": "NeuroDesk/neurocontainers",
             "napari 0.8.0": "NeuroDesk/neurocontainers",
             "napari GUI-napari 0.8.0": "NeuroDesk/neurocontainers",
             "VoxTell-napari 0.8.0": "NeuroDesk/neurocontainers",
@@ -1086,6 +1116,10 @@
             "nnInteractive-napari 0.9.2": "NeuroDesk/neurocontainers"
         },
         "napari_arm64": {
+            "napari_arm64 0.10.0": "NeuroDesk/neurocontainers",
+            "napari GUI-napari_arm64 0.10.0": "NeuroDesk/neurocontainers",
+            "VoxTell-napari_arm64 0.10.0": "NeuroDesk/neurocontainers",
+            "nnInteractive-napari_arm64 0.10.0": "NeuroDesk/neurocontainers",
             "napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
             "napari GUI-napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
             "VoxTell-napari_arm64 0.9.2": "NeuroDesk/neurocontainers",
@@ -1407,7 +1441,9 @@
             "rstudio 2026.09.0": "NeuroDesk/neurocontainers",
             "rstudioGUI-rstudio 2026.09.0": "NeuroDesk/neurocontainers",
             "rstudio 2026.10.0": "NeuroDesk/neurocontainers",
-            "rstudioGUI-rstudio 2026.10.0": "NeuroDesk/neurocontainers"
+            "rstudioGUI-rstudio 2026.10.0": "NeuroDesk/neurocontainers",
+            "rstudio 2026.10.1": "NeuroDesk/neurocontainers",
+            "rstudioGUI-rstudio 2026.10.1": "NeuroDesk/neurocontainers"
         },
         "samri": {
             "samri 0.5.4": "NeuroDesk/neurocontainers",
