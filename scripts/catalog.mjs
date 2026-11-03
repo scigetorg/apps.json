@@ -1,9 +1,9 @@
 import YAML from "yaml";
+import { spawn } from "node:child_process";
 import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const IMAGE = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function jsonText(value) {
   return `${JSON.stringify(value, null, 4)}\n`;
@@ -192,7 +192,7 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
   );
 }
 
-export async function makeFiles(catalog, sourceCommits, releases) {
+export async function makeFiles(catalog, sourceCommits, releases, licenseProvenance = {}) {
   const imageOwners = new Map();
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
@@ -218,47 +218,15 @@ export async function makeFiles(catalog, sourceCommits, releases) {
       entries: imageOwners.size,
       source_commits: sourceCommits,
       app_sources: appSources,
+      license_provenance: licenseProvenance,
     }),
   };
-}
-
-async function zenodoRecords(title, token) {
-  if (!token)
-    throw new Error("ZENODO_TOKEN is required for Zenodo DOI lookups");
-  const query = new URLSearchParams({
-    q: `metadata.title:"${title}"`,
-    size: "10",
-  });
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const response = await fetch(
-      `https://zenodo.org/api/records?${query}`,
-      {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    if (response.ok) return (await response.json()).hits?.hits ?? [];
-    if (response.status === 401 || response.status === 403) {
-      throw new Error(
-        `Zenodo DOI lookup for ${title}: HTTP ${response.status}; check ZENODO_TOKEN`,
-      );
-    }
-    if (![429, 500, 502, 503, 504].includes(response.status) || attempt === 3) {
-      throw new Error(
-        `Zenodo DOI lookup for ${title}: HTTP ${response.status}`,
-      );
-    }
-    await sleep(5000 * 2 ** attempt);
-  }
-  return [];
 }
 
 export async function collectDoiMetadata(
   catalog,
   releases,
-  { delayMs = 2100, token } = {},
+  publishedDois = {},
 ) {
   const found = {};
   const groups = new Map();
@@ -279,46 +247,79 @@ export async function collectDoiMetadata(
         if (!app.doi) (found[tool] ??= {})[name] = existing;
       continue;
     }
-    const records = await zenodoRecords(title, token);
-    const matches = records.filter(
-      (record) => record.metadata?.title === title,
-    );
-    matches.sort((a, b) => Number(b.id) - Number(a.id));
-    const doi = matches[0]?.doi ?? matches[0]?.metadata?.doi;
+    const doi = publishedDois[title];
     if (doi) {
       for (const [name, item] of related)
         if (!item.doi) (found[tool] ??= {})[name] = `https://doi.org/${doi}`;
     }
-    if (delayMs) await sleep(delayMs);
   }
   return found;
 }
 
-export async function collectLicenseMetadata(catalog, sourceRoots) {
-  const found = {};
-  await Promise.all(
-    Object.entries(catalog).map(async ([tool, entry]) => {
-      for (const [name, app] of Object.entries(entry.apps)) {
-        if (app.license) continue;
-        const source = typeof sourceRoots === "string" ?
-          { root: sourceRoots, recipe: tool.replace(/_arm64$/, "") } : sourceRoots[tool]?.[name];
-        if (!source) continue;
-        let yaml;
-        try {
-          yaml = await readFile(join(source.root, "recipes", source.recipe, "build.yaml"), "utf8");
-        } catch (error) {
-          if (error.code === "ENOENT") continue;
-          throw error;
-        }
-        const document = YAML.parse(yaml);
-        const licenses = [...new Set((document?.copyright ?? [])
-          .map((item) => item?.license)
-          .filter((item) => typeof item === "string" && item))].sort();
-        if (licenses.length) (found[tool] ??= {})[name] = licenses;
+export async function resolveBuildLicenses(titles, cache = {}) {
+  if (!titles.length) return { resolved: {}, errors: {} };
+  return new Promise((resolve, reject) => {
+    const child = spawn("python3", ["-m", "scripts.catalog_licenses"],
+      { stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8").on("data", (chunk) => { stdout += chunk; });
+    child.stderr.setEncoding("utf8").on("data", (chunk) => { stderr += chunk; });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code !== 0) reject(new Error(`License resolver failed: ${stderr.trim()}`));
+      else {
+        try { resolve(JSON.parse(stdout)); } catch (error) { reject(error); }
       }
-    }),
-  );
-  return found;
+    });
+    child.stdin.end(JSON.stringify({ titles, cache }));
+  });
+}
+
+export async function collectLicenseMetadata(catalog, sourceRoots, {
+  cache = {}, resolve = resolveBuildLicenses,
+} = {}) {
+  const artifacts = new Map();
+  for (const [tool, entry] of Object.entries(catalog)) {
+    for (const [name, app] of Object.entries(entry.apps)) {
+      const source = sourceRoots[tool]?.[name];
+      if (!source) continue;
+      const title = `${app.image}_${app.version}`;
+      const group = artifacts.get(title) ?? { recipe: source.recipe, apps: [] };
+      if (group.recipe !== source.recipe)
+        throw new Error(`Conflicting source recipes for ${title}`);
+      group.apps.push({ tool, name });
+      artifacts.set(title, group);
+    }
+  }
+  const titles = [...artifacts.keys()];
+  const { resolved = {}, errors = {} } = titles.length
+    ? await resolve(titles, Object.fromEntries(titles.filter((title) => cache[title])
+      .map((title) => [title, cache[title]]))) : { resolved: {}, errors: {} };
+  const apps = {};
+  const provenance = {};
+  for (const [title, group] of artifacts) {
+    const record = resolved[title];
+    if (!record) {
+      console.warn(`Could not verify build-time license for ${title}: ${errors[title] ?? "no result"}`);
+      continue;
+    }
+    if (!/^[0-9a-f]{40}$/.test(record.revision) ||
+        !/^[A-Za-z0-9_.-]+$/.test(record.recipe))
+      throw new Error(`Invalid build-time recipe provenance for ${title}`);
+    const metadata = { license: record.license, license_details: record.license_details };
+    provenance[title] = {
+      revision: record.revision, recipe: record.recipe, copyright: record.copyright,
+      zenodo_license: record.zenodo_license ?? null,
+    };
+    if (metadata.license.length) {
+      for (const { tool, name } of group.apps)
+        (apps[tool] ??= {})[name] = metadata;
+    } else {
+      console.warn(`Build-time recipe for ${title} declares no license`);
+    }
+  }
+  return { apps, provenance };
 }
 
 export function applyMetadata(catalog, dois, licenses) {
@@ -326,7 +327,15 @@ export function applyMetadata(catalog, dois, licenses) {
   for (const [tool, entry] of Object.entries(updated)) {
     for (const [name, app] of Object.entries(entry.apps)) {
       if (dois[tool]?.[name]) app.doi = dois[tool][name];
-      if (licenses[tool]?.[name]) app.license = licenses[tool][name];
+      if (licenses[tool]?.[name]) {
+        const metadata = licenses[tool][name];
+        if (Array.isArray(metadata)) app.license = metadata;
+        else {
+          app.license = metadata.license;
+          if (metadata.license_details.length) app.license_details = metadata.license_details;
+          else delete app.license_details;
+        }
+      }
     }
   }
   return updated;
@@ -338,8 +347,9 @@ export async function consolidate({
   sources,
   previous,
   previousByIdentity = new Map(),
-  doiDelayMs = 2100,
-  zenodoToken = process.env.ZENODO_TOKEN,
+  licenseCache = {},
+  resolveLicenses = resolveBuildLicenses,
+  publishedDois = {},
 }) {
   previous ??= await readPreviousCatalog(root);
   const releases = [];
@@ -359,16 +369,16 @@ export async function consolidate({
   }
   const base = buildCatalog(releases, previous, previousByIdentity);
   const [dois, licenses] = await Promise.all([
-    zenodoToken ? collectDoiMetadata(base, releases, {
-      delayMs: doiDelayMs,
-      token: zenodoToken,
-    }) : Promise.resolve({}),
-    collectLicenseMetadata(base, sourceRoots),
+    collectDoiMetadata(base, releases, publishedDois),
+    collectLicenseMetadata(base, sourceRoots, {
+      cache: licenseCache, resolve: resolveLicenses,
+    }),
   ]);
   const files = await makeFiles(
-    applyMetadata(base, dois, licenses),
+    applyMetadata(base, dois, licenses.apps),
     sourceCommits,
     releases,
+    licenses.provenance,
   );
   await mkdir(root, { recursive: true });
   for (const [name, content] of Object.entries(files)) {

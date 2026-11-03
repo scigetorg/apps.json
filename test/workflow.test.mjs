@@ -12,9 +12,10 @@ const domains = {
   microscopy: { source_repositories: [repo] },
 };
 const sha = "a".repeat(40);
-const resolveLicenses = async (titles) => ({
+const resolveLicenses = async (titles, cache = {}) => ({
   resolved: Object.fromEntries(titles.map((title) => [title, {
-    revision: sha, recipe: "demo", copyright: [{ license: "MIT" }],
+    ...(cache[title] ?? { revision: sha, recipe: "demo", copyright: [{ license: "MIT" }] }),
+    license: ["MIT"], license_details: [],
   }])), errors: {},
 });
 
@@ -52,14 +53,15 @@ test("validates source lists and generated paths", async () => {
 test("domain move routes every version and carries established license", async () => {
   const { root, source } = await fixture();
   await consolidateDomains(root, domains, {
-    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
+    sourceCommits: { [repo]: sha }, resolveLicenses,
   });
   let neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   assert.deepEqual(neuro.demo.apps["demo 1.0"].license, ["MIT"]);
+  assert.equal(neuro.demo.apps["demo 1.0"].doi, "https://doi.org/10.123/demo");
   assert.equal(Object.hasOwn(neuro.demo.apps["demo 1.0"], "show_in_menu"), false);
   await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [microscopy]\n");
   await consolidateDomains(root, domains, {
-    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
+    sourceCommits: { [repo]: sha }, resolveLicenses,
   });
   neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   const micro = JSON.parse(await readFile(join(root, "microscopy", "apps.json"), "utf8"));
@@ -81,9 +83,39 @@ test("catalog generation can run before DOI publication", async () => {
   await writeFile(join(root, "neuroimaging", "apps.json"), "{}\n");
 
   await consolidateDomains(root, domains, {
-    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
+    sourceCommits: { [repo]: sha }, resolveLicenses,
   });
 
+  const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.equal(Object.hasOwn(catalog.demo.apps["demo 1.0"], "doi"), false);
+});
+
+test("one account lookup attaches a published DOI across domains", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921" } }, categories: ["visualization"],
+  }));
+  await writeFile(join(root, "neuroimaging", "apps.json"), "{}\n");
+  let lookups = 0;
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses,
+    lookupDois: async () => { lookups++; return { "demo_1.0_20260921": "10.123/new" }; },
+  });
+  const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.equal(catalog.demo.apps["demo 1.0"].doi, "https://doi.org/10.123/new");
+  assert.equal(lookups, 1);
+});
+
+test("Zenodo lookup failure does not block catalog generation", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921" } }, categories: ["visualization"],
+  }));
+  await writeFile(join(root, "neuroimaging", "apps.json"), "{}\n");
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses,
+    lookupDois: async () => { throw new Error("Zenodo unavailable"); },
+  });
   const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   assert.equal(Object.hasOwn(catalog.demo.apps["demo 1.0"], "doi"), false);
 });

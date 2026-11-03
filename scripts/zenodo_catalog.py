@@ -75,7 +75,7 @@ def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
                 if not isinstance(app, dict):
                     raise ValueError(f"Invalid app in {path}: {tool}/{name}")
                 title = artifact_name(app, name)
-                current = artifacts.setdefault(title, {"doi": "", "license": []})
+                current = artifacts.setdefault(title, {"doi": "", "license": [], "license_details": []})
                 doi = app.get("doi") or ""
                 if doi and current["doi"] and doi != current["doi"]:
                     raise ValueError(f"Conflicting DOI for {title}")
@@ -91,6 +91,13 @@ def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
                     if current["license"] and current["license"] != normalized:
                         raise ValueError(f"Conflicting licenses for {title}")
                     current["license"] = normalized
+                details = app.get("license_details") or []
+                if not isinstance(details, list) or any(not isinstance(item, dict) for item in details):
+                    raise ValueError(f"Invalid license details for {tool}/{name}")
+                if details:
+                    if current["license_details"] and current["license_details"] != details:
+                        raise ValueError(f"Conflicting license details for {title}")
+                    current["license_details"] = details
     return artifacts
 
 
@@ -98,13 +105,22 @@ def has_production_doi(doi: Any) -> bool:
     return isinstance(doi, str) and bool(doi) and "10.5072/" not in doi
 
 
-def published_depositions(session: requests.Session) -> dict[str, dict[str, Any]]:
+def published_depositions(
+    session: requests.Session, titles: set[str] | None = None
+) -> dict[str, dict[str, Any]]:
+    if titles is not None and not titles:
+        return {}
     result: dict[str, dict[str, Any]] = {}
     page = 1
     while True:
+        params = {"status": "published", "all_versions": 1, "page": page, "size": 100}
+        if titles is not None:
+            params["q"] = " OR ".join(
+                f'metadata.title:"{title}"' for title in sorted(titles)
+            )
         response = session.get(
             f"{ZENODO_API}/deposit/depositions",
-            params={"status": "published", "all_versions": 1, "page": page, "size": 100},
+            params=params,
             timeout=(10, 60),
         )
         response.raise_for_status()
@@ -113,7 +129,7 @@ def published_depositions(session: requests.Session) -> dict[str, dict[str, Any]
             raise ValueError("Zenodo depositions response must be a list")
         for row in rows:
             title = row.get("title") or row.get("metadata", {}).get("title")
-            if isinstance(title, str) and (
+            if isinstance(title, str) and (titles is None or title in titles) and (
                 title not in result or str(row.get("modified", "")) >
                 str(result[title].get("modified", ""))
             ):
@@ -211,7 +227,7 @@ def publish_batch(
     artifacts: dict[str, dict[str, Any]], selected: list[str], session: requests.Session,
     catalogue: dict[str, dict[str, Any]], github_token: str,
 ) -> int:
-    existing = published_depositions(session)
+    existing = published_depositions(session, set(selected))
     count = 0
     total = len(selected)
     for i, title in enumerate(selected, 1):
@@ -225,12 +241,14 @@ def publish_batch(
             print(f"{prefix}: resolving license ...", flush=True)
             license_info = get_license(title, github_token, catalogue)
             catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-            recipe_ids = {entry["id"] for entry in license_info["entries"]}
+            recipe_ids = {value.lower() for value in license_info["declared"]}
             if not catalog_ids or catalog_ids != recipe_ids:
                 raise ValueError(
                     f"Catalog licenses {sorted(catalog_ids)!r} differ from "
                     f"build-time recipe {sorted(recipe_ids)!r}"
                 )
+            if artifacts[title].get("license_details", []) != license_info["license_details"]:
+                raise ValueError("Catalog license details differ from build-time recipe")
             print(f"{prefix}: uploading to Zenodo ...", flush=True)
             doi = publish_deposition(title, license_info, session)
             existing[title] = {"doi": doi}
@@ -245,7 +263,7 @@ def publish_batch(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["plan", "publish"])
+    parser.add_argument("command", choices=["plan", "publish", "lookup"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--max-artifacts", type=int, default=16)
     parser.add_argument("--artifacts-json")
@@ -253,8 +271,13 @@ def main() -> int:
     token = os.environ.get("ZENODO_TOKEN")
     if not token:
         parser.error("ZENODO_TOKEN is required")
-    artifacts = catalog_artifacts(args.catalog_root)
     session = build_session(token)
+    if args.command == "lookup":
+        print(json.dumps({title: row.get("doi") or (row.get("metadata") or {}).get("doi")
+                          for title, row in published_depositions(session).items()
+                          if row.get("doi") or (row.get("metadata") or {}).get("doi")}))
+        return 0
+    artifacts = catalog_artifacts(args.catalog_root)
     if args.command == "plan":
         print(json.dumps(missing_batches(
             artifacts, published_depositions(session), args.max_artifacts

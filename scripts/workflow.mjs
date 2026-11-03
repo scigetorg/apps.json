@@ -71,7 +71,16 @@ export function assertUniqueSources(sources) {
   }
 }
 
-export async function consolidateDomains(root, domains, { doiDelayMs = 2100, sourceCommits = {} } = {}) {
+export async function lookupPublishedDois() {
+  if (!process.env.ZENODO_TOKEN) return {};
+  const { stdout } = await exec("python3", ["-m", "scripts.zenodo_catalog", "lookup"],
+    { maxBuffer: 10 * 1024 * 1024 });
+  return JSON.parse(stdout);
+}
+
+export async function consolidateDomains(root, domains, {
+  sourceCommits = {}, resolveLicenses, publishedDois, lookupDois = lookupPublishedDois,
+} = {}) {
   const repositories = [...new Set(Object.values(domains).flatMap((config) => config.source_repositories))];
   const sources = new Map();
   for (const repository of repositories) {
@@ -87,6 +96,14 @@ export async function consolidateDomains(root, domains, { doiDelayMs = 2100, sou
   const previousByDomain = {};
   for (const id of Object.keys(domains))
     previousByDomain[id] = await readPreviousCatalog(join(root, id));
+  const licenseCache = {};
+  for (const previous of Object.values(previousByDomain)) {
+    for (const [title, record] of Object.entries(previous.manifest?.license_provenance ?? {})) {
+      if (licenseCache[title] && JSON.stringify(licenseCache[title]) !== JSON.stringify(record))
+        throw new Error(`Conflicting build-time license provenance for ${title}`);
+      licenseCache[title] = record;
+    }
+  }
   const previousByIdentity = new Map();
   for (const [id, previous] of Object.entries(previousByDomain)) {
     const priorSources = Object.keys(previous.manifest?.source_commits ?? {});
@@ -102,12 +119,23 @@ export async function consolidateDomains(root, domains, { doiDelayMs = 2100, sou
       }
     }
   }
+  let dois = publishedDois;
+  if (dois === undefined) {
+    try {
+      dois = await lookupDois();
+    } catch (error) {
+      console.warn(`Could not look up published Zenodo DOIs: ${error.message}`);
+      dois = {};
+    }
+  }
   for (const [id, config] of Object.entries(domains)) {
     const selected = config.source_repositories.map((repository) => ({ repository, ...sources.get(repository) }));
     const files = await consolidate({
       root: join(root, id), domain: id, sources: selected,
-      previous: previousByDomain[id], previousByIdentity, doiDelayMs,
+      previous: previousByDomain[id], previousByIdentity, publishedDois: dois,
+      licenseCache, resolveLicenses,
     });
+    Object.assign(licenseCache, JSON.parse(files["manifest.json"]).license_provenance);
     console.log(`Generated ${id}: ${Object.keys(files).join(", ")} from ${config.source_repositories.join(", ")}`);
   }
 }

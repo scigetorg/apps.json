@@ -38,6 +38,7 @@ jobs:
       - name: Consolidate every domain and recipe licenses
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
         run: npm run consolidate
       - name: Publish apps catalogs to Cloudflare
         env:
