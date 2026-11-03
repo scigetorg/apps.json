@@ -11,11 +11,14 @@ from pathlib import Path
 import requests
 
 from .zenodo_catalog import catalog_artifacts
+from .doi_license import LicenseValidationError, fetch_catalogue, resolve_recipe_license
+from .license_terms import declared_licenses, license_details
+from .zenodo_catalog import domain_paths
 
 
 DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
 
-# Zenodo license IDs that differ from what apps.json stores (old renames, typos, notation variants).
+# Zenodo has used different IDs for the same license across catalogue updates.
 LICENSE_ALIASES = {
     "mit-license": "mit",
     "apache2.0": "apache-2.0",
@@ -29,6 +32,10 @@ LICENSE_ALIASES = {
     "lgpl-2.1": "lgpl-2.1-only",
 }
 
+
+def same_zenodo_license(actual, expected):
+    return (actual == expected or LICENSE_ALIASES.get(actual) == expected
+            or LICENSE_ALIASES.get(expected) == actual)
 
 def fetch_depositions(token):
     depositions = []
@@ -69,14 +76,26 @@ def fetch_depositions(token):
         page += 1
 
 
-def audit_deposition(deposition, artifacts):
+def load_provenance(root):
+    provenance = {}
+    for apps_path in domain_paths(root):
+        manifest_path = apps_path.with_name("manifest.json")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for title, record in (manifest.get("license_provenance") or {}).items():
+            if title in provenance and provenance[title] != record:
+                raise ValueError(f"Conflicting build-time license provenance for {title}")
+            provenance[title] = record
+    return provenance
+
+
+def audit_deposition(deposition, artifacts, provenance, catalogue):
     metadata = deposition.get("metadata") or {}
     title = deposition.get("title") or metadata.get("title") or ""
     actual_license = metadata.get("license")
     if isinstance(actual_license, dict):
         actual_license = actual_license.get("id")
     if isinstance(actual_license, str):
-        actual_license = LICENSE_ALIASES.get(actual_license, actual_license)
+        actual_license = actual_license.lower()
     doi_url = deposition.get("doi_url")
     if not doi_url and deposition.get("doi"):
         doi_url = f"https://doi.org/{deposition['doi']}"
@@ -94,16 +113,30 @@ def audit_deposition(deposition, artifacts):
         return row
     catalog_ids = sorted({v.lower() for v in artifacts[title]["license"]})
     row["catalog_license"] = catalog_ids
+    record = provenance.get(title)
+    if record is None:
+        row.update(status="unverified", reason="No verified build-time recipe in catalog manifest")
+        return row
+    recipe = {"copyright": record["copyright"]}
+    if record.get("zenodo_license") is not None:
+        recipe["zenodo_license"] = record["zenodo_license"]
     problems = []
-    if not catalog_ids:
-        problems.append("apps.json has no license for this container")
-    elif len(catalog_ids) == 1:
-        if actual_license != catalog_ids[0]:
-            problems.append(f"Zenodo license {actual_license!r} differs from apps.json {catalog_ids[0]!r}")
-    elif actual_license not in {"other-open", "other-closed"}:
-        problems.append(
-            f"Zenodo license {actual_license!r} is not other-open/other-closed for multi-license container"
-        )
+    try:
+        expected_ids = sorted({value.lower() for value in declared_licenses(recipe)})
+        expected_details = license_details(recipe)
+        expected_zenodo = resolve_recipe_license(recipe, catalogue)["zenodo_id"]
+    except (KeyError, ValueError, LicenseValidationError) as exc:
+        row.update(status="mismatch", problems=[f"Build-time license cannot be resolved: {exc}"])
+        return row
+    row["build_revision"] = record["revision"]
+    row["expected_license"] = expected_ids
+    row["expected_zenodo_license"] = expected_zenodo
+    if catalog_ids != expected_ids:
+        problems.append(f"apps.json licenses {catalog_ids!r} differ from build-time recipe {expected_ids!r}")
+    if artifacts[title].get("license_details", []) != expected_details:
+        problems.append("apps.json license details differ from build-time recipe")
+    if not same_zenodo_license(actual_license, expected_zenodo):
+        problems.append(f"Zenodo license {actual_license!r} differs from expected {expected_zenodo!r}")
     row.update(status="mismatch" if problems else "verified", problems=problems)
     return row
 
@@ -127,32 +160,17 @@ def write_summary(path, report):
         stream.write("\n".join(lines) + "\n")
 
 
-def load_previous(path):
-    """Return verified rows from a previous audit keyed by deposition ID."""
-    try:
-        with open(path, encoding="utf-8") as f:
-            prev = json.load(f)
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return {
-        row["id"]: row
-        for row in prev.get("records", [])
-        if row.get("status") == "verified" and row.get("id") is not None
-    }
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--output", required=True)
-    parser.add_argument("--previous", metavar="PATH",
-                        help="Previous audit JSON; verified records are reused unless catalog licenses changed")
     args = parser.parse_args()
     zenodo_token = os.environ.get("ZENODO_TOKEN")
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     artifacts = catalog_artifacts(args.catalog_root)
-    cache = load_previous(args.previous) if args.previous else {}
+    provenance = load_provenance(args.catalog_root)
+    catalogue = fetch_catalogue()["entries"]
     rows = []
     for deposition in fetch_depositions(zenodo_token):
         metadata = deposition.get("metadata") or {}
@@ -161,15 +179,7 @@ def main():
             resource = {}
         if metadata.get("upload_type") != "software" and resource.get("type") != "software":
             continue
-        dep_id = deposition.get("id")
-        cached = cache.get(dep_id)
-        if cached is not None:
-            title = cached.get("title", "")
-            if title in artifacts:
-                current = sorted({v.lower() for v in artifacts[title]["license"]})
-                if cached.get("catalog_license") != current:
-                    cached = None
-        rows.append(cached if cached is not None else audit_deposition(deposition, artifacts))
+        rows.append(audit_deposition(deposition, artifacts, provenance, catalogue))
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1
@@ -183,10 +193,11 @@ def main():
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         write_summary(os.environ["GITHUB_STEP_SUMMARY"], report)
     print(json.dumps(summary, sort_keys=True))
+    return 1 if summary.get("mismatch") or summary.get("unverified") else 0
 
 
 if __name__ == "__main__":
     try:
-        main()
+        raise SystemExit(main())
     except RuntimeError as exc:
         raise SystemExit(f"Audit failed: {exc}") from exc

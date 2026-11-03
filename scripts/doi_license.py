@@ -264,10 +264,12 @@ def resolve_recipe_license(recipe, catalogue):
                 )
             if not given_url:
                 raise LicenseValidationError(f"{context} name-only custom license needs a URL")
-            category = (
-                _category(item["zenodo_license"], catalogue, f"{context} zenodo_license")
-                if item.get("zenodo_license") is not None else "other-open"
-            )
+            selected = item.get("zenodo_license", recipe.get("zenodo_license"))
+            if selected is None:
+                raise LicenseValidationError(
+                    f"{context} custom license needs zenodo_license: other-open or other-closed"
+                )
+            category = _category(selected, catalogue, f"{context} zenodo_license")
             resolved.append({"id": category, "name": stated, "url": given_url, "osi_approved": False, "custom": True})
         else:
             raise LicenseValidationError(f"{context} needs a license ID or custom name")
@@ -275,9 +277,11 @@ def resolve_recipe_license(recipe, catalogue):
     ids = {item["id"] for item in resolved}
     override = recipe.get("zenodo_license")
     if override is not None:
-        if len(resolved) < 2:
-            raise LicenseValidationError("Top-level zenodo_license is only for multiple copyright entries")
+        if len(resolved) < 2 and not resolved[0]["custom"]:
+            raise LicenseValidationError("Top-level zenodo_license is only for custom or multiple copyright entries")
         zenodo_id = _category(override, catalogue, "Top-level zenodo_license")
+        if len(resolved) == 1 and resolved[0]["custom"] and resolved[0]["id"] != zenodo_id:
+            raise LicenseValidationError("Top-level zenodo_license conflicts with the custom copyright entry")
         if zenodo_id == "other-open" and any(item["id"] == "other-closed" for item in resolved):
             raise LicenseValidationError(
                 "Top-level other-open conflicts with an other-closed copyright entry"
