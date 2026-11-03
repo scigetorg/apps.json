@@ -69,20 +69,16 @@ test("DOI and build-time recipe licenses enrich every launcher", async () => {
   await writeFile(join(sourceRoot, "recipes", "demo", "build.yaml"),
     "domains: [neuroimaging]\ncopyright:\n  - license: Apache-2.0\n");
   const catalog = buildCatalog(rows, { catalog: {} });
-  const previousFetch = globalThis.fetch;
-  globalThis.fetch = async () => ({ ok: true, json: async () => ({ hits: { hits: [{
-    id: 12, doi: "10.123/demo", metadata: { title: "demo_1.0_20260921" },
-  }] } }) });
-  try {
+  {
     const sourceRoots = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
       .map((name) => [name, { root: sourceRoot, recipe: "demo" }])) };
     const [dois, licenses] = await Promise.all([
-      collectDoiMetadata(catalog, rows, { delayMs: 0, token: "test-token" }),
+      collectDoiMetadata(catalog, rows, { "demo_1.0_20260921": "10.123/demo" }),
       collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles) => {
         assert.deepEqual(titles, ["demo_1.0_20260921"]);
         return { resolved: { "demo_1.0_20260921": {
           revision: "a".repeat(40), recipe: "demo",
-          copyright: [{ license: "MIT" }],
+          copyright: [{ license: "MIT" }], license: ["MIT"], license_details: [],
         } }, errors: {} };
       } }),
     ]);
@@ -93,7 +89,7 @@ test("DOI and build-time recipe licenses enrich every launcher", async () => {
     }
     assert.deepEqual(licenses.provenance["demo_1.0_20260921"].copyright,
       [{ license: "MIT" }]);
-  } finally { globalThis.fetch = previousFetch; }
+  }
 });
 
 test("cached build provenance preserves historical and custom terms", async () => {
@@ -108,7 +104,14 @@ test("cached build provenance preserves historical and custom terms", async () =
       url: "https://example.org/terms" }],
   } };
   const result = await collectLicenseMetadata(catalog, sources, {
-    cache, resolve: async () => { throw new Error("cache should avoid network lookup"); },
+    cache, resolve: async (titles, cached) => {
+      assert.deepEqual(titles, ["demo_1.0_20260921"]);
+      assert.deepEqual(cached, cache);
+      return { resolved: { "demo_1.0_20260921": {
+        ...cache["demo_1.0_20260921"], license: ["other-closed"],
+        license_details: cache["demo_1.0_20260921"].copyright,
+      } }, errors: {} };
+    },
   });
   const enriched = applyMetadata(catalog, {}, result.apps);
   for (const app of Object.values(enriched.demo.apps)) {

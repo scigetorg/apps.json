@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from scripts.zenodo_catalog import (
     catalog_artifacts,
     missing_batches,
+    published_depositions,
     publish_deposition,
 )
 
@@ -80,6 +81,19 @@ class ZenodoCatalogTests(unittest.TestCase):
         metadata = session.put.call_args_list[1].kwargs["json"]["metadata"]
         self.assertEqual(metadata["license"], "mit")
         self.assertIn("Build recipe:", metadata["description"])
+
+    def test_published_lookup_limits_titles_and_checks_exact_match(self) -> None:
+        session = MagicMock()
+        response = MagicMock()
+        response.json.return_value = [
+            {"title": "demo_1.0_20260101", "doi": "10.123/demo"},
+            {"title": "demo_1.0_20260101-extra", "doi": "10.123/wrong"},
+        ]
+        session.get.return_value = response
+        rows = published_depositions(session, {"demo_1.0_20260101"})
+        self.assertEqual(set(rows), {"demo_1.0_20260101"})
+        self.assertEqual(session.get.call_args.kwargs["params"]["q"],
+                         'metadata.title:"demo_1.0_20260101"')
 
 
 if __name__ == "__main__":

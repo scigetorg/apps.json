@@ -55,8 +55,10 @@ retrieves that revision's recipe. It caches the original `copyright` entries in
 the manifest, so later runs do not repeat registry and GitHub lookups. Images
 whose provenance cannot be verified retain an existing catalog license, if
 one exists, but the DOI audit marks them unverified. A separate DOI
-workflow publishes missing SIF records to production Zenodo and adds their DOIs
-to every launcher for the image. Before publication it validates the license
+workflow publishes missing SIF records to production Zenodo. The next catalog
+run reads this account's published depositions once and adds their DOIs to every
+launcher for the image. A Zenodo lookup failure leaves existing catalog DOIs in
+place and does not stop catalog generation. Before publication it validates the license
 against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
