@@ -2,7 +2,7 @@
 
 This directory is the root of the future public `Neurodesk/apps.json` GitHub
 repository. The active domain is `neuroimaging`, sourced from
-`Neurodesk/neurocontainers`. Catalogs and inventories are generated from
+`Neurodesk/neurocontainers`. Catalogs are generated from
 configured source repositories; edit their recipe metadata and release files,
 not generated `apps.json` files.
 
@@ -24,16 +24,14 @@ declares.
 ```text
 domains.json
 neuroimaging/apps.json       # generated catalog
-neuroimaging/logs.txt        # generated CVMFS inventory
-neuroimaging/manifest.json   # generated log checksum and source commits
+neuroimaging/manifest.json   # generated image count, source commits, license provenance
 microscopy/apps.json         # generated after its source is configured
-microscopy/logs.txt          # generated
 microscopy/manifest.json     # generated
 ```
 
 Microscopy is an example only. To add it later, list the source repositories
 under `microscopy` in `domains.json` before recipes declare that domain. An
-empty configured domain publishes an empty catalog and inventory until its
+empty configured domain publishes an empty catalog until its
 first app arrives.
 
 ## Consolidation rules
@@ -49,20 +47,36 @@ launchers whose release has no primary app entry.
 supplies them, at the app or release level. Existing DOI and license values
 follow an app across domain moves when release metadata cannot supply them.
 
-`logs.txt` contains every release image and build in the domain, including
-GUI-only releases. Deleting a release JSON retires that version from the next
-catalog and log while retaining other versions. `manifest.json` records the
-log's SHA-256, image count, and source commits. The catalog workflow builds
-domain catalogs and extracts licenses from current recipes. A separate DOI
+Deleting a release JSON retires that version from the next catalog while
+retaining other versions. `manifest.json` records the image count, source
+commits, and verified build-time license
+provenance. The catalog workflow reads each image's OCI build revision and
+retrieves that revision's recipe. It caches the original `copyright` entries in
+the manifest, so later runs do not repeat registry and GitHub lookups. Images
+whose provenance cannot be verified retain an existing catalog license, if
+one exists, but the DOI audit marks them unverified. A separate DOI
 workflow publishes missing SIF records to production Zenodo and adds their DOIs
 to every launcher for the image. Before publication it validates the license
 against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
 A weekly read-only audit compares published Zenodo licenses and catalog licenses
-with those same build-time recipes, and uploads a JSON report. A Zenodo failure
-does not block catalog updates. Historical releases should state their license
-when it differs from the current recipe.
+with those same build-time recipes, and uploads a JSON report. It checks the
+exact Zenodo category selected for multiple licenses and fails on mismatches or
+unverified provenance. The audit rechecks every published deposition each run.
+A Zenodo failure does not block catalog updates. Historical releases state their license
+through their build-time recipe, without edits to release JSON. These checks
+verify agreement between the recipe, catalog, and Zenodo; they cannot determine
+whether the original recipe described the upstream legal terms correctly.
+
+For DOI publication, each `copyright[].license` in the build-time recipe must
+match an ID in Zenodo's live license catalogue. List multiple licenses as
+separate `copyright` entries. An SPDX expression such as `MIT OR Apache-2.0`
+is not a single Zenodo license ID. For custom terms, provide a `name`, a URL
+linking to the license terms, and an explicit `zenodo_license: other-open` or
+`other-closed`; a name and URL alone do not establish whether terms are open.
+The recipe can specify that category at the top level when its combined
+licenses need one Zenodo category.
 
 ## Enable the schedule
 
@@ -83,8 +97,7 @@ when it differs from the current recipe.
    `show_in_applist` to select visible entries. The catalog workflow sends
    no dispatch event and needs no website token.
 4. Run **Consolidate apps catalog**, then **Publish apps catalog DOIs** manually.
-   Check the files under `neuroimaging/`, website consumption, and CVMFS log
-   retrieval before
+   Check the files under `neuroimaging/` and website consumption before
    archiving `neurocommand` or disabling its old queue.
 
 The catalog workflow runs daily at 02:25 UTC; DOI publication runs at 04:25 UTC.
@@ -96,11 +109,9 @@ remains enabled.
 
 ## Retire an image
 
-Delete its versioned release JSON in the source repository. After the daily
-catalog run publishes the new domain logs, the CVMFS sync can remove the image
-if no domain still references it. The object-store cleaner applies its retention
-period after the image is absent from all published inventories and source
-release files. Published Docker registry cleanup is a separate task.
+Delete its versioned release JSON in the source repository. The next catalog
+run removes its launchers from `apps.json`. Container storage cleanup follows
+its own retention policy.
 
 ## Publish on Cloudflare Workers
 

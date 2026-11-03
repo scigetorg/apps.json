@@ -12,6 +12,11 @@ const domains = {
   microscopy: { source_repositories: [repo] },
 };
 const sha = "a".repeat(40);
+const resolveLicenses = async (titles) => ({
+  resolved: Object.fromEntries(titles.map((title) => [title, {
+    revision: sha, recipe: "demo", copyright: [{ license: "MIT" }],
+  }])), errors: {},
+});
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "catalog-workflow-"));
@@ -35,8 +40,8 @@ test("validates source lists and generated paths", async () => {
   const { root } = await fixture();
   assert.deepEqual(await readDomains(root), domains);
   assert.deepEqual(outputPaths(domains), [
-    "neuroimaging/apps.json", "neuroimaging/logs.txt", "neuroimaging/manifest.json",
-    "microscopy/apps.json", "microscopy/logs.txt", "microscopy/manifest.json",
+    "neuroimaging/apps.json", "neuroimaging/manifest.json",
+    "microscopy/apps.json", "microscopy/manifest.json",
   ]);
   await writeFile(join(root, "domains.json"), JSON.stringify({ domains: {
     neuroimaging: { source_repositories: [repo, repo] },
@@ -46,19 +51,24 @@ test("validates source lists and generated paths", async () => {
 
 test("domain move routes every version and carries established license", async () => {
   const { root, source } = await fixture();
-  await consolidateDomains(root, domains, { doiDelayMs: 0, sourceCommits: { [repo]: sha } });
+  await consolidateDomains(root, domains, {
+    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
+  });
   let neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   assert.deepEqual(neuro.demo.apps["demo 1.0"].license, ["MIT"]);
   assert.equal(Object.hasOwn(neuro.demo.apps["demo 1.0"], "show_in_menu"), false);
   await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [microscopy]\n");
-  await consolidateDomains(root, domains, { doiDelayMs: 0, sourceCommits: { [repo]: sha } });
+  await consolidateDomains(root, domains, {
+    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
+  });
   neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   const micro = JSON.parse(await readFile(join(root, "microscopy", "apps.json"), "utf8"));
   assert.deepEqual(neuro, {});
   assert.deepEqual(micro.demo.apps["demo 1.0"].license, ["MIT"]);
-  assert.equal((await readFile(join(root, "neuroimaging", "logs.txt"), "utf8")), "");
-  assert.equal((await readFile(join(root, "microscopy", "logs.txt"), "utf8")),
-    "demo_1.0_20260921 categories:visualization,\n");
+  assert.equal(JSON.parse(await readFile(join(root, "neuroimaging", "manifest.json"), "utf8"))
+    .entries, 0);
+  assert.equal(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8"))
+    .entries, 1);
   assert.deepEqual(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8"))
     .source_commits, { [repo]: sha });
 });
@@ -71,7 +81,7 @@ test("catalog generation can run before DOI publication", async () => {
   await writeFile(join(root, "neuroimaging", "apps.json"), "{}\n");
 
   await consolidateDomains(root, domains, {
-    doiDelayMs: 0, sourceCommits: { [repo]: sha },
+    doiDelayMs: 0, sourceCommits: { [repo]: sha }, resolveLicenses,
   });
 
   const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
