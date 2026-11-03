@@ -24,7 +24,7 @@ declares.
 ```text
 domains.json
 neuroimaging/apps.json       # generated catalog
-neuroimaging/manifest.json   # generated image count, source commits, license provenance
+neuroimaging/manifest.json   # generated image count and source commits
 microscopy/apps.json         # generated after its source is configured
 microscopy/manifest.json     # generated
 ```
@@ -44,28 +44,27 @@ domain. Duplicate app or image identities across repositories fail generation.
 Each generated app carries the exact `image` name of its SIF, including GUI
 launchers whose release has no primary app entry.
 `show_in_menu` and `show_in_applist` appear only when release JSON explicitly
-supplies them, at the app or release level. Existing DOI and license values
-follow an app across domain moves when release metadata cannot supply them.
+supplies them, at the app or release level. Existing license values follow the
+same image build across domain moves. DOI values follow the same build when a
+Zenodo lookup is unavailable.
 
 Deleting a release JSON retires that version from the next catalog while
-retaining other versions. `manifest.json` records the image count, source
-commits, and verified build-time license
-provenance. The catalog workflow reads each image's OCI build revision and
-retrieves that revision's recipe. It caches the original `copyright` entries in
-the manifest, so later runs do not repeat registry and GitHub lookups. Images
-whose provenance cannot be verified retain an existing catalog license, if
-one exists, but the DOI audit marks them unverified. A separate DOI
-workflow publishes missing SIF records to production Zenodo. The next catalog
-run reads this account's published depositions once and adds their DOIs to every
-launcher for the image. A Zenodo lookup failure leaves existing catalog DOIs in
-place and does not stop catalog generation. Before publication it validates the license
+retaining other versions. Deleting the last release produces an empty catalog.
+`manifest.json` records the image count and source commits. The catalog workflow
+reuses licenses for unchanged image builds and reads the OCI build revision and
+historical recipe for new builds or images without a catalog license. It does
+not carry an older build's license onto a new build. A separate DOI workflow
+publishes missing SIF records to production Zenodo. The next catalog run reads
+this account's published depositions once and adds their DOIs to every launcher
+for the image. A Zenodo lookup failure leaves existing catalog DOIs in place
+and does not stop catalog generation. Before publication it validates the license
 against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
 A weekly read-only audit compares published Zenodo licenses and catalog licenses
-with those same build-time recipes, and uploads a JSON report. It checks the
+with freshly fetched build-time recipes, and uploads a JSON report. It checks the
 exact Zenodo category selected for multiple licenses and fails on mismatches or
-unverified provenance. The audit rechecks every published deposition each run.
+unverified recipes. The audit rechecks every published deposition each run.
 A Zenodo failure does not block catalog updates. Historical releases state their license
 through their build-time recipe, without edits to release JSON. These checks
 verify agreement between the recipe, catalog, and Zenodo; they cannot determine
@@ -104,7 +103,7 @@ licenses need one Zenodo category.
 
 The catalog workflow runs daily at 02:25 UTC; DOI publication runs at 04:25 UTC.
 The DOI license audit runs Sundays at 05:00 UTC.
-Both commit generated files using the repository `GITHUB_TOKEN`. GitHub may
+The catalog workflow commits generated files using the repository `GITHUB_TOKEN`. GitHub may
 disable scheduled workflows in public
 repositories after a long period without activity; check that the schedule
 remains enabled.
@@ -112,8 +111,10 @@ remains enabled.
 ## Retire an image
 
 Delete its versioned release JSON in the source repository. The next catalog
-run removes its launchers from `apps.json`. Container storage cleanup follows
-its own retention policy.
+run removes its launchers from `apps.json`, even when it was the final release.
+The DOI planner no longer selects the removed image. A previously published DOI
+remains on Zenodo and appears as unmatched in the read-only audit. Container
+storage cleanup follows its own retention policy.
 
 ## Publish on Cloudflare Workers
 

@@ -16,7 +16,7 @@ container images, and commit the results back to `main`.
 ```text
 domains.json                 # allowed domains -> source_repositories (owner/repo array)
 <domain>/apps.json           # GENERATED catalog (neuroimaging is the only domain today)
-<domain>/manifest.json       # GENERATED image count, source commits, license provenance
+<domain>/manifest.json       # GENERATED image count and source commits
 scripts/workflow.mjs         # CLI: checkout | run | output-paths; multi-domain orchestration
 scripts/catalog.mjs          # reads releases, builds catalog/manifest, license + DOI carry-over
 scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL verification
@@ -55,11 +55,13 @@ and keep unrelated regenerated diffs out of code PRs.
 - Each app carries the exact SIF `image` name (GUI launchers included).
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
-- Existing `doi` and `license` values follow an app across domain moves. The
-  catalog replaces license values when it verifies the image's build-time
-  recipe, and caches that provenance in each domain manifest.
+- Existing license values follow the same image build across domain moves.
+  New builds resolve their license from the build-time recipe. The weekly
+  audit fetches published images' build-time recipes again; manifests do not
+  cache license provenance.
 - Retiring an image = deleting its release JSON upstream; there is no
-  `retired-images.json` any more.
+  `retired-images.json` any more. Deleting the last release produces an empty
+  catalog.
 - DOI publication validates the license against the recipe at the image's OCI
   build revision and fails if `apps.json` licenses disagree. The weekly audit
   compares the same build-time declarations and exact Zenodo ID. A Zenodo failure
@@ -72,7 +74,6 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 | Workflow | Trigger | Does |
 | --- | --- | --- |
 | `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → Cloudflare publish → commit outputs |
-| `publish-catalog.yml` | push to `main` touching `*/apps.json` | Cloudflare publish only |
 | `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan batches (`ZENODO_MAX_PUBLICATIONS`, default 16) → matrix publish |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
 
@@ -102,7 +103,6 @@ Run Python scripts as modules (`python -m scripts.<name>`) from the repo root.
 
 - `npm run publish:cloudflare` updates the public Worker.
 - `python -m scripts.zenodo_catalog publish` mints permanent production DOIs.
-- Pushing to `main` triggers `publish-catalog.yml`.
 
 Tests must not hit the network; existing tests stub `fetch`/`requests`.
 Follow that pattern when adding tests.

@@ -51,8 +51,6 @@ export async function readReleases(sourceRoot) {
       });
     }
   }
-  if (!releases.length)
-    throw new Error(`No release JSON files found in ${sourceRoot}`);
   return releases;
 }
 
@@ -172,10 +170,9 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
           throw new Error(`${flag} must be boolean for ${name}`);
         if (value !== undefined) combined[flag] = value;
       }
-      for (const field of ["doi", "license"]) {
-        if (combined[field] === undefined && prior[field] !== undefined)
-          combined[field] = prior[field];
-      }
+      if (combined.doi === undefined && prior.image === combined.image &&
+          prior.version === combined.version && prior.doi !== undefined)
+        combined.doi = prior.doi;
       const owner = owners.get(`${tool}\0${name}`);
       if (owner && owner !== data.repository)
         throw new Error(`Duplicate app ${tool}/${name} from ${owner} and ${data.repository}`);
@@ -192,7 +189,7 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
   );
 }
 
-export async function makeFiles(catalog, sourceCommits, releases, licenseProvenance = {}) {
+export async function makeFiles(catalog, sourceCommits, releases) {
   const imageOwners = new Map();
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
@@ -218,7 +215,6 @@ export async function makeFiles(catalog, sourceCommits, releases, licenseProvena
       entries: imageOwners.size,
       source_commits: sourceCommits,
       app_sources: appSources,
-      license_provenance: licenseProvenance,
     }),
   };
 }
@@ -241,22 +237,24 @@ export async function collectDoiMetadata(
   }
   for (const { tool, title, names } of groups.values()) {
     const related = [...names].map((name) => [name, catalog[tool].apps[name]]);
+    const doi = publishedDois[title];
+    if (doi) {
+      for (const [name, app] of related) {
+        const resolved = `https://doi.org/${doi}`;
+        if (app.doi !== resolved) (found[tool] ??= {})[name] = resolved;
+      }
+      continue;
+    }
     const existing = related.find(([, app]) => app.doi)?.[1].doi;
     if (existing) {
       for (const [name, app] of related)
         if (!app.doi) (found[tool] ??= {})[name] = existing;
-      continue;
-    }
-    const doi = publishedDois[title];
-    if (doi) {
-      for (const [name, item] of related)
-        if (!item.doi) (found[tool] ??= {})[name] = `https://doi.org/${doi}`;
     }
   }
   return found;
 }
 
-export async function resolveBuildLicenses(titles, cache = {}) {
+export async function resolveBuildLicenses(titles) {
   if (!titles.length) return { resolved: {}, errors: {} };
   return new Promise((resolve, reject) => {
     const child = spawn("python3", ["-m", "scripts.catalog_licenses"],
@@ -272,12 +270,12 @@ export async function resolveBuildLicenses(titles, cache = {}) {
         try { resolve(JSON.parse(stdout)); } catch (error) { reject(error); }
       }
     });
-    child.stdin.end(JSON.stringify({ titles, cache }));
+    child.stdin.end(JSON.stringify({ titles }));
   });
 }
 
 export async function collectLicenseMetadata(catalog, sourceRoots, {
-  cache = {}, resolve = resolveBuildLicenses,
+  previousByImage = new Map(), resolve = resolveBuildLicenses,
 } = {}) {
   const artifacts = new Map();
   for (const [tool, entry] of Object.entries(catalog)) {
@@ -292,26 +290,30 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
       artifacts.set(title, group);
     }
   }
-  const titles = [...artifacts.keys()];
+  const titles = [...artifacts].filter(([title, group]) => {
+    const previous = previousByImage.get(title);
+    if (!previous) return true;
+    return group.apps.some(({ tool, name }) => {
+      const app = catalog[tool].apps[name];
+      return (app.license !== undefined &&
+          JSON.stringify(app.license) !== JSON.stringify(previous.license)) ||
+        (app.license_details !== undefined &&
+          JSON.stringify(app.license_details) !== JSON.stringify(previous.license_details));
+    });
+  }).map(([title]) => title);
   const { resolved = {}, errors = {} } = titles.length
-    ? await resolve(titles, Object.fromEntries(titles.filter((title) => cache[title])
-      .map((title) => [title, cache[title]]))) : { resolved: {}, errors: {} };
+    ? await resolve(titles) : { resolved: {}, errors: {} };
+  const refreshed = new Set(titles);
   const apps = {};
-  const provenance = {};
   for (const [title, group] of artifacts) {
-    const record = resolved[title];
-    if (!record) {
-      console.warn(`Could not verify build-time license for ${title}: ${errors[title] ?? "no result"}`);
+    const metadata = refreshed.has(title)
+      ? resolved[title] ?? previousByImage.get(title) : previousByImage.get(title);
+    if (errors[title])
+      console.warn(`Could not verify build-time license for ${title}: ${errors[title]}`);
+    if (!metadata) {
+      if (!errors[title]) console.warn(`Could not verify build-time license for ${title}: no result`);
       continue;
     }
-    if (!/^[0-9a-f]{40}$/.test(record.revision) ||
-        !/^[A-Za-z0-9_.-]+$/.test(record.recipe))
-      throw new Error(`Invalid build-time recipe provenance for ${title}`);
-    const metadata = { license: record.license, license_details: record.license_details };
-    provenance[title] = {
-      revision: record.revision, recipe: record.recipe, copyright: record.copyright,
-      zenodo_license: record.zenodo_license ?? null,
-    };
     if (metadata.license.length) {
       for (const { tool, name } of group.apps)
         (apps[tool] ??= {})[name] = metadata;
@@ -319,7 +321,7 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
       console.warn(`Build-time recipe for ${title} declares no license`);
     }
   }
-  return { apps, provenance };
+  return apps;
 }
 
 export function applyMetadata(catalog, dois, licenses) {
@@ -347,7 +349,7 @@ export async function consolidate({
   sources,
   previous,
   previousByIdentity = new Map(),
-  licenseCache = {},
+  previousByImage = new Map(),
   resolveLicenses = resolveBuildLicenses,
   publishedDois = {},
 }) {
@@ -371,14 +373,13 @@ export async function consolidate({
   const [dois, licenses] = await Promise.all([
     collectDoiMetadata(base, releases, publishedDois),
     collectLicenseMetadata(base, sourceRoots, {
-      cache: licenseCache, resolve: resolveLicenses,
+      previousByImage, resolve: resolveLicenses,
     }),
   ]);
   const files = await makeFiles(
-    applyMetadata(base, dois, licenses.apps),
+    applyMetadata(base, dois, licenses),
     sourceCommits,
     releases,
-    licenses.provenance,
   );
   await mkdir(root, { recursive: true });
   for (const [name, content] of Object.entries(files)) {

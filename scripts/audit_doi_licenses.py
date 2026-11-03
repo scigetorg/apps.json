@@ -5,15 +5,15 @@ import json
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
 
 from .zenodo_catalog import catalog_artifacts
-from .doi_license import LicenseValidationError, fetch_catalogue, resolve_recipe_license
-from .license_terms import declared_licenses, license_details
-from .zenodo_catalog import domain_paths
+from .doi_license import fetch_catalogue
+from .doi_metadata import get_license
 
 
 DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
@@ -76,19 +76,22 @@ def fetch_depositions(token):
         page += 1
 
 
-def load_provenance(root):
-    provenance = {}
-    for apps_path in domain_paths(root):
-        manifest_path = apps_path.with_name("manifest.json")
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        for title, record in (manifest.get("license_provenance") or {}).items():
-            if title in provenance and provenance[title] != record:
-                raise ValueError(f"Conflicting build-time license provenance for {title}")
-            provenance[title] = record
-    return provenance
+def resolve_published_licenses(titles, github_token, catalogue, workers=8):
+    """Read each published image's build-time recipe once for this audit."""
+    results = {}
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(get_license, title, github_token, catalogue): title
+                   for title in titles}
+        for future in as_completed(futures):
+            title = futures[future]
+            try:
+                results[title] = future.result()
+            except Exception as exc:
+                results[title] = exc
+    return results
 
 
-def audit_deposition(deposition, artifacts, provenance, catalogue):
+def audit_deposition(deposition, artifacts, resolved):
     metadata = deposition.get("metadata") or {}
     title = deposition.get("title") or metadata.get("title") or ""
     actual_license = metadata.get("license")
@@ -113,22 +116,16 @@ def audit_deposition(deposition, artifacts, provenance, catalogue):
         return row
     catalog_ids = sorted({v.lower() for v in artifacts[title]["license"]})
     row["catalog_license"] = catalog_ids
-    record = provenance.get(title)
-    if record is None:
-        row.update(status="unverified", reason="No verified build-time recipe in catalog manifest")
+    info = resolved.get(title)
+    if info is None or isinstance(info, Exception):
+        reason = str(info) if info is not None else "No build-time recipe lookup result"
+        row.update(status="unverified", reason=f"Could not verify build-time recipe: {reason}")
         return row
-    recipe = {"copyright": record["copyright"]}
-    if record.get("zenodo_license") is not None:
-        recipe["zenodo_license"] = record["zenodo_license"]
     problems = []
-    try:
-        expected_ids = sorted({value.lower() for value in declared_licenses(recipe)})
-        expected_details = license_details(recipe)
-        expected_zenodo = resolve_recipe_license(recipe, catalogue)["zenodo_id"]
-    except (KeyError, ValueError, LicenseValidationError) as exc:
-        row.update(status="mismatch", problems=[f"Build-time license cannot be resolved: {exc}"])
-        return row
-    row["build_revision"] = record["revision"]
+    expected_ids = sorted({value.lower() for value in info["declared"]})
+    expected_details = info["license_details"]
+    expected_zenodo = info["zenodo_id"]
+    row["build_revision"] = info["revision"]
     row["expected_license"] = expected_ids
     row["expected_zenodo_license"] = expected_zenodo
     if catalog_ids != expected_ids:
@@ -169,9 +166,8 @@ def main():
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     artifacts = catalog_artifacts(args.catalog_root)
-    provenance = load_provenance(args.catalog_root)
     catalogue = fetch_catalogue()["entries"]
-    rows = []
+    depositions = []
     for deposition in fetch_depositions(zenodo_token):
         metadata = deposition.get("metadata") or {}
         resource = metadata.get("resource_type") or {}
@@ -179,7 +175,13 @@ def main():
             resource = {}
         if metadata.get("upload_type") != "software" and resource.get("type") != "software":
             continue
-        rows.append(audit_deposition(deposition, artifacts, provenance, catalogue))
+        depositions.append(deposition)
+    titles = {
+        deposition.get("title") or (deposition.get("metadata") or {}).get("title")
+        for deposition in depositions
+    } & artifacts.keys()
+    resolved = resolve_published_licenses(titles, os.environ.get("GITHUB_TOKEN"), catalogue)
+    rows = [audit_deposition(deposition, artifacts, resolved) for deposition in depositions]
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1

@@ -71,6 +71,25 @@ export function assertUniqueSources(sources) {
   }
 }
 
+function rememberBuildLicenses(previousByImage, catalog, { activeTitles, replace = false } = {}) {
+  for (const entry of Object.values(catalog)) {
+    for (const app of Object.values(entry.apps ?? {})) {
+      if (!app.image || !app.version || !Array.isArray(app.license) || !app.license.length)
+        continue;
+      const title = `${app.image}_${app.version}`;
+      if (activeTitles && !activeTitles.has(title)) continue;
+      const metadata = {
+        license: app.license,
+        license_details: app.license_details ?? [],
+      };
+      const prior = previousByImage.get(title);
+      if (prior && !replace && JSON.stringify(prior) !== JSON.stringify(metadata))
+        throw new Error(`Conflicting catalog licenses for ${title}`);
+      previousByImage.set(title, metadata);
+    }
+  }
+}
+
 export async function lookupPublishedDois() {
   if (!process.env.ZENODO_TOKEN) return {};
   const { stdout } = await exec("python3", ["-m", "scripts.zenodo_catalog", "lookup"],
@@ -93,17 +112,20 @@ export async function consolidateDomains(root, domains, {
     sources.set(repository, { sourceRoot, sourceCommit, releases, metadata });
   }
   assertUniqueSources(sources);
+  const activeTitles = new Set();
+  for (const source of sources.values()) {
+    for (const { path, data } of source.releases) {
+      const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
+      for (const app of Object.values(data.apps))
+        activeTitles.add(imageBuild(tool, release, app));
+    }
+  }
   const previousByDomain = {};
   for (const id of Object.keys(domains))
     previousByDomain[id] = await readPreviousCatalog(join(root, id));
-  const licenseCache = {};
-  for (const previous of Object.values(previousByDomain)) {
-    for (const [title, record] of Object.entries(previous.manifest?.license_provenance ?? {})) {
-      if (licenseCache[title] && JSON.stringify(licenseCache[title]) !== JSON.stringify(record))
-        throw new Error(`Conflicting build-time license provenance for ${title}`);
-      licenseCache[title] = record;
-    }
-  }
+  const previousByImage = new Map();
+  for (const previous of Object.values(previousByDomain))
+    rememberBuildLicenses(previousByImage, previous.catalog, { activeTitles });
   const previousByIdentity = new Map();
   for (const [id, previous] of Object.entries(previousByDomain)) {
     const priorSources = Object.keys(previous.manifest?.source_commits ?? {});
@@ -133,9 +155,9 @@ export async function consolidateDomains(root, domains, {
     const files = await consolidate({
       root: join(root, id), domain: id, sources: selected,
       previous: previousByDomain[id], previousByIdentity, publishedDois: dois,
-      licenseCache, resolveLicenses,
+      previousByImage, resolveLicenses,
     });
-    Object.assign(licenseCache, JSON.parse(files["manifest.json"]).license_provenance);
+    rememberBuildLicenses(previousByImage, JSON.parse(files["apps.json"]), { replace: true });
     console.log(`Generated ${id}: ${Object.keys(files).join(", ")} from ${config.source_repositories.join(", ")}`);
   }
 }
