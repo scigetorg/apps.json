@@ -52,8 +52,13 @@ def domain_paths(root: Path) -> list[Path]:
     return [root / domain / "apps.json" for domain in sorted(domains)]
 
 
-def artifact_name(app: dict[str, Any], name: str = "") -> str:
-    image = re.sub(r"^[A-Za-z]+GUI-", "", name).replace(" ", "_")
+def artifact_name(app: dict[str, Any], name: str = "", tool: str = "") -> str:
+    image = app.get("image")
+    if image is None:
+        # Older catalogs predate the explicit image field. Launcher labels may
+        # differ from the image name (for example, VoxTell-napari).
+        release = name.rsplit(" ", 1)[-1]
+        image = f"{tool}_{release}" if tool and release != name else ""
     date = app.get("version")
     if not isinstance(image, str) or not IMAGE.fullmatch(image):
         raise ValueError(f"Invalid catalog image: {image!r}")
@@ -74,7 +79,7 @@ def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
             for name, app in entry["apps"].items():
                 if not isinstance(app, dict):
                     raise ValueError(f"Invalid app in {path}: {tool}/{name}")
-                title = artifact_name(app, name)
+                title = artifact_name(app, name, tool)
                 current = artifacts.setdefault(title, {"doi": "", "license": [], "license_details": []})
                 doi = app.get("doi") or ""
                 if doi and current["doi"] and doi != current["doi"]:

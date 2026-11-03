@@ -46,6 +46,26 @@ class ZenodoCatalogTests(unittest.TestCase):
         self.assertEqual(artifacts["demo_1.0_20260101"]["license"], ["MIT"])
         self.assertEqual(missing_batches(artifacts, {}, 1), [["viewer_2.0_20261010"]])
 
+    def test_launcher_alias_uses_its_image_for_doi_identity(self) -> None:
+        path = self.root / "neuroimaging/apps.json"
+        catalog = json.loads(path.read_text())
+        catalog["demo"]["apps"]["VoxTell-demo 1.0"] = {
+            "image": "demo_1.0", "version": "20260101", "license": ["MIT"],
+        }
+        path.write_text(json.dumps(catalog))
+        artifacts = catalog_artifacts(self.root)
+        self.assertEqual(set(artifacts), {"demo_1.0_20260101", "viewer_2.0_20261010"})
+
+    def test_legacy_launcher_alias_uses_tool_and_release(self) -> None:
+        path = self.root / "neuroimaging/apps.json"
+        catalog = json.loads(path.read_text())
+        catalog["demo"]["apps"]["VoxTell-demo 1.0"] = {
+            "version": "20260101", "license": ["MIT"],
+        }
+        path.write_text(json.dumps(catalog))
+        artifacts = catalog_artifacts(self.root)
+        self.assertEqual(set(artifacts), {"demo_1.0_20260101", "viewer_2.0_20261010"})
+
     def test_sandbox_doi_does_not_prevent_production_publication(self) -> None:
         artifacts = catalog_artifacts(self.root)
         artifacts["demo_1.0_20260101"]["doi"] = "https://doi.org/10.5072/zenodo.1"
