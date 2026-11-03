@@ -17,6 +17,7 @@ from .doi_metadata import get_license
 
 
 DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
+RELEASE_TITLE = re.compile(r".+_.+_[0-9]{8}\Z")
 
 # Zenodo has used different IDs for the same license across catalogue updates.
 LICENSE_ALIASES = {
@@ -36,6 +37,11 @@ LICENSE_ALIASES = {
 def same_zenodo_license(actual, expected):
     return (actual == expected or LICENSE_ALIASES.get(actual) == expected
             or LICENSE_ALIASES.get(expected) == actual)
+
+
+def is_release_title(title):
+    return isinstance(title, str) and RELEASE_TITLE.fullmatch(title) is not None
+
 
 def fetch_depositions(token):
     depositions = []
@@ -108,14 +114,11 @@ def audit_deposition(deposition, artifacts, resolved):
         "doi_url": doi_url,
         "published_license": actual_license,
     }
-    if not re.fullmatch(r".+_.+_[0-9]{8}", title):
+    if not is_release_title(title):
         row.update(status="unmatched", reason="Title does not match a container release name")
         return row
-    if title not in artifacts:
-        row.update(status="unmatched", reason="Title not found in apps.json catalog")
-        return row
-    catalog_ids = sorted({v.lower() for v in artifacts[title]["license"]})
-    row["catalog_license"] = catalog_ids
+    catalog_entry = artifacts.get(title)
+    row["catalog_status"] = "current" if catalog_entry is not None else "absent"
     info = resolved.get(title)
     if info is None or isinstance(info, Exception):
         reason = str(info) if info is not None else "No build-time recipe lookup result"
@@ -128,10 +131,15 @@ def audit_deposition(deposition, artifacts, resolved):
     row["build_revision"] = info["revision"]
     row["expected_license"] = expected_ids
     row["expected_zenodo_license"] = expected_zenodo
-    if catalog_ids != expected_ids:
-        problems.append(f"apps.json licenses {catalog_ids!r} differ from build-time recipe {expected_ids!r}")
-    if artifacts[title].get("license_details", []) != expected_details:
-        problems.append("apps.json license details differ from build-time recipe")
+    if info.get("image"):
+        row["build_image"] = info["image"]
+    if catalog_entry is not None:
+        catalog_ids = sorted({v.lower() for v in catalog_entry["license"]})
+        row["catalog_license"] = catalog_ids
+        if catalog_ids != expected_ids:
+            problems.append(f"apps.json licenses {catalog_ids!r} differ from build-time recipe {expected_ids!r}")
+        if catalog_entry.get("license_details", []) != expected_details:
+            problems.append("apps.json license details differ from build-time recipe")
     if not same_zenodo_license(actual_license, expected_zenodo):
         problems.append(f"Zenodo license {actual_license!r} differs from expected {expected_zenodo!r}")
     row.update(status="mismatch" if problems else "verified", problems=problems)
@@ -142,7 +150,7 @@ def write_summary(path, report):
     lines = [
         "## Zenodo license audit",
         "",
-        f"- Published software records: {len(report['records'])}",
+        f"- Audited container records: {len(report['records'])}",
     ]
     for status, count in sorted(report["summary"].items()):
         lines.append(f"- {status}: {count}")
@@ -166,7 +174,6 @@ def main():
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     artifacts = catalog_artifacts(args.catalog_root)
-    catalogue = fetch_catalogue()["entries"]
     depositions = []
     for deposition in fetch_depositions(zenodo_token):
         metadata = deposition.get("metadata") or {}
@@ -175,12 +182,17 @@ def main():
             resource = {}
         if metadata.get("upload_type") != "software" and resource.get("type") != "software":
             continue
+        title = deposition.get("title") or metadata.get("title")
+        if not is_release_title(title) or title not in artifacts:
+            continue
         depositions.append(deposition)
     titles = {
         deposition.get("title") or (deposition.get("metadata") or {}).get("title")
         for deposition in depositions
-    } & artifacts.keys()
-    resolved = resolve_published_licenses(titles, os.environ.get("GITHUB_TOKEN"), catalogue)
+    }
+    resolved = (resolve_published_licenses(
+        titles, os.environ.get("GITHUB_TOKEN"), fetch_catalogue()["entries"]
+    ) if titles else {})
     rows = [audit_deposition(deposition, artifacts, resolved) for deposition in depositions]
     summary = {}
     for row in rows:

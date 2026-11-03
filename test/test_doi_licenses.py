@@ -2,11 +2,13 @@
 
 import base64
 import json
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from scripts import catalog_licenses, doi_license, doi_metadata, doi_provenance
+from scripts import audit_doi_licenses, catalog_licenses, doi_license, doi_metadata, doi_provenance
 from scripts.audit_doi_licenses import audit_deposition, resolve_published_licenses
 from scripts.license_terms import declared_licenses
 from scripts.zenodo_catalog import publish_batch
@@ -187,17 +189,52 @@ class DoiLicenseTests(unittest.TestCase):
         self.assertEqual(row["published_license"], "mit-license")
         self.assertEqual(row["expected_zenodo_license"], "mit")
 
-    def test_audit_unmatched_when_title_absent_from_catalog(self):
+    def test_audit_checks_historical_build_absent_from_catalog(self):
         record = {"id": 14, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
-        row = audit_deposition(record, {}, {})
-        self.assertEqual(row["status"], "unmatched")
+        row = audit_deposition(record, {}, resolved())
+        self.assertEqual(row["status"], "verified")
+        self.assertEqual(row["catalog_status"], "absent")
+        self.assertNotIn("catalog_license", row)
 
-    def test_removed_image_does_not_require_a_recipe_lookup(self):
+    def test_audit_flags_historical_zenodo_license_mismatch(self):
         record = {"id": 20, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
-        with patch("scripts.audit_doi_licenses.get_license") as lookup:
-            row = audit_deposition(record, {}, {})
-        lookup.assert_not_called()
-        self.assertEqual(row["status"], "unmatched")
+        row = audit_deposition(record, {}, resolved(zenodo_id="other-open"))
+        self.assertEqual(row["status"], "mismatch")
+        self.assertEqual(len(row["problems"]), 1)
+        self.assertIn("Zenodo license", row["problems"][0])
+
+    def test_missing_historical_build_is_unverified(self):
+        record = {"id": 22, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
+        row = audit_deposition(record, {}, {record["title"]: RuntimeError("Image unavailable")})
+        self.assertEqual(row["status"], "unverified")
+        self.assertIn("Image unavailable", row["reason"])
+
+    def test_audit_omits_published_images_absent_from_catalog(self):
+        old = "demo_1.0_20260101"
+        current = "demo_1.0_20260201"
+        depositions = [
+            {"id": 23, "title": old, "metadata": {"upload_type": "software", "license": "mit"}},
+            {"id": 24, "title": current, "metadata": {"upload_type": "software", "license": "mit"}},
+            {"id": 25, "title": "invalid", "metadata": {"upload_type": "software", "license": "mit"}},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "audit.json"
+            with (patch("sys.argv", ["audit", "--output", str(output)]),
+                  patch.dict("os.environ", {"ZENODO_TOKEN": "token"}),
+                  patch.object(audit_doi_licenses, "catalog_artifacts",
+                               return_value={current: {"license": ["MIT"]}}),
+                  patch.object(audit_doi_licenses, "fetch_catalogue",
+                               return_value={"entries": catalogue()}),
+                  patch.object(audit_doi_licenses, "fetch_depositions",
+                               return_value=depositions),
+                  patch.object(audit_doi_licenses, "resolve_published_licenses",
+                               return_value=resolved(current)) as lookup):
+                self.assertEqual(audit_doi_licenses.main(), 0)
+            self.assertEqual(lookup.call_args.args[0], {current})
+            report = json.loads(output.read_text())
+            rows = {row["title"]: row for row in report["records"]}
+            self.assertEqual(set(rows), {current})
+            self.assertEqual(report["summary"], {"verified": 1})
 
     def test_audit_reports_unavailable_build_recipe(self):
         title = "demo_1.0_20260101"

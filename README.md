@@ -62,9 +62,10 @@ against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
 A weekly read-only audit compares published Zenodo licenses and catalog licenses
-with freshly fetched build-time recipes, and uploads a JSON report. It checks the
-exact Zenodo category selected for multiple licenses and fails on mismatches or
-unverified recipes. The audit rechecks every published deposition each run.
+with freshly fetched build-time recipes for images still in the catalog. It
+uploads a JSON report, checks the exact Zenodo category selected for multiple
+licenses, and fails on mismatches or unverified recipes. It omits Zenodo records
+whose images have been removed from the catalog.
 A Zenodo failure does not block catalog updates. Historical releases state their license
 through their build-time recipe, without edits to release JSON. These checks
 verify agreement between the recipe, catalog, and Zenodo; they cannot determine
@@ -113,7 +114,7 @@ remains enabled.
 Delete its versioned release JSON in the source repository. The next catalog
 run removes its launchers from `apps.json`, even when it was the final release.
 The DOI planner no longer selects the removed image. A previously published DOI
-remains on Zenodo and appears as unmatched in the read-only audit. Container
+remains on Zenodo and is omitted from the catalog license audit. Container
 storage cleanup follows its own retention policy.
 
 ## Publish on Cloudflare Workers
