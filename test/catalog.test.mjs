@@ -77,47 +77,94 @@ test("DOI and build-time recipe licenses enrich every launcher", async () => {
       collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles) => {
         assert.deepEqual(titles, ["demo_1.0_20260921"]);
         return { resolved: { "demo_1.0_20260921": {
-          revision: "a".repeat(40), recipe: "demo",
-          copyright: [{ license: "MIT" }], license: ["MIT"], license_details: [],
+          license: ["MIT"], license_details: [],
         } }, errors: {} };
       } }),
     ]);
-    const enriched = applyMetadata(catalog, dois, licenses.apps);
+    const enriched = applyMetadata(catalog, dois, licenses);
     for (const app of Object.values(enriched.demo.apps)) {
       assert.equal(app.doi, "https://doi.org/10.123/demo");
       assert.deepEqual(app.license, ["MIT"]);
     }
-    assert.deepEqual(licenses.provenance["demo_1.0_20260921"].copyright,
-      [{ license: "MIT" }]);
   }
 });
 
-test("cached build provenance preserves historical and custom terms", async () => {
-  const catalog = buildCatalog(rows, { catalog: { demo: { apps: {
-    "demo 1.0": { license: ["Apache-2.0"] },
-  } } } });
+test("the same image reuses its catalog license and custom terms", async () => {
+  const catalog = buildCatalog(rows, { catalog: {} });
   const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
     .map((name) => [name, { recipe: "demo" }])) };
-  const cache = { "demo_1.0_20260921": {
-    revision: "b".repeat(40), recipe: "demo",
-    copyright: [{ license: "other-closed", name: "Research terms",
-      url: "https://example.org/terms" }],
-  } };
+  const details = [{ license: "other-closed", name: "Research terms",
+    url: "https://example.org/terms" }];
+  const previousByImage = new Map([["demo_1.0_20260921", {
+    license: ["other-closed"], license_details: details,
+  }]]);
   const result = await collectLicenseMetadata(catalog, sources, {
-    cache, resolve: async (titles, cached) => {
-      assert.deepEqual(titles, ["demo_1.0_20260921"]);
-      assert.deepEqual(cached, cache);
-      return { resolved: { "demo_1.0_20260921": {
-        ...cache["demo_1.0_20260921"], license: ["other-closed"],
-        license_details: cache["demo_1.0_20260921"].copyright,
+    previousByImage, resolve: async () => {
+      assert.fail("Existing image should not require a recipe lookup");
+    },
+  });
+  const enriched = applyMetadata(catalog, {}, result);
+  for (const app of Object.values(enriched.demo.apps)) {
+    assert.deepEqual(app.license, ["other-closed"]);
+    assert.deepEqual(app.license_details, details);
+  }
+});
+
+test("a new build does not inherit the previous build's license or DOI", async () => {
+  const prior = buildCatalog(rows, { catalog: {} });
+  prior.demo.apps["demo 1.0"].license = ["MIT"];
+  prior.demo.apps["demo 1.0"].doi = "https://doi.org/10.123/old";
+  const next = structuredClone(rows);
+  next[0].data.apps["demo 1.0"].version = "20261010";
+  const catalog = buildCatalog(next, { catalog: prior }, new Map([
+    [JSON.stringify([repository, "demo", "demo 1.0"]), prior.demo.apps["demo 1.0"]],
+  ]));
+  assert.equal(Object.hasOwn(catalog.demo.apps["demo 1.0"], "license"), false);
+  assert.equal(Object.hasOwn(catalog.demo.apps["demo 1.0"], "doi"), false);
+  const sources = { demo: { "demo 1.0": { recipe: "demo" } } };
+  const licenses = await collectLicenseMetadata(catalog, sources, {
+    previousByImage: new Map([["demo_1.0_20260921", {
+      license: ["MIT"], license_details: [],
+    }]]),
+    resolve: async (titles) => {
+      assert.deepEqual(titles, ["demo_1.0_20261010"]);
+      return { resolved: { "demo_1.0_20261010": {
+        license: ["Apache-2.0"], license_details: [],
       } }, errors: {} };
     },
   });
-  const enriched = applyMetadata(catalog, {}, result.apps);
-  for (const app of Object.values(enriched.demo.apps)) {
-    assert.deepEqual(app.license, ["other-closed"]);
-    assert.deepEqual(app.license_details, cache["demo_1.0_20260921"].copyright);
-  }
+  assert.deepEqual(applyMetadata(catalog, {}, licenses).demo.apps["demo 1.0"].license,
+    ["Apache-2.0"]);
+});
+
+test("changed release license is checked against the build-time recipe", async () => {
+  const changed = structuredClone(rows);
+  changed[0].data.apps["demo 1.0"].license = ["Apache-2.0"];
+  const catalog = buildCatalog(changed, { catalog: {} });
+  const previousByImage = new Map([["demo_1.0_20260921", {
+    license: ["MIT"], license_details: [],
+  }]]);
+  const licenses = await collectLicenseMetadata(catalog,
+    { demo: { "demo 1.0": { recipe: "demo" } } }, {
+      previousByImage,
+      resolve: async (titles) => {
+        assert.deepEqual(titles, ["demo_1.0_20260921"]);
+        return { resolved: { "demo_1.0_20260921": {
+          license: ["Apache-2.0"], license_details: [],
+        } }, errors: {} };
+      },
+    });
+  assert.deepEqual(applyMetadata(catalog, {}, licenses).demo.apps["demo 1.0"].license,
+    ["Apache-2.0"]);
+});
+
+test("an account DOI replaces an old DOI for the same image", async () => {
+  const catalog = buildCatalog(rows, { catalog: {} });
+  catalog.demo.apps["demo 1.0"].doi = "https://doi.org/10.5072/zenodo.1";
+  const dois = await collectDoiMetadata(catalog, rows,
+    { "demo_1.0_20260921": "10.5281/zenodo.2" });
+  assert.equal(applyMetadata(catalog, dois, {}).demo.apps["demo 1.0"].doi,
+    "https://doi.org/10.5281/zenodo.2");
 });
 
 test("recipe domains are mandatory and validated against the registry", async () => {

@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from scripts import catalog_licenses, doi_license, doi_metadata, doi_provenance
-from scripts.audit_doi_licenses import audit_deposition
+from scripts.audit_doi_licenses import audit_deposition, resolve_published_licenses
 from scripts.license_terms import declared_licenses
 from scripts.zenodo_catalog import publish_batch
 
@@ -19,6 +19,11 @@ def catalogue():
         "other-open": {"id": "other-open", "title": "Other Open", "url": None, "osi_approved": False},
         "other-closed": {"id": "other-closed", "title": "Other Closed", "url": None, "osi_approved": False},
     }
+
+
+def resolved(title="demo_1.0_20260101", declared=None, zenodo_id="mit"):
+    return {title: {"revision": "a" * 40, "declared": declared or ["MIT"],
+                    "license_details": [], "zenodo_id": zenodo_id}}
 
 
 class DoiLicenseTests(unittest.TestCase):
@@ -89,24 +94,17 @@ class DoiLicenseTests(unittest.TestCase):
         )):
             result = catalog_licenses.resolve_one("demo_1.0_20260101", "token")
         self.assertEqual(result["license"], ["other-closed"])
-        self.assertEqual(result["copyright"], recipe["copyright"])
+        self.assertEqual(result["license_details"], recipe["copyright"])
         self.assertEqual(declared_licenses({"copyright": [{"name": "Research terms",
             "url": "https://example.org/terms"}]}), ["Research terms"])
 
-    def test_cached_and_fresh_recipe_metadata_match(self):
-        record = {"revision": "a" * 40, "recipe": "demo",
-                  "copyright": [{"name": "Research terms",
-                                 "url": "https://example.org/terms"}]}
-        with patch.object(catalog_licenses, "get_build_recipe", return_value=(
-            {"copyright": record["copyright"]},
-            {"revision": record["revision"], "recipe": record["recipe"]}
-        )):
-            fresh = catalog_licenses.resolve_one("demo_1.0_20260101", "token")
-        cached = catalog_licenses.resolve_artifacts(
-            ["demo_1.0_20260101"], "token", {"demo_1.0_20260101": record}
-        )["resolved"]["demo_1.0_20260101"]
-        self.assertEqual(cached["license"], fresh["license"])
-        self.assertEqual(cached["license_details"], fresh["license_details"])
+    def test_audit_reads_each_published_build_recipe(self):
+        titles = {"demo_1.0_20260101", "viewer_2.0_20260102"}
+        with patch("scripts.audit_doi_licenses.get_license", side_effect=lambda title, *_:
+                   resolved(title)[title]) as lookup:
+            results = resolve_published_licenses(titles, "token", catalogue())
+        self.assertEqual(set(results), titles)
+        self.assertEqual(lookup.call_count, 2)
 
     def test_image_labels_must_match_container(self):
         revision = "a" * 40
@@ -168,45 +166,53 @@ class DoiLicenseTests(unittest.TestCase):
 
     def test_audit_flags_zenodo_and_apps_json_mismatches(self):
         record = {"id": 12, "title": "demo_1.0_20260101", "metadata": {"license": "apache-2.0"}}
-        provenance = {"demo_1.0_20260101": {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}]}}
         row = audit_deposition(record, {"demo_1.0_20260101": {"license": ["MIT"]}},
-                               provenance, catalogue())
+                               resolved())
         self.assertEqual(row["status"], "mismatch")
         self.assertTrue(any("apache-2.0" in p and "mit" in p for p in row["problems"]))
 
     def test_audit_verified_when_licenses_match(self):
         record = {"id": 13, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
-        provenance = {"demo_1.0_20260101": {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}]}}
         row = audit_deposition(record, {"demo_1.0_20260101": {"license": ["MIT"]}},
-                               provenance, catalogue())
+                               resolved())
         self.assertEqual(row["status"], "verified")
         self.assertEqual(row["problems"], [])
 
     def test_audit_accepts_zenodo_license_alias(self):
         title = "demo_1.0_20260101"
         record = {"id": 19, "title": title, "metadata": {"license": {"id": "mit-license"}}}
-        provenance = {title: {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}]}}
         row = audit_deposition(record, {title: {"license": ["MIT"]}},
-                               provenance, catalogue())
+                               resolved())
         self.assertEqual(row["status"], "verified")
         self.assertEqual(row["published_license"], "mit-license")
         self.assertEqual(row["expected_zenodo_license"], "mit")
 
     def test_audit_unmatched_when_title_absent_from_catalog(self):
         record = {"id": 14, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
-        row = audit_deposition(record, {}, {}, catalogue())
+        row = audit_deposition(record, {}, {})
         self.assertEqual(row["status"], "unmatched")
+
+    def test_removed_image_does_not_require_a_recipe_lookup(self):
+        record = {"id": 20, "title": "demo_1.0_20260101", "metadata": {"license": "mit"}}
+        with patch("scripts.audit_doi_licenses.get_license") as lookup:
+            row = audit_deposition(record, {}, {})
+        lookup.assert_not_called()
+        self.assertEqual(row["status"], "unmatched")
+
+    def test_audit_reports_unavailable_build_recipe(self):
+        title = "demo_1.0_20260101"
+        record = {"id": 21, "title": title, "metadata": {"license": "mit"}}
+        row = audit_deposition(record, {title: {"license": ["MIT"]}},
+                               {title: RuntimeError("Registry unavailable")})
+        self.assertEqual(row["status"], "unverified")
+        self.assertIn("Registry unavailable", row["reason"])
 
     def test_audit_requires_exact_multi_license_zenodo_category(self):
         title = "demo_1.0_20260101"
         record = {"id": 15, "title": title, "metadata": {"license": "other-closed"}}
         artifacts = {title: {"license": ["MIT", "Apache-2.0"]}}
-        provenance = {title: {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}, {"license": "Apache-2.0"}]}}
-        row = audit_deposition(record, artifacts, provenance, catalogue())
+        row = audit_deposition(record, artifacts,
+                               resolved(title, ["MIT", "Apache-2.0"], "other-open"))
         self.assertEqual(row["status"], "mismatch")
         self.assertEqual(row["expected_zenodo_license"], "other-open")
 
@@ -214,9 +220,7 @@ class DoiLicenseTests(unittest.TestCase):
         title = "demo_1.0_20260101"
         record = {"id": 16, "title": title, "metadata": {"license": "mit"}}
         artifacts = {title: {"license": ["Apache-2.0"]}}
-        provenance = {title: {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}]}}
-        row = audit_deposition(record, artifacts, provenance, catalogue())
+        row = audit_deposition(record, artifacts, resolved())
         self.assertEqual(row["status"], "mismatch")
         self.assertTrue(any("apps.json" in problem for problem in row["problems"]))
 
@@ -224,10 +228,8 @@ class DoiLicenseTests(unittest.TestCase):
         title = "demo_1.0_20260101"
         record = {"id": 18, "title": title, "metadata": {"license": "other-closed"}}
         artifacts = {title: {"license": ["MIT", "Apache-2.0"]}}
-        provenance = {title: {"revision": "a" * 40,
-            "copyright": [{"license": "MIT"}, {"license": "Apache-2.0"}],
-            "zenodo_license": "other-closed"}}
-        row = audit_deposition(record, artifacts, provenance, catalogue())
+        row = audit_deposition(record, artifacts,
+                               resolved(title, ["MIT", "Apache-2.0"], "other-closed"))
         self.assertEqual(row["status"], "verified")
 
 if __name__ == "__main__":

@@ -46,6 +46,13 @@ class ZenodoCatalogTests(unittest.TestCase):
         self.assertEqual(artifacts["demo_1.0_20260101"]["license"], ["MIT"])
         self.assertEqual(missing_batches(artifacts, {}, 1), [["viewer_2.0_20261010"]])
 
+    def test_removed_releases_are_absent_from_doi_plan(self) -> None:
+        for domain in ("neuroimaging", "microscopy"):
+            (self.root / domain / "apps.json").write_text("{}\n")
+        artifacts = catalog_artifacts(self.root)
+        self.assertEqual(artifacts, {})
+        self.assertEqual(missing_batches(artifacts, {}, 16), [[]])
+
     def test_launcher_alias_uses_its_image_for_doi_identity(self) -> None:
         path = self.root / "neuroimaging/apps.json"
         catalog = json.loads(path.read_text())

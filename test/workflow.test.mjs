@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -12,9 +12,8 @@ const domains = {
   microscopy: { source_repositories: [repo] },
 };
 const sha = "a".repeat(40);
-const resolveLicenses = async (titles, cache = {}) => ({
+const resolveLicenses = async (titles) => ({
   resolved: Object.fromEntries(titles.map((title) => [title, {
-    ...(cache[title] ?? { revision: sha, recipe: "demo", copyright: [{ license: "MIT" }] }),
     license: ["MIT"], license_details: [],
   }])), errors: {},
 });
@@ -32,7 +31,8 @@ async function fixture() {
   await writeFile(join(source, "recipes", "demo", "build.yaml"), "domains: [neuroimaging]\n");
   await mkdir(join(root, "neuroimaging"));
   await writeFile(join(root, "neuroimaging", "apps.json"), JSON.stringify({
-    demo: { apps: { "demo 1.0": { doi: "https://doi.org/10.123/old", license: ["MIT"] } } },
+    demo: { apps: { "demo 1.0": { image: "demo_1.0", version: "20260921",
+      doi: "https://doi.org/10.123/old", license: ["MIT"] } } },
   }));
   return { root, source };
 }
@@ -73,6 +73,57 @@ test("domain move routes every version and carries established license", async (
     .entries, 1);
   assert.deepEqual(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8"))
     .source_commits, { [repo]: sha });
+  assert.equal(Object.hasOwn(JSON.parse(await readFile(join(root, "microscopy", "manifest.json"), "utf8")),
+    "license_provenance"), false);
+});
+
+test("deleting a release JSON removes that image and keeps another version", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "releases", "demo", "2.0.json"), JSON.stringify({
+    apps: { "demo 2.0": { version: "20261010" } }, categories: ["visualization"],
+  }));
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses, publishedDois: {},
+  });
+  await unlink(join(source, "releases", "demo", "1.0.json"));
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses, publishedDois: {},
+  });
+  const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.deepEqual(Object.keys(catalog.demo.apps), ["demo 2.0"]);
+  assert.equal(catalog.demo.apps["demo 2.0"].image, "demo_2.0");
+  const manifest = JSON.parse(await readFile(join(root, "neuroimaging", "manifest.json"), "utf8"));
+  assert.equal(manifest.entries, 1);
+  assert.equal(Object.hasOwn(manifest, "license_provenance"), false);
+});
+
+test("deleting the last release JSON publishes an empty catalog", async () => {
+  const { root, source } = await fixture();
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses, publishedDois: {},
+  });
+  await unlink(join(source, "releases", "demo", "1.0.json"));
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses, publishedDois: {},
+  });
+  assert.deepEqual(JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8")), {});
+  const manifest = JSON.parse(await readFile(join(root, "neuroimaging", "manifest.json"), "utf8"));
+  assert.equal(manifest.entries, 0);
+});
+
+test("a corrected release license can replace the previous build's value", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "releases", "demo", "1.0.json"), JSON.stringify({
+    apps: { "demo 1.0": { version: "20260921", license: ["Apache-2.0"] } },
+    categories: ["visualization"],
+  }));
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, publishedDois: {},
+    resolveLicenses: async (titles) => ({ resolved: Object.fromEntries(titles.map(
+      (title) => [title, { license: ["Apache-2.0"], license_details: [] }])), errors: {} }),
+  });
+  const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.deepEqual(catalog.demo.apps["demo 1.0"].license, ["Apache-2.0"]);
 });
 
 test("catalog generation can run before DOI publication", async () => {
