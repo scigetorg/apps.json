@@ -8363,7 +8363,7 @@
                 "image": "prostatefiducialseg_8.0.2"
             },
             "prostatefiducialseg 8.0.3": {
-                "version": "20261023",
+                "version": "20261102",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "prostatefiducialseg_8.0.3"
