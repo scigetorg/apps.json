@@ -8,15 +8,17 @@ import yaml
 
 from .doi_license import LicenseValidationError, resolve_recipe_license
 from .doi_provenance import ProvenanceServiceError, get_build_provenance
+from .license_terms import declared_licenses, license_details
 
-def get_license(container_name, gh_token, catalogue):
-    """Resolve and validate the recipe at the image's build revision."""
+def get_build_recipe(container_name, gh_token):
+    """Read the recipe identified by the built image's OCI revision."""
     provenance = get_build_provenance(container_name, gh_token)
     headers = {
         "Accept": "application/vnd.github+json",
-        "Authorization": "Bearer " + gh_token,
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    if gh_token:
+        headers["Authorization"] = "Bearer " + gh_token
     url = (
         "https://api.github.com/repos/Neurodesk/neurocontainers/contents/"
         f"recipes/{provenance['recipe']}/build.yaml"
@@ -56,7 +58,15 @@ def get_license(container_name, gh_token, catalogue):
         raise LicenseValidationError(f"Build-time recipe YAML is invalid: {exc}") from exc
     if not isinstance(recipe, dict):
         raise LicenseValidationError("Build-time recipe YAML is not an object")
+    return recipe, provenance
+
+
+def get_license(container_name, gh_token, catalogue):
+    """Resolve and validate the recipe at the image's build revision."""
+    recipe, provenance = get_build_recipe(container_name, gh_token)
     license_info = resolve_recipe_license(recipe, catalogue)
+    license_info["declared"] = declared_licenses(recipe)
+    license_info["license_details"] = license_details(recipe)
     license_info.update(provenance)
     return license_info
 
