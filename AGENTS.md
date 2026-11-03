@@ -16,10 +16,9 @@ container images, and commit the results back to `main`.
 ```text
 domains.json                 # allowed domains -> source_repositories (owner/repo array)
 <domain>/apps.json           # GENERATED catalog (neuroimaging is the only domain today)
-<domain>/logs.txt            # GENERATED CVMFS inventory: one image_version_build per line
-<domain>/manifest.json       # GENERATED logs.txt sha256, entry count, source commit(s)
+<domain>/manifest.json       # GENERATED image count, source commits, license provenance
 scripts/workflow.mjs         # CLI: checkout | run | output-paths; multi-domain orchestration
-scripts/catalog.mjs          # reads releases, builds catalog/logs/manifest, license + DOI carry-over
+scripts/catalog.mjs          # reads releases, builds catalog/manifest, license + DOI carry-over
 scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL verification
 scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
@@ -35,7 +34,7 @@ test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses)
 
 ## Generated files — do not hand-edit
 
-`*/apps.json`, `*/logs.txt`, and `*/manifest.json` are rewritten by CI. Most
+`*/apps.json` and `*/manifest.json` are rewritten by CI. Most
 commits on `main` are bot commits ("Update domain apps catalogs from container
 releases", "Add published DOI metadata ..."). Fix data problems in the source
 repository's recipes / release JSON, or fix the generator here. When a
@@ -56,12 +55,14 @@ and keep unrelated regenerated diffs out of code PRs.
 - Each app carries the exact SIF `image` name (GUI launchers included).
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
-- Existing `doi` and `license` values follow an app across domain moves when
-  release metadata can't supply them.
+- Existing `doi` and `license` values follow an app across domain moves. The
+  catalog replaces license values when it verifies the image's build-time
+  recipe, and caches that provenance in each domain manifest.
 - Retiring an image = deleting its release JSON upstream; there is no
   `retired-images.json` any more.
 - DOI publication validates the license against the recipe at the image's OCI
-  build revision and fails if `apps.json` licenses disagree. A Zenodo failure
+  build revision and fails if `apps.json` licenses disagree. The weekly audit
+  compares the same build-time declarations and exact Zenodo ID. A Zenodo failure
   must not block catalog updates.
 
 ## Workflows (`.github/workflows/`)

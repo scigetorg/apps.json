@@ -30,14 +30,14 @@ test("only explicit release visibility flags appear in the catalog", () => {
   assert.equal(Object.hasOwn(catalog.demo, "domains"), false);
 });
 
-test("a GUI-only release remains in the CVMFS inventory", async () => {
+test("a GUI-only release remains in the catalog", async () => {
   const gui = [{ path: "releases/demo/2.0.json", data: { repository,
     apps: { "viewerGUI-demo 2.0": { version: "20260922", exec: "viewer" } },
     categories: ["visualization"],
   } }];
   const catalog = buildCatalog(gui, { catalog: {} });
   const files = await makeFiles(catalog, { [repository]: "a".repeat(40) }, gui);
-  assert.equal(files["logs.txt"], "demo_2.0_20260922 categories:visualization,\n");
+  assert.deepEqual(Object.keys(files), ["apps.json", "manifest.json"]);
   assert.equal(catalog.demo.apps["viewerGUI-demo 2.0"].image, "demo_2.0");
   assert.equal(Object.hasOwn(catalog.demo.apps["viewerGUI-demo 2.0"], "show_in_menu"), false);
 });
@@ -50,22 +50,24 @@ test("deleting one release removes its image and launchers but retains other ver
   const after = buildCatalog([newer], { catalog: buildCatalog([...rows, newer], { catalog: {} }) });
   assert.deepEqual(Object.keys(after.demo.apps), ["demo 2.0"]);
   const files = await makeFiles(after, { [repository]: "a".repeat(40) }, [newer]);
-  assert.equal(files["logs.txt"], "demo_2.0_20260922 categories:visualization,\n");
+  assert.equal(JSON.parse(files["manifest.json"]).entries, 1);
 });
 
-test("empty domain produces an empty catalog and log", async () => {
+test("empty domain produces an empty catalog and manifest", async () => {
   const files = await makeFiles(buildCatalog([], { catalog: {} }),
     { [repository]: "a".repeat(40) }, []);
   assert.deepEqual(JSON.parse(files["apps.json"]), {});
-  assert.equal(files["logs.txt"], "");
-  assert.equal(JSON.parse(files["manifest.json"]).entries, 0);
+  assert.deepEqual(Object.keys(files), ["apps.json", "manifest.json"]);
+  const manifest = JSON.parse(files["manifest.json"]);
+  assert.equal(manifest.entries, 0);
+  assert.equal(Object.hasOwn(manifest, "logs_sha256"), false);
 });
 
-test("DOI and recipe license enrichment still apply", async () => {
+test("DOI and build-time recipe licenses enrich every launcher", async () => {
   const sourceRoot = await mkdtemp(join(tmpdir(), "catalog-license-"));
   await mkdir(join(sourceRoot, "recipes", "demo"), { recursive: true });
   await writeFile(join(sourceRoot, "recipes", "demo", "build.yaml"),
-    "domains: [neuroimaging]\ncopyright:\n  - license: MIT\n");
+    "domains: [neuroimaging]\ncopyright:\n  - license: Apache-2.0\n");
   const catalog = buildCatalog(rows, { catalog: {} });
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async () => ({ ok: true, json: async () => ({ hits: { hits: [{
@@ -76,14 +78,43 @@ test("DOI and recipe license enrichment still apply", async () => {
       .map((name) => [name, { root: sourceRoot, recipe: "demo" }])) };
     const [dois, licenses] = await Promise.all([
       collectDoiMetadata(catalog, rows, { delayMs: 0, token: "test-token" }),
-      collectLicenseMetadata(catalog, sourceRoots),
+      collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles) => {
+        assert.deepEqual(titles, ["demo_1.0_20260921"]);
+        return { resolved: { "demo_1.0_20260921": {
+          revision: "a".repeat(40), recipe: "demo",
+          copyright: [{ license: "MIT" }],
+        } }, errors: {} };
+      } }),
     ]);
-    const enriched = applyMetadata(catalog, dois, licenses);
+    const enriched = applyMetadata(catalog, dois, licenses.apps);
     for (const app of Object.values(enriched.demo.apps)) {
       assert.equal(app.doi, "https://doi.org/10.123/demo");
       assert.deepEqual(app.license, ["MIT"]);
     }
+    assert.deepEqual(licenses.provenance["demo_1.0_20260921"].copyright,
+      [{ license: "MIT" }]);
   } finally { globalThis.fetch = previousFetch; }
+});
+
+test("cached build provenance preserves historical and custom terms", async () => {
+  const catalog = buildCatalog(rows, { catalog: { demo: { apps: {
+    "demo 1.0": { license: ["Apache-2.0"] },
+  } } } });
+  const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
+    .map((name) => [name, { recipe: "demo" }])) };
+  const cache = { "demo_1.0_20260921": {
+    revision: "b".repeat(40), recipe: "demo",
+    copyright: [{ license: "other-closed", name: "Research terms",
+      url: "https://example.org/terms" }],
+  } };
+  const result = await collectLicenseMetadata(catalog, sources, {
+    cache, resolve: async () => { throw new Error("cache should avoid network lookup"); },
+  });
+  const enriched = applyMetadata(catalog, {}, result.apps);
+  for (const app of Object.values(enriched.demo.apps)) {
+    assert.deepEqual(app.license, ["other-closed"]);
+    assert.deepEqual(app.license_details, cache["demo_1.0_20260921"].copyright);
+  }
 });
 
 test("recipe domains are mandatory and validated against the registry", async () => {
