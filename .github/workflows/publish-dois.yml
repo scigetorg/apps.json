@@ -4,15 +4,13 @@ on:
   schedule:
     - cron: '25 4 * * *'
   workflow_dispatch: {}
-  pull_request:
-    branches: [ main ]
 
 concurrency:
   group: apps-catalog
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
   packages: read
 
 jobs:
@@ -32,20 +30,20 @@ jobs:
         id: plan
         env:
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
-          MAX_PUBLICATIONS: ${{ vars.ZENODO_MAX_PUBLICATIONS || '16' }}
         run: |
           test -n "$ZENODO_TOKEN" || { echo 'ZENODO_TOKEN is required' >&2; exit 1; }
-          batches="$(python -m scripts.zenodo_catalog plan \
-            --catalog-root . --max-artifacts "$MAX_PUBLICATIONS")"
+          batches="$(python -m scripts.zenodo_catalog plan --catalog-root .)"
           echo "batches=$batches" >> "$GITHUB_OUTPUT"
 
   publish:
     needs: plan
+    if: needs.plan.outputs.batches != '[[]]'
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     strategy:
       fail-fast: false
-      max-parallel: 4
+      # Matches PUBLISH_JOBS in scripts/zenodo_catalog.py.
+      max-parallel: 6
       matrix:
         artifacts: ${{ fromJSON(needs.plan.outputs.batches) }}
     steps:
