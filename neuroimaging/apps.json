@@ -2202,6 +2202,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cat12_26.0.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933846",
                 "license": [
                     "GPL-2.0"
                 ]
@@ -2211,6 +2212,7 @@
                 "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
                 "apptainer_args": [],
                 "image": "cat12_26.0.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933846",
                 "license": [
                     "GPL-2.0"
                 ]
@@ -6254,6 +6256,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6264,6 +6267,7 @@
                 "exec": "libreoffice",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6274,6 +6278,7 @@
                 "exec": "lowriter",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6284,6 +6289,7 @@
                 "exec": "localc",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6294,6 +6300,7 @@
                 "exec": "loimpress",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6304,6 +6311,7 @@
                 "exec": "lodraw",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6314,6 +6322,7 @@
                 "exec": "lobase",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6324,6 +6333,7 @@
                 "exec": "lomath",
                 "apptainer_args": [],
                 "image": "libreoffice_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933907",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6341,6 +6351,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6351,6 +6362,7 @@
                 "exec": "libreoffice",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6361,6 +6373,7 @@
                 "exec": "lowriter",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6371,6 +6384,7 @@
                 "exec": "localc",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6381,6 +6395,7 @@
                 "exec": "loimpress",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6391,6 +6406,7 @@
                 "exec": "lodraw",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6401,6 +6417,7 @@
                 "exec": "lobase",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -6411,6 +6428,7 @@
                 "exec": "lomath",
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
+                "doi": "https://doi.org/10.5281/zenodo.23933481",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -7354,6 +7372,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mobstr3d_1.0.5",
+                "doi": "https://doi.org/10.5281/zenodo.23933479",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -8008,6 +8027,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "napari_arm64_0.10.0",
+                "doi": "https://doi.org/10.5281/zenodo.23933483",
                 "license": [
                     "Apache-2.0",
                     "BSD-3-Clause"
@@ -8018,6 +8038,7 @@
                 "exec": "napari",
                 "apptainer_args": [],
                 "image": "napari_arm64_0.10.0",
+                "doi": "https://doi.org/10.5281/zenodo.23933483",
                 "license": [
                     "Apache-2.0",
                     "BSD-3-Clause"
@@ -8028,6 +8049,7 @@
                 "exec": "napari-voxtell",
                 "apptainer_args": [],
                 "image": "napari_arm64_0.10.0",
+                "doi": "https://doi.org/10.5281/zenodo.23933483",
                 "license": [
                     "Apache-2.0",
                     "BSD-3-Clause"
@@ -8038,6 +8060,7 @@
                 "exec": "napari-nninteractive",
                 "apptainer_args": [],
                 "image": "napari_arm64_0.10.0",
+                "doi": "https://doi.org/10.5281/zenodo.23933483",
                 "license": [
                     "Apache-2.0",
                     "BSD-3-Clause"
@@ -9179,6 +9202,12 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "prostatefiducialseg_8.0.3"
+            },
+            "prostatefiducialseg 8.0.4": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "prostatefiducialseg_8.0.4"
             }
         },
         "categories": [
@@ -10333,6 +10362,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "rstudio_2026.10.1",
+                "doi": "https://doi.org/10.5281/zenodo.23933850",
                 "license": [
                     "AGPL-3.0"
                 ]
@@ -10342,6 +10372,7 @@
                 "exec": "rstudio",
                 "apptainer_args": [],
                 "image": "rstudio_2026.10.1",
+                "doi": "https://doi.org/10.5281/zenodo.23933850",
                 "license": [
                     "AGPL-3.0"
                 ]
@@ -11599,25 +11630,6 @@
         },
         "categories": [
             "diffusion imaging"
-        ]
-    },
-    "uhcfire": {
-        "apps": {
-            "uhcfire 1.0.0": {
-                "version": "20261103",
-                "exec": "",
-                "apptainer_args": [],
-                "image": "uhcfire_1.0.0"
-            },
-            "uhcfire 1.1.0": {
-                "version": "20261103",
-                "exec": "",
-                "apptainer_args": [],
-                "image": "uhcfire_1.1.0"
-            }
-        },
-        "categories": [
-            "image reconstruction"
         ]
     },
     "vertexwiser": {

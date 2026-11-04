@@ -1,7 +1,7 @@
 {
-    "entries": 768,
+    "entries": 767,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "2eb24d2e78334bc25d545a1ed40dc542d3a1ecee"
+        "NeuroDesk/neurocontainers": "a3e491686b82d2af0d57d8cfdedfdd5e450dabc5"
     },
     "app_sources": {
         "afni": {
@@ -1296,7 +1296,8 @@
         "prostatefiducialseg": {
             "prostatefiducialseg 8.0.1": "NeuroDesk/neurocontainers",
             "prostatefiducialseg 8.0.2": "NeuroDesk/neurocontainers",
-            "prostatefiducialseg 8.0.3": "NeuroDesk/neurocontainers"
+            "prostatefiducialseg 8.0.3": "NeuroDesk/neurocontainers",
+            "prostatefiducialseg 8.0.4": "NeuroDesk/neurocontainers"
         },
         "pydeface": {
             "pydeface 2.0.2": "NeuroDesk/neurocontainers",
@@ -1642,10 +1643,6 @@
         },
         "tractseg_arm64": {
             "tractseg_arm64 2.10.0": "NeuroDesk/neurocontainers"
-        },
-        "uhcfire": {
-            "uhcfire 1.0.0": "NeuroDesk/neurocontainers",
-            "uhcfire 1.1.0": "NeuroDesk/neurocontainers"
         },
         "vertexwiser": {
             "vertexwiser 1.5.1": "NeuroDesk/neurocontainers",
