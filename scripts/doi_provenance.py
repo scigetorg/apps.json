@@ -21,7 +21,7 @@ MANIFEST_ACCEPT = ", ".join(
     )
 )
 DOC_PATTERN = re.compile(
-    r"^https://github\.com/neurodesk/neurocontainers/tree/"
+    r"^https://github\.com/(?P<repository>[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)/tree/"
     r"(?P<revision>[0-9a-f]{40})/recipes/(?P<recipe>[a-zA-Z0-9_.-]+)$",
     re.IGNORECASE,
 )
@@ -57,6 +57,13 @@ class RegistryReader:
                     token_response = requests.get(
                         realm, params=params,
                         auth=("x-access-token", self.github_token), timeout=(15, 60),
+                    )
+                if token_response.status_code in (401, 403, 404):
+                    # GHCR denies anonymous tokens for packages it does not
+                    # host, so this means "not here": try the next registry.
+                    raise LicenseValidationError(
+                        f"Build image {self.repository} is unavailable "
+                        f"(token HTTP {token_response.status_code}); cannot verify its recipe revision"
                     )
                 if not token_response.ok:
                     raise ProvenanceServiceError(
@@ -108,7 +115,11 @@ class RegistryReader:
         return (config.get("config") or config.get("Config") or {}).get("Labels") or {}
 
 
-def get_build_provenance(container_name, github_token=None):
+def get_build_provenance(container_name, github_token=None, source_repositories=None):
+    allowed = ("NeuroDesk/neurocontainers",) if source_repositories is None else source_repositories
+    if not allowed:
+        raise LicenseValidationError("No source repositories are configured for this image")
+    allowed_by_lowercase = {repository.lower(): repository for repository in allowed}
     try:
         image_stem, build_date = container_name.rsplit("_", 1)
     except ValueError as exc:
@@ -148,7 +159,9 @@ def get_build_provenance(container_name, github_token=None):
                 not re.fullmatch(r"[0-9a-f]{40}", revision)
                 or not match
                 or match.group("revision") != revision
-                or source.lower().rstrip("/") != "https://github.com/neurodesk/neurocontainers"
+                or source.lower().rstrip("/") !=
+                f"https://github.com/{match.group('repository').lower()}"
+                or match.group("repository").lower() not in allowed_by_lowercase
             ):
                 raise LicenseValidationError("Build image lacks matching recipe revision labels")
             expected_names = {f"{title}_{version}"}
@@ -170,6 +183,7 @@ def get_build_provenance(container_name, github_token=None):
             return {
                 "revision": revision,
                 "recipe": match.group("recipe"),
+                "source_repository": allowed_by_lowercase[match.group("repository").lower()],
                 "image": f"{registry.removeprefix('https://')}/{repository}:{build_date}",
             }
         except LicenseValidationError as exc:
