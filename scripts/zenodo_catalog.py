@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import re
 import sys
@@ -18,7 +17,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .doi_license import fetch_catalogue
-from .doi_metadata import build_metadata, get_license
+from .doi_metadata import build_metadata, resolve_build_license
 
 
 ZENODO_API = os.environ.get("ZENODO_API_ROOT", "https://zenodo.org/api").rstrip("/")
@@ -52,13 +51,10 @@ def domain_paths(root: Path) -> list[Path]:
     return [root / domain / "apps.json" for domain in sorted(domains)]
 
 
-def artifact_name(app: dict[str, Any], name: str = "", tool: str = "") -> str:
+def artifact_name(app: dict[str, Any]) -> str:
+    # consolidate writes the exact SIF image on every launcher; it cannot be
+    # derived from launcher names (GUI and arm64 releases differ).
     image = app.get("image")
-    if image is None:
-        # Older catalogs predate the explicit image field. Launcher labels may
-        # differ from the image name (for example, VoxTell-napari).
-        release = name.rsplit(" ", 1)[-1]
-        image = f"{tool}_{release}" if tool and release != name else ""
     date = app.get("version")
     if not isinstance(image, str) or not IMAGE.fullmatch(image):
         raise ValueError(f"Invalid catalog image: {image!r}")
@@ -69,7 +65,14 @@ def artifact_name(app: dict[str, Any], name: str = "", tool: str = "") -> str:
 
 def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
     artifacts: dict[str, dict[str, Any]] = {}
+    domains = json.loads((root / "domains.json").read_text(encoding="utf-8"))["domains"]
     for path in domain_paths(root):
+        sources = domains[path.parent.name].get("source_repositories")
+        if not isinstance(sources, list) or not sources or any(
+            not isinstance(source, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", source)
+            for source in sources
+        ) or len(set(sources)) != len(sources):
+            raise ValueError(f"Invalid source_repositories for {path.parent.name}")
         catalog = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(catalog, dict):
             raise ValueError(f"Invalid apps catalog: {path}")
@@ -79,8 +82,12 @@ def catalog_artifacts(root: Path) -> dict[str, dict[str, Any]]:
             for name, app in entry["apps"].items():
                 if not isinstance(app, dict):
                     raise ValueError(f"Invalid app in {path}: {tool}/{name}")
-                title = artifact_name(app, name, tool)
-                current = artifacts.setdefault(title, {"doi": "", "license": [], "license_details": []})
+                title = artifact_name(app)
+                current = artifacts.setdefault(title, {"doi": "", "license": [],
+                                                       "license_details": [], "source_repositories": []})
+                current["source_repositories"] = sorted(set(
+                    current["source_repositories"] + sources
+                ))
                 doi = app.get("doi") or ""
                 if doi and current["doi"] and doi != current["doi"]:
                     raise ValueError(f"Conflicting DOI for {title}")
@@ -144,23 +151,28 @@ def published_depositions(
         page += 1
 
 
+# Keep in step with `max-parallel` in .github/workflows/publish-dois.yml.
+PUBLISH_JOBS = 6
+
+
 def missing_batches(
     artifacts: dict[str, dict[str, Any]],
     published: dict[str, dict[str, Any]],
-    max_artifacts: int,
+    jobs: int = PUBLISH_JOBS,
 ) -> list[list[str]]:
-    if max_artifacts < 1:
-        raise ValueError("max_artifacts must be positive")
+    """Split every unpublished image across at most `jobs` parallel batches."""
+    if jobs < 1:
+        raise ValueError("jobs must be positive")
     missing = [
         title for title, metadata in artifacts.items()
         if not has_production_doi(metadata["doi"]) and title not in published
     ]
-    missing.sort(key=lambda title: (-int(title.rsplit("_", 1)[1]), title))
-    selected = missing[:max_artifacts]
-    if not selected:
+    if not missing:
         return [[]]
-    batch_size = max(1, math.ceil(len(selected) / 4))
-    return [selected[i:i + batch_size] for i in range(0, len(selected), batch_size)]
+    missing.sort(key=lambda title: (-int(title.rsplit("_", 1)[1]), title))
+    # Round-robin keeps batches within one image of each other and starts the
+    # newest builds first in every job.
+    return [missing[i::jobs] for i in range(min(jobs, len(missing)))]
 
 
 class RemoteStream:
@@ -245,7 +257,8 @@ def publish_batch(
                 print(f"{prefix}: already published, skipping", flush=True)
                 continue
             print(f"{prefix}: resolving license ...", flush=True)
-            license_info = get_license(title, github_token, catalogue)
+            license_info = resolve_build_license(
+                title, github_token, artifacts[title].get("source_repositories"), catalogue)
             catalog_ids = {value.lower() for value in artifacts[title]["license"]}
             recipe_ids = {value.lower() for value in license_info["declared"]}
             if not catalog_ids or catalog_ids != recipe_ids:
@@ -276,7 +289,6 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["plan", "publish", "lookup"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
-    parser.add_argument("--max-artifacts", type=int, default=16)
     parser.add_argument("--artifacts-json")
     args = parser.parse_args()
     token = os.environ.get("ZENODO_TOKEN")
@@ -290,9 +302,7 @@ def main() -> int:
         return 0
     artifacts = catalog_artifacts(args.catalog_root)
     if args.command == "plan":
-        print(json.dumps(missing_batches(
-            artifacts, published_depositions(session), args.max_artifacts
-        )))
+        print(json.dumps(missing_batches(artifacts, published_depositions(session))))
     elif args.command == "publish":
         if args.artifacts_json is None:
             parser.error("--artifacts-json is required for publish")
