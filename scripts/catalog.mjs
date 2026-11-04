@@ -125,9 +125,10 @@ function validBuildDate(value) {
   );
 }
 
+// Cross-repository ownership of apps and images is enforced once, across all
+// sources, by assertUniqueSources in workflow.mjs before any domain is built.
 export function buildCatalog(releases, previous, previousByIdentity = new Map()) {
   const catalog = {};
-  const owners = new Map();
   for (const { path, data } of [...releases].sort((a, b) =>
     a.path.localeCompare(b.path),
   )) {
@@ -173,10 +174,6 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
       if (combined.doi === undefined && prior.image === combined.image &&
           prior.version === combined.version && prior.doi !== undefined)
         combined.doi = prior.doi;
-      const owner = owners.get(`${tool}\0${name}`);
-      if (owner && owner !== data.repository)
-        throw new Error(`Duplicate app ${tool}/${name} from ${owner} and ${data.repository}`);
-      owners.set(`${tool}\0${name}`, data.repository);
       if (entry.apps[name] && JSON.stringify(entry.apps[name]) !== JSON.stringify(combined))
         throw new Error(`Conflicting app ${name} in ${path}`);
       entry.apps[name] = combined;
@@ -190,16 +187,10 @@ export function buildCatalog(releases, previous, previousByIdentity = new Map())
 }
 
 export async function makeFiles(catalog, sourceCommits, releases) {
-  const imageOwners = new Map();
+  const images = new Set();
   for (const { path, data } of releases) {
     const [, tool, release] = /^releases\/([^/]+)\/([^/]+)\.json$/.exec(path);
-    for (const app of Object.values(data.apps)) {
-      const application = imageBuild(tool, release, app);
-      const priorOwner = imageOwners.get(application);
-      if (priorOwner && priorOwner !== data.repository)
-        throw new Error(`Duplicate image ${application} from ${priorOwner} and ${data.repository}`);
-      imageOwners.set(application, data.repository);
-    }
+    for (const app of Object.values(data.apps)) images.add(imageBuild(tool, release, app));
   }
   const appSources = {};
   for (const { path, data } of releases) {
@@ -212,7 +203,7 @@ export async function makeFiles(catalog, sourceCommits, releases) {
   return {
     "apps.json": jsonText(catalog),
     "manifest.json": jsonText({
-      entries: imageOwners.size,
+      entries: images.size,
       source_commits: sourceCommits,
       app_sources: appSources,
     }),
@@ -254,7 +245,7 @@ export async function collectDoiMetadata(
   return found;
 }
 
-export async function resolveBuildLicenses(titles) {
+export async function resolveBuildLicenses(titles, sourceRepositoriesByTitle = {}) {
   if (!titles.length) return { resolved: {}, errors: {} };
   return new Promise((resolve, reject) => {
     const child = spawn("python3", ["-m", "scripts.catalog_licenses"],
@@ -270,7 +261,7 @@ export async function resolveBuildLicenses(titles) {
         try { resolve(JSON.parse(stdout)); } catch (error) { reject(error); }
       }
     });
-    child.stdin.end(JSON.stringify({ titles }));
+    child.stdin.end(JSON.stringify({ titles, source_repositories_by_title: sourceRepositoriesByTitle }));
   });
 }
 
@@ -283,8 +274,11 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
       const source = sourceRoots[tool]?.[name];
       if (!source) continue;
       const title = `${app.image}_${app.version}`;
-      const group = artifacts.get(title) ?? { recipe: source.recipe, apps: [] };
-      if (group.recipe !== source.recipe)
+      const group = artifacts.get(title) ?? {
+        recipe: source.recipe, repository: source.repository, apps: [],
+      };
+      if (group.recipe !== source.recipe || (group.repository && source.repository &&
+          group.repository !== source.repository))
         throw new Error(`Conflicting source recipes for ${title}`);
       group.apps.push({ tool, name });
       artifacts.set(title, group);
@@ -301,8 +295,12 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
           JSON.stringify(app.license_details) !== JSON.stringify(previous.license_details));
     });
   }).map(([title]) => title);
+  const sourceRepositoriesByTitle = Object.fromEntries(titles
+    .map((title) => [title, artifacts.get(title).repository])
+    .filter(([, repository]) => repository)
+    .map(([title, repository]) => [title, [repository]]));
   const { resolved = {}, errors = {} } = titles.length
-    ? await resolve(titles) : { resolved: {}, errors: {} };
+    ? await resolve(titles, sourceRepositoriesByTitle) : { resolved: {}, errors: {} };
   const refreshed = new Set(titles);
   const apps = {};
   for (const [title, group] of artifacts) {
@@ -366,7 +364,9 @@ export async function consolidate({
       releases.push({ path: release.path, data: { ...release.data, repository: source.repository } });
       sourceRoots[tool] ??= {};
       for (const name of Object.keys(release.data.apps))
-        sourceRoots[tool][name] = { root: source.sourceRoot, recipe: metadata.recipe };
+        sourceRoots[tool][name] = {
+          root: source.sourceRoot, recipe: metadata.recipe, repository: source.repository,
+        };
     }
   }
   const base = buildCatalog(releases, previous, previousByIdentity);

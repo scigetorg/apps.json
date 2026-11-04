@@ -71,11 +71,12 @@ test("DOI and build-time recipe licenses enrich every launcher", async () => {
   const catalog = buildCatalog(rows, { catalog: {} });
   {
     const sourceRoots = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
-      .map((name) => [name, { root: sourceRoot, recipe: "demo" }])) };
+      .map((name) => [name, { root: sourceRoot, recipe: "demo", repository }])) };
     const [dois, licenses] = await Promise.all([
       collectDoiMetadata(catalog, rows, { "demo_1.0_20260921": "10.123/demo" }),
-      collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles) => {
+      collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles, sources) => {
         assert.deepEqual(titles, ["demo_1.0_20260921"]);
+        assert.deepEqual(sources, { "demo_1.0_20260921": [repository] });
         return { resolved: { "demo_1.0_20260921": {
           license: ["MIT"], license_details: [],
         } }, errors: {} };
