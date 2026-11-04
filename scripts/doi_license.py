@@ -26,6 +26,24 @@ DEPRECATED_SPDX = {
 }
 
 
+# Legacy spellings Zenodo has used for the same license. Comparison only: the
+# ID chosen for publication still comes from the live catalogue.
+LEGACY_IDS = {
+    "mit-license": "mit",
+    "apache2.0": "apache-2.0",
+    "apgl-v3": "agpl-3.0",
+    "bsd-2-clause-netbsd": "bsd-2-clause",
+}
+
+
+def license_equivalence_key(value):
+    """Fold license IDs that name the same terms onto one comparison key."""
+    key = value.strip().lower()
+    key = LEGACY_IDS.get(key, key)
+    key = DEPRECATED_SPDX.get(key, key)
+    return key.removesuffix("-only")
+
+
 class LicenseValidationError(ValueError):
     def __init__(self, message, suggestions=None):
         super().__init__(message)

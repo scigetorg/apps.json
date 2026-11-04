@@ -20,7 +20,8 @@ class ZenodoCatalogTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         (self.root / "domains.json").write_text(json.dumps({"domains": {
-            "neuroimaging": {}, "microscopy": {},
+            "neuroimaging": {"source_repositories": ["NeuroDesk/neurocontainers"]},
+            "microscopy": {"source_repositories": ["Example/microcontainers"]},
         }}))
         for domain in ("neuroimaging", "microscopy"):
             (self.root / domain).mkdir()
@@ -44,14 +45,33 @@ class ZenodoCatalogTests(unittest.TestCase):
             "demo_1.0_20260101", "viewer_2.0_20261010"
         })
         self.assertEqual(artifacts["demo_1.0_20260101"]["license"], ["MIT"])
-        self.assertEqual(missing_batches(artifacts, {}, 1), [["viewer_2.0_20261010"]])
+        self.assertEqual(artifacts["demo_1.0_20260101"]["source_repositories"],
+                         ["NeuroDesk/neurocontainers"])
+        self.assertEqual(artifacts["viewer_2.0_20261010"]["source_repositories"],
+                         ["Example/microcontainers"])
+        self.assertEqual(missing_batches(artifacts, {}),
+                         [["viewer_2.0_20261010"], ["demo_1.0_20260101"]])
+
+    def test_every_missing_image_is_split_across_at_most_six_jobs(self) -> None:
+        artifacts = {f"tool_1.0_202601{day:02d}": {"doi": ""} for day in range(1, 15)}
+        artifacts["done_1.0_20260120"] = {"doi": "10.5281/zenodo.9"}
+        batches = missing_batches(artifacts, {"tool_1.0_20260114": {}})
+        self.assertEqual(len(batches), 6)
+        self.assertEqual(sorted(sum(batches, [])),
+                         sorted(f"tool_1.0_202601{day:02d}" for day in range(1, 14)))
+        self.assertEqual([len(batch) for batch in batches], [3, 2, 2, 2, 2, 2])
+        self.assertEqual([batch[0] for batch in batches],
+                         [f"tool_1.0_202601{day:02d}" for day in range(13, 7, -1)])
+        self.assertEqual(missing_batches(artifacts, {}, jobs=20)[0], ["tool_1.0_20260114"])
+        with self.assertRaises(ValueError):
+            missing_batches(artifacts, {}, jobs=0)
 
     def test_removed_releases_are_absent_from_doi_plan(self) -> None:
         for domain in ("neuroimaging", "microscopy"):
             (self.root / domain / "apps.json").write_text("{}\n")
         artifacts = catalog_artifacts(self.root)
         self.assertEqual(artifacts, {})
-        self.assertEqual(missing_batches(artifacts, {}, 16), [[]])
+        self.assertEqual(missing_batches(artifacts, {}), [[]])
 
     def test_launcher_alias_uses_its_image_for_doi_identity(self) -> None:
         path = self.root / "neuroimaging/apps.json"
@@ -63,22 +83,22 @@ class ZenodoCatalogTests(unittest.TestCase):
         artifacts = catalog_artifacts(self.root)
         self.assertEqual(set(artifacts), {"demo_1.0_20260101", "viewer_2.0_20261010"})
 
-    def test_legacy_launcher_alias_uses_tool_and_release(self) -> None:
+    def test_app_without_image_is_rejected(self) -> None:
         path = self.root / "neuroimaging/apps.json"
         catalog = json.loads(path.read_text())
         catalog["demo"]["apps"]["VoxTell-demo 1.0"] = {
             "version": "20260101", "license": ["MIT"],
         }
         path.write_text(json.dumps(catalog))
-        artifacts = catalog_artifacts(self.root)
-        self.assertEqual(set(artifacts), {"demo_1.0_20260101", "viewer_2.0_20261010"})
+        with self.assertRaisesRegex(ValueError, "Invalid catalog image: None"):
+            catalog_artifacts(self.root)
 
     def test_sandbox_doi_does_not_prevent_production_publication(self) -> None:
         artifacts = catalog_artifacts(self.root)
         artifacts["demo_1.0_20260101"]["doi"] = "https://doi.org/10.5072/zenodo.1"
         artifacts["viewer_2.0_20261010"]["doi"] = "https://doi.org/10.5281/zenodo.2"
 
-        self.assertEqual(missing_batches(artifacts, {}, 16), [["demo_1.0_20260101"]])
+        self.assertEqual(missing_batches(artifacts, {}), [["demo_1.0_20260101"]])
 
     def test_public_sif_download_has_no_zenodo_token(self) -> None:
         download = MagicMock()
@@ -98,6 +118,7 @@ class ZenodoCatalogTests(unittest.TestCase):
             doi = publish_deposition("demo_1.0_20260101", {
                 "zenodo_id": "mit", "entries": [{"name": "MIT", "url": None}],
                 "revision": "a" * 40, "recipe": "demo",
+                "source_repository": "Example/microcontainers",
             }, session)
 
         self.assertEqual(doi, "10.5281/zenodo.12")
@@ -108,6 +129,7 @@ class ZenodoCatalogTests(unittest.TestCase):
         metadata = session.put.call_args_list[1].kwargs["json"]["metadata"]
         self.assertEqual(metadata["license"], "mit")
         self.assertIn("Build recipe:", metadata["description"])
+        self.assertIn("github.com/Example/microcontainers", metadata["description"])
 
     def test_published_lookup_limits_titles_and_checks_exact_match(self) -> None:
         session = MagicMock()
