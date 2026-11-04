@@ -18,6 +18,8 @@ def catalogue():
     return {
         "mit": {"id": "mit", "title": "MIT License", "url": "https://spdx.org/licenses/MIT.html", "osi_approved": True},
         "apache-2.0": {"id": "apache-2.0", "title": "Apache License 2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0", "osi_approved": True},
+        "gpl-3.0-only": {"id": "gpl-3.0-only", "title": "GNU General Public License v3.0 only", "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html", "osi_approved": True},
+        "gpl-3.0-or-later": {"id": "gpl-3.0-or-later", "title": "GNU General Public License v3.0 or later", "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html", "osi_approved": True},
         "other-open": {"id": "other-open", "title": "Other Open", "url": None, "osi_approved": False},
         "other-closed": {"id": "other-closed", "title": "Other Closed", "url": None, "osi_approved": False},
     }
@@ -44,6 +46,15 @@ class DoiLicenseTests(unittest.TestCase):
                             "zenodo_license": "other-closed"}]}, catalogue()
         )
         self.assertEqual(info["zenodo_id"], "other-closed")
+
+    def test_deprecated_spdx_gpl_id_maps_to_zenodo_id(self):
+        for stated, expected in (("GPL-3.0", "gpl-3.0-only"), ("GPL-3.0+", "gpl-3.0-or-later")):
+            info = doi_license.resolve_recipe_license(
+                {"copyright": [{"license": stated, "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html"}]},
+                catalogue(),
+            )
+            self.assertEqual(info["zenodo_id"], expected)
+            self.assertEqual(info["entries"][0]["name"], stated)
 
     def test_multiple_zenodo_ids_use_separate_copyright_entries(self):
         info = doi_license.resolve_recipe_license({"copyright": [
@@ -131,9 +142,31 @@ class DoiLicenseTests(unittest.TestCase):
         with (patch("scripts.zenodo_catalog.published_depositions", return_value={}),
               patch("scripts.zenodo_catalog.get_license", return_value=expected),
               patch("scripts.zenodo_catalog.publish_deposition") as publish):
-            with self.assertRaisesRegex(ValueError, "Catalog licenses"):
+            with self.assertRaisesRegex(RuntimeError, "demo_1.0_20260101: ValueError: Catalog licenses"):
                 publish_batch(artifacts, ["demo_1.0_20260101"], MagicMock(), catalogue(), "token")
         publish.assert_not_called()
+
+    def test_license_failure_names_image_and_batch_continues(self):
+        artifacts = {"bad_1.0_20260101": {"doi": "", "license": ["Odd"]},
+                     "good_1.0_20260101": {"doi": "", "license": ["MIT"]}}
+        good = {"zenodo_id": "mit", "declared": ["MIT"], "license_details": [],
+                "entries": [{"id": "mit", "name": "MIT", "url": None}]}
+
+        def get_license(title, *_):
+            if title.startswith("bad"):
+                raise doi_license.LicenseValidationError("not a Zenodo catalogue ID")
+            return good
+
+        with (patch("scripts.zenodo_catalog.published_depositions", return_value={}),
+              patch("scripts.zenodo_catalog.get_license", side_effect=get_license),
+              patch("scripts.zenodo_catalog.publish_deposition",
+                    return_value="10.123/good") as publish):
+            with self.assertRaisesRegex(
+                RuntimeError, r"(?s)Published 1; .*bad_1\.0_20260101: LicenseValidationError"
+            ):
+                publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(), "token")
+        publish.assert_called_once()
+        self.assertEqual(publish.call_args.args[0], "good_1.0_20260101")
 
     def test_custom_license_name_can_publish_with_zenodo_category(self):
         title = "demo_1.0_20260101"

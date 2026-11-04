@@ -14,6 +14,16 @@ import requests
 CATALOGUE_URL = "https://zenodo.org/api/licenses/"
 OTHER_IDS = {"other-open", "other-closed"}
 UNKNOWN_NAMES = {"none", "unknown", "noassertion"}
+# Deprecated SPDX IDs that Zenodo's legacy deposit API accepted, mapped to the
+# IDs in its current catalogue so already-published recipes stay valid.
+DEPRECATED_SPDX = {
+    **{f"{family}-{version}": f"{family}-{version}-only" for family, version in (
+        ("gpl", "1.0"), ("gpl", "2.0"), ("gpl", "3.0"), ("lgpl", "2.0"),
+        ("lgpl", "2.1"), ("lgpl", "3.0"), ("agpl", "1.0"), ("agpl", "3.0"))},
+    **{f"{family}-{version}+": f"{family}-{version}-or-later" for family, version in (
+        ("gpl", "1.0"), ("gpl", "2.0"), ("gpl", "3.0"), ("lgpl", "2.0"),
+        ("lgpl", "2.1"), ("lgpl", "3.0"))},
+}
 
 
 class LicenseValidationError(ValueError):
@@ -210,6 +220,8 @@ def resolve_recipe_license(recipe, catalogue):
         if isinstance(identifier, str) and identifier.strip():
             stated = identifier.strip()
             license_id = stated.lower()
+            if license_id not in catalogue:
+                license_id = DEPRECATED_SPDX.get(license_id, license_id)
             if license_id not in catalogue:
                 raise LicenseValidationError(
                     f"{context} license {stated!r} is not a Zenodo catalogue ID; "
