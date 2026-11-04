@@ -61,11 +61,16 @@ and does not stop catalog generation. Before publication it validates the licens
 against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
-A weekly read-only audit compares published Zenodo licenses and catalog licenses
-with freshly fetched build-time recipes for images still in the catalog. It
-uploads a JSON report, checks the exact Zenodo category selected for multiple
-licenses, and fails on mismatches or unverified recipes. It omits Zenodo records
-whose images have been removed from the catalog.
+A weekly read-only audit compares each published Zenodo record's license with
+the `apps.json` license for the same image. A single catalog license must match
+the Zenodo ID; known legacy Zenodo spellings (for example `mit-license`, or
+`gpl-3.0` for `gpl-3.0-only`) count as equal. Multiple licenses or custom terms
+must use `other-open` or `other-closed`. Images without a catalog license are
+reported as `no_catalog_license`. Records for images removed from the catalog
+are skipped. The audit uploads a JSON report and fails on mismatches. It does
+not fetch recipes: build-time recipes are checked when consolidation writes a
+license and again before publication, so a recipe license fixed without a
+rebuild is not detected by the audit.
 A Zenodo failure does not block catalog updates. Historical releases state their license
 through their build-time recipe, without edits to release JSON. These checks
 verify agreement between the recipe, catalog, and Zenodo; they cannot determine
@@ -75,9 +80,10 @@ For DOI publication, each `copyright[].license` in the build-time recipe must
 match an ID in Zenodo's live license catalogue. List multiple licenses as
 separate `copyright` entries. An SPDX expression such as `MIT OR Apache-2.0`
 is not a single Zenodo license ID. For custom terms, provide a `name`, a URL
-linking to the license terms, and an explicit `zenodo_license: other-open` or
-`other-closed`; a name and URL alone do not establish whether terms are open.
-The recipe can specify that category at the top level when its combined
+linking to the license terms, and either `license: other-open` / `other-closed`
+in that copyright entry or an explicit `zenodo_license: other-open` /
+`other-closed`. A name and URL alone do not establish whether terms are open.
+The recipe can specify `zenodo_license` at the top level when its combined
 licenses need one Zenodo category.
 
 ## Enable the schedule
@@ -90,8 +96,8 @@ licenses need one Zenodo category.
    `deposit:actions` scopes, and save it as the `ZENODO_TOKEN` Actions secret in
    `Neurodesk/apps.json`. The workflow uses it to list and publish depositions.
    A sandbox Zenodo token is separate and will not work for production Zenodo.
-   By default, at most 16 missing SIFs are published per run, newest first;
-   set the `ZENODO_MAX_PUBLICATIONS` repository variable to change that limit.
+   Each run publishes every missing SIF, newest first, split across at most 6
+   parallel jobs.
 3. Update the website's app catalog source to
    `https://apps-json.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`
    after configuring the Cloudflare publishing described below.
@@ -114,13 +120,18 @@ remains enabled.
 Delete its versioned release JSON in the source repository. The next catalog
 run removes its launchers from `apps.json`, even when it was the final release.
 The DOI planner no longer selects the removed image. A previously published DOI
-remains on Zenodo and is omitted from the catalog license audit. Container
-storage cleanup follows its own retention policy.
+remains on Zenodo and is omitted from the catalog license audit.
+
+The SIF is removed on a timer, not by an event. Neurocontainers'
+`cleanup-stale-containers` runs daily at 11:25 UTC, after the 02:25 catalog run,
+and keeps any SIF named in a domain `apps.json`, a source release JSON, or signed
+CVMFS. Unreferenced SIFs older than 7 days are deleted from Nectar and S3.
 
 ## Publish on Cloudflare Workers
 
-The workflow publishes every configured domain as a Worker static asset at
-`/<domain>/apps.json` and commits the generated catalogs. The GitHub
+The workflow commits the generated catalogs, then publishes every configured
+domain as a Worker static asset at `/<domain>/apps.json`. If the push fails,
+nothing is published. The GitHub
 repository remains the source of truth. Cloudflare serves the latest deployed
 catalog.
 
@@ -145,7 +156,9 @@ public Worker.
 ## Local checks
 
 Use Node.js 24.0.0, then run `npm ci` and `npm test`. The DOI helper tests use
-Python with `requests`: `python -m unittest discover -s test -p test_zenodo_catalog.py`.
+Python with `requests` and `pyyaml`: `python -m unittest discover -s test -p 'test_*.py'`.
+The `Test` workflow runs both suites, without secrets, on pull requests and on
+code pushes to `main`.
 For a local consolidation of all configured domains, run:
 
 ```bash
