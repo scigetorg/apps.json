@@ -234,25 +234,25 @@ def publish_batch(
 ) -> int:
     existing = published_depositions(session, set(selected))
     count = 0
-    failures = []
+    failures = {}
     total = len(selected)
     for i, title in enumerate(selected, 1):
         prefix = f"[{i}/{total}] {title}"
-        if title not in artifacts:
-            raise ValueError(f"{prefix}: absent from domain catalogs")
-        if has_production_doi(artifacts[title]["doi"]) or title in existing:
-            print(f"{prefix}: already published, skipping", flush=True)
-            continue
-        print(f"{prefix}: resolving license ...", flush=True)
-        license_info = get_license(title, github_token, catalogue)
-        catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-        recipe_ids = {value.lower() for value in license_info["declared"]}
-        if not catalog_ids or catalog_ids != recipe_ids:
-            raise ValueError(
-                f"Catalog licenses {sorted(catalog_ids)!r} differ from "
-                f"build-time recipe {sorted(recipe_ids)!r}"
-            )
         try:
+            if title not in artifacts:
+                raise ValueError("absent from domain catalogs")
+            if has_production_doi(artifacts[title]["doi"]) or title in existing:
+                print(f"{prefix}: already published, skipping", flush=True)
+                continue
+            print(f"{prefix}: resolving license ...", flush=True)
+            license_info = get_license(title, github_token, catalogue)
+            catalog_ids = {value.lower() for value in artifacts[title]["license"]}
+            recipe_ids = {value.lower() for value in license_info["declared"]}
+            if not catalog_ids or catalog_ids != recipe_ids:
+                raise ValueError(
+                    f"Catalog licenses {sorted(catalog_ids)!r} differ from "
+                    f"build-time recipe {sorted(recipe_ids)!r}"
+                )
             if artifacts[title].get("license_details", []) != license_info["license_details"]:
                 raise ValueError("Catalog license details differ from build-time recipe")
             print(f"{prefix}: uploading to Zenodo ...", flush=True)
@@ -261,10 +261,13 @@ def publish_batch(
             count += 1
             print(f"{prefix}: published {doi}", flush=True)
         except Exception as exc:
-            print(f"{prefix}: FAILED - {exc}", file=sys.stderr, flush=True)
-            failures.append(title)
+            print(f"{prefix}: FAILED - {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+            failures[title] = f"{type(exc).__name__}: {exc}"
     if failures:
-        raise RuntimeError(f"Failed to publish {len(failures)} artifact(s): {failures}")
+        summary = "\n".join(f"  {title}: {error}" for title, error in failures.items())
+        raise RuntimeError(
+            f"Published {count}; failed to publish {len(failures)} artifact(s):\n{summary}"
+        )
     return count
 
 
