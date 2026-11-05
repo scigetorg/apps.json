@@ -10,6 +10,8 @@ from urllib.parse import urlsplit
 
 import requests
 
+from .license_terms import is_custom_term
+
 
 CATALOGUE_URL = "https://zenodo.org/api/licenses/"
 OTHER_IDS = {"other-open", "other-closed"}
@@ -297,7 +299,7 @@ def rights_from_catalog(entry):
     Catalogue IDs keep the recipe's spelling; compare with same_rights.
     """
     custom = [detail for detail in entry.get("license_details") or []
-              if is_custom_license(detail.get("license"))]
+              if is_custom_term(detail.get("license"))]
     rights = []
     for detail in custom:
         if not detail.get("name") or not detail.get("url"):
@@ -305,6 +307,9 @@ def rights_from_catalog(entry):
         rights.append(custom_right(detail["name"], detail["url"]))
     custom_values = {(detail.get("license") or detail["name"]).strip().lower() for detail in custom}
     ids = sorted({value.strip().lower() for value in entry.get("license") or []} - custom_values)
+    for value in ids:
+        if is_custom_term(value):
+            raise ValueError(f"apps.json has no license_details (name and URL) for {value!r}")
     return [{"id": value} for value in ids] + rights
 
 

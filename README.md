@@ -91,7 +91,11 @@ retaining other versions. Deleting the last release produces an empty catalog.
 `manifest.json` records the image count and source commits. The catalog workflow
 reuses licenses for unchanged image builds and reads the OCI build revision and
 historical recipe for new builds or images without a catalog license. It does
-not carry an older build's license onto a new build. A separate DOI workflow
+not carry an older build's license onto a new build. An image whose license
+includes custom terms (`other-*`, `LicenseRef-…` or a free-text name) but has no
+`license_details` is looked up again, so the name and URL that DOI publication
+needs are filled in; until then, publication and the audit report that
+`apps.json` lacks them. A separate DOI workflow
 publishes missing SIF records to production Zenodo. The next catalog run reads
 this account's published depositions once and adds their DOIs to every launcher
 for the image. A Zenodo lookup failure leaves existing catalog DOIs in place

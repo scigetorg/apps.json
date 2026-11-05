@@ -19,7 +19,8 @@
 - **What:** Remove `zenodo_license` from `recipes/{dicomtools,metabody,bidstools,cryosparc}/build.yaml`
   and from the `builder/validation.py` messages that suggest `other-open`/`other-closed`. Add a
   `name` to `LicenseRef-…` copyright entries that lack one (stir and startrack on `update-licenses`;
-  also quantiphyse, topofit and vmtk on `origin/main`).
+  also mede, quantiphyse, topofit and vmtk on `origin/main`). The images already built from those
+  recipes need a rebuild after the fix, because DOIs use the recipe at the image's build revision.
 - **Why:** DOIs now go through Zenodo's records API, where each license is its own `rights`
   entry and custom terms publish by name + URL. `zenodo_license` is ignored, and custom entries
   without a name cannot be published.

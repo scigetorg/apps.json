@@ -60,7 +60,10 @@ and keep unrelated regenerated diffs out of code PRs.
   New builds resolve their license from the build-time recipe
   (`doi_metadata.resolve_build_license`: OCI revision labels, then the recipe
   from raw.githubusercontent.com at that revision). Manifests do not cache
-  license provenance.
+  license provenance. Custom terms (`license_terms.is_custom_term`, mirrored
+  by `isCustomLicense` in `catalog.mjs`) keep their name and URL in
+  `license_details`; an entry with custom terms and no details is resolved
+  again, and `rights_from_catalog` refuses to turn such terms into IDs.
 - Retiring an image = deleting its release JSON upstream; there is no
   `retired-images.json` any more. Deleting the last release produces an empty
   catalog. Cleanup is time-based: neurocontainers' `cleanup-stale-containers`

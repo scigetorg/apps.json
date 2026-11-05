@@ -111,6 +111,35 @@ test("the same image reuses its catalog license and custom terms", async () => {
   }
 });
 
+test("custom catalog licenses without license_details are looked up again once", async () => {
+  const catalog = buildCatalog(rows, { catalog: {} });
+  const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
+    .map((name) => [name, { recipe: "demo" }])) };
+  const details = [{ license: "LicenseRef-FSL", name: "FSL licence",
+    url: "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html" }];
+  for (const [license, expected] of [
+    [["MIT", "LicenseRef-FSL"], ["demo_1.0_20260921"]],
+    [["FreeSurfer Software License Agreement"], ["demo_1.0_20260921"]],
+    [["other-closed"], ["demo_1.0_20260921"]],
+    [["MIT", "GPL-3.0-only"], []],
+  ]) {
+    const looked = [];
+    const result = await collectLicenseMetadata(catalog, sources, {
+      previousByImage: new Map([["demo_1.0_20260921", { license, license_details: [] }]]),
+      resolve: async (titles) => {
+        looked.push(...titles);
+        return { resolved: Object.fromEntries(titles.map((title) => [title, {
+          license: ["LicenseRef-FSL", "MIT"], license_details: details,
+        }])), errors: {} };
+      },
+    });
+    assert.deepEqual(looked, expected, license.join());
+    const app = applyMetadata(catalog, {}, result).demo.apps["demo 1.0"];
+    if (expected.length) assert.deepEqual(app.license_details, details);
+    else assert.equal(Object.hasOwn(app, "license_details"), false);
+  }
+});
+
 test("a new build does not inherit the previous build's license or DOI", async () => {
   const prior = buildCatalog(rows, { catalog: {} });
   prior.demo.apps["demo 1.0"].license = ["MIT"];

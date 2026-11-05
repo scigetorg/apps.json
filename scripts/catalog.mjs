@@ -265,6 +265,21 @@ export async function resolveBuildLicenses(titles, sourceRepositoriesByTitle = {
   });
 }
 
+// Custom terms (other-*, LicenseRef-…, or a name such as "FreeSurfer Software
+// License Agreement") have no Zenodo license ID; DOIs need their name and URL
+// from license_details. Mirrors license_terms.is_custom_term.
+export function isCustomLicense(value) {
+  const id = value.trim().toLowerCase();
+  return id === "other-open" || id === "other-closed" || id.startsWith("licenseref-") ||
+    !/^[a-z0-9][a-z0-9.+-]*$/.test(id);
+}
+
+// Catalog entries written before license_details existed: re-read their
+// build-time recipe once so the details are filled in.
+function lacksLicenseDetails(previous) {
+  return !previous.license_details?.length && previous.license.some(isCustomLicense);
+}
+
 export async function collectLicenseMetadata(catalog, sourceRoots, {
   previousByImage = new Map(), resolve = resolveBuildLicenses,
 } = {}) {
@@ -286,7 +301,7 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
   }
   const titles = [...artifacts].filter(([title, group]) => {
     const previous = previousByImage.get(title);
-    if (!previous) return true;
+    if (!previous || lacksLicenseDetails(previous)) return true;
     return group.apps.some(({ tool, name }) => {
       const app = catalog[tool].apps[name];
       return (app.license !== undefined &&

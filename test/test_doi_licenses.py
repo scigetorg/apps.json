@@ -120,6 +120,23 @@ class DoiLicenseTests(unittest.TestCase):
             doi_license.rights_from_catalog({"license": ["other-open"],
                                              "license_details": [{"license": "other-open"}]})
 
+    def test_custom_catalog_license_without_details_is_refused(self):
+        # Entries written before license_details existed: never turn them into IDs.
+        for value in ("other-closed", "LicenseRef-FSL", "FreeSurfer Software License Agreement"):
+            with self.assertRaisesRegex(ValueError, "no license_details"):
+                doi_license.rights_from_catalog({"license": ["MIT", value]})
+        # A free-text license value is custom too, so its details are kept.
+        recipe = {"copyright": [{"license": "FreeSurfer Software License Agreement",
+                                 "url": "https://example.org/fs"}, {"license": "MIT"}]}
+        self.assertEqual(license_details(recipe), [{"license": "FreeSurfer Software License Agreement",
+                                                    "url": "https://example.org/fs"}])
+        with self.assertRaisesRegex(ValueError, "needs a name and URL"):
+            doi_license.rights_from_catalog({"license": declared_licenses(recipe),
+                                             "license_details": license_details(recipe)})
+        row = audit_record(record([{"id": "other-closed"}]), {"license": ["other-closed"]})
+        self.assertEqual(row["status"], "mismatch")
+        self.assertIn("no license_details", row["problems"][0])
+
     def test_image_labels_must_match_container(self):
         revision = "a" * 40
         labels = {
