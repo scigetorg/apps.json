@@ -305,7 +305,10 @@ def rights_from_catalog(entry):
         if not detail.get("name") or not detail.get("url"):
             raise ValueError(f"Custom license {detail!r} needs a name and URL")
         rights.append(custom_right(detail["name"], detail["url"]))
-    custom_values = {(detail.get("license") or detail["name"]).strip().lower() for detail in custom}
+    # apps.json lists custom terms by name (older entries by their other-*/LicenseRef- ID).
+    custom_values = {value.strip().lower() for detail in custom
+                     for value in (detail.get("license"), detail.get("name"))
+                     if isinstance(value, str) and value.strip()}
     ids = sorted({value.strip().lower() for value in entry.get("license") or []} - custom_values)
     for value in ids:
         if is_custom_term(value):
