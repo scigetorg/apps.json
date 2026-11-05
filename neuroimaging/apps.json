@@ -2482,11 +2482,10 @@
                 "doi": "https://doi.org/10.5281/zenodo.18931685"
             },
             "code 240320": {
-                "version": "20261029",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "code_240320",
-                "doi": "https://doi.org/10.5281/zenodo.23850281"
+                "image": "code_240320"
             }
         },
         "categories": [
@@ -2496,7 +2495,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261029",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_arm64_240320"
@@ -2906,6 +2905,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "datalad_1.7.2",
+                "doi": "https://doi.org/10.5281/zenodo.23937084",
                 "license": [
                     "MIT"
                 ]
@@ -2916,6 +2916,15 @@
                 "apptainer_args": [],
                 "image": "datalad_1.7.3",
                 "doi": "https://doi.org/10.5281/zenodo.23905825",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "datalad 1.8.0": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "datalad_1.8.0",
                 "license": [
                     "MIT"
                 ]
@@ -3003,6 +3012,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "datalad_arm64_1.7.2",
+                "doi": "https://doi.org/10.5281/zenodo.23937092",
                 "license": [
                     "MIT"
                 ]
@@ -3013,6 +3023,15 @@
                 "apptainer_args": [],
                 "image": "datalad_arm64_1.7.3",
                 "doi": "https://doi.org/10.5281/zenodo.23875811",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "datalad_arm64 1.8.0": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "datalad_arm64_1.8.0",
                 "license": [
                     "MIT"
                 ]
@@ -7288,11 +7307,10 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.23904248",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7305,11 +7323,10 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.23904311",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7332,11 +7349,10 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.23904345",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7350,11 +7366,10 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.23904494",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -11986,6 +12001,23 @@
                 "license": [
                     "Apache-2.0",
                     "CC-BY-4.0"
+                ]
+            },
+            "whitematterlesions 0.5.20261103": {
+                "version": "20261104",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "whitematterlesions_0.5.20261103",
+                "license": [
+                    "Apache-2.0",
+                    "CC-BY-4.0",
+                    "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             }
         },

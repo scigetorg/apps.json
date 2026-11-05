@@ -1,7 +1,7 @@
 {
-    "entries": 767,
+    "entries": 770,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "a3e491686b82d2af0d57d8cfdedfdd5e450dabc5"
+        "NeuroDesk/neurocontainers": "5fc5675e94f6148ec5e9c8f766a57dba330ef51d"
     },
     "app_sources": {
         "afni": {
@@ -411,7 +411,8 @@
             "datalad 1.7.0": "NeuroDesk/neurocontainers",
             "datalad 1.7.1": "NeuroDesk/neurocontainers",
             "datalad 1.7.2": "NeuroDesk/neurocontainers",
-            "datalad 1.7.3": "NeuroDesk/neurocontainers"
+            "datalad 1.7.3": "NeuroDesk/neurocontainers",
+            "datalad 1.8.0": "NeuroDesk/neurocontainers"
         },
         "datalad_arm64": {
             "datalad_arm64 1.1.5": "NeuroDesk/neurocontainers",
@@ -422,7 +423,8 @@
             "datalad_arm64 1.7.0": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.7.1": "NeuroDesk/neurocontainers",
             "datalad_arm64 1.7.2": "NeuroDesk/neurocontainers",
-            "datalad_arm64 1.7.3": "NeuroDesk/neurocontainers"
+            "datalad_arm64 1.7.3": "NeuroDesk/neurocontainers",
+            "datalad_arm64 1.8.0": "NeuroDesk/neurocontainers"
         },
         "dcm2bids": {
             "dcm2bids 3.2.0": "NeuroDesk/neurocontainers",
@@ -1695,7 +1697,8 @@
         "whitematterlesions": {
             "whitematterlesions 0.2.20261009": "NeuroDesk/neurocontainers",
             "whitematterlesions 0.3.20261015": "NeuroDesk/neurocontainers",
-            "whitematterlesions 0.5.20261022": "NeuroDesk/neurocontainers"
+            "whitematterlesions 0.5.20261022": "NeuroDesk/neurocontainers",
+            "whitematterlesions 0.5.20261103": "NeuroDesk/neurocontainers"
         },
         "workshopdemo": {
             "workshopdemo 1.0.0": "NeuroDesk/neurocontainers"
