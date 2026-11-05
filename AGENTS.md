@@ -23,8 +23,9 @@ scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL veri
 scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
 scripts/doi_provenance.py    # reads OCI image build revision from the registry (GHCR, Docker Hub fallback)
-scripts/doi_metadata.py      # builds Zenodo deposition metadata
-scripts/audit_doi_licenses.py# weekly read-only license audit -> JSON report
+scripts/doi_metadata.py      # build-time license resolution + records-API draft metadata
+scripts/audit_doi_licenses.py# weekly read-only audit: Zenodo license vs apps.json -> JSON report
+scripts/backfill_zenodo_rights.py # manual: rewrite verified_legacy records' rights from apps.json
 test/*.test.mjs              # node:test suites (catalog, workflow, cloudflare)
 test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses)
 ```
@@ -56,16 +57,28 @@ and keep unrelated regenerated diffs out of code PRs.
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
 - Existing license values follow the same image build across domain moves.
-  New builds resolve their license from the build-time recipe. The weekly
-  audit fetches published images' build-time recipes again; manifests do not
-  cache license provenance.
+  New builds resolve their license from the build-time recipe
+  (`doi_metadata.resolve_build_license`: OCI revision labels, then the recipe
+  from raw.githubusercontent.com at that revision). Manifests do not cache
+  license provenance. Custom terms (`license_terms.is_custom_term`, mirrored
+  by `isCustomLicense` in `catalog.mjs`) keep their name and URL in
+  `license_details`; an entry with custom terms and no details is resolved
+  again, and `rights_from_catalog` refuses to turn such terms into IDs.
 - Retiring an image = deleting its release JSON upstream; there is no
   `retired-images.json` any more. Deleting the last release produces an empty
-  catalog.
+  catalog. Cleanup is time-based: neurocontainers' `cleanup-stale-containers`
+  (11:25 UTC) deletes SIFs absent from apps.json, releases and CVMFS once
+  they are older than 7 days.
 - DOI publication validates the license against the recipe at the image's OCI
   build revision and fails if `apps.json` licenses disagree. The weekly audit
-  compares the same build-time declarations and exact Zenodo ID. A Zenodo failure
-  must not block catalog updates.
+  compares each Zenodo record with apps.json only (no recipe or registry calls),
+  using `doi_license.same_rights`. A Zenodo failure must not block catalog updates.
+- Zenodo is used through its records API (InvenioRDM). Always send
+  `Accept: application/vnd.inveniordm.v1+json` (otherwise `/api/user/records`
+  answers in the legacy format with one license and no `pids`), write `rights`
+  in bare form (`{id}` or `{title, link}`; Zenodo rejects its own expanded
+  entries), and treat a non-empty `errors` list on a draft write as a failure
+  even though the HTTP status is 200/201.
 
 ## Workflows (`.github/workflows/`)
 
@@ -73,9 +86,14 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → Cloudflare publish → commit outputs |
-| `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan batches (`ZENODO_MAX_PUBLICATIONS`, default 16) → matrix publish |
+| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
+| `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan every missing licensed image (others skipped and listed; `limit` input for a smoke test) into ≤6 batches (`PUBLISH_JOBS`) → matrix publish, 6 in parallel, no new upload after 5 h (skipped when nothing is missing) |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
+| `backfill-zenodo-rights.yml` | manual only | dry run by default; `apply` edits `verified_legacy` records' license list (same DOI) |
+| `test.yml` | PRs and code pushes to `main` | `npm test` + Python unittest, no secrets |
+
+Never add `pull_request` triggers to workflows that receive `ZENODO_TOKEN`:
+`publish-dois` mints permanent production DOIs.
 
 Secrets/vars: `ZENODO_TOKEN` (production zenodo.org, deposit:write +
 deposit:actions), `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, optional
@@ -94,7 +112,7 @@ python -m unittest discover -s test -p 'test_*.py'  # Python DOI tests
 node scripts/workflow.mjs checkout                  # clone sources (network)
 npm run consolidate                                 # regenerate every domain
 node scripts/workflow.mjs output-paths              # files CI commits
-python -m scripts.zenodo_catalog plan --catalog-root . --max-artifacts 16
+python -m scripts.zenodo_catalog plan --catalog-root .
 ```
 
 Run Python scripts as modules (`python -m scripts.<name>`) from the repo root.
@@ -103,6 +121,7 @@ Run Python scripts as modules (`python -m scripts.<name>`) from the repo root.
 
 - `npm run publish:cloudflare` updates the public Worker.
 - `python -m scripts.zenodo_catalog publish` mints permanent production DOIs.
+- `python -m scripts.backfill_zenodo_rights --apply` edits published production records.
 
 Tests must not hit the network; existing tests stub `fetch`/`requests`.
 Follow that pattern when adding tests.

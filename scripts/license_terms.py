@@ -1,5 +1,21 @@
 """Extract the original license declarations from a build recipe."""
 
+import re
+
+# Shape of a license catalogue ID such as "gpl-3.0-only".
+CATALOGUE_ID = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
+
+
+def is_custom_term(value):
+    """A declared license with no license ID: other-*, LicenseRef-…, or free text.
+
+    Such terms need their name and URL kept in license_details. Mirrored by
+    isCustomLicense in scripts/catalog.mjs.
+    """
+    value = (value or "").strip().lower()
+    return (value in {"other-open", "other-closed"} or value.startswith("licenseref-")
+            or not CATALOGUE_ID.fullmatch(value))
+
 
 def declared_licenses(recipe):
     entries = recipe.get("copyright") or []
@@ -22,7 +38,7 @@ def license_details(recipe):
     details = []
     for entry in recipe.get("copyright") or []:
         identifier = entry.get("license") or ""
-        if entry.get("name") or identifier.lower() in {"other-open", "other-closed"} or identifier.lower().startswith("licenseref-"):
+        if entry.get("name") or is_custom_term(identifier):
             details.append({
                 key: entry[key].strip()
                 for key in ("license", "name", "url")

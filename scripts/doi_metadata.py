@@ -1,6 +1,6 @@
 """Resolve a container release's build-time recipe license and Zenodo metadata."""
 
-import base64
+from datetime import datetime, timezone
 from html import escape
 
 import requests
@@ -10,85 +10,73 @@ from .doi_license import LicenseValidationError, resolve_recipe_license
 from .doi_provenance import ProvenanceServiceError, get_build_provenance
 from .license_terms import declared_licenses, license_details
 
-def get_build_recipe(container_name, gh_token):
-    """Read the recipe identified by the built image's OCI revision."""
-    provenance = get_build_provenance(container_name, gh_token)
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
-    if gh_token:
-        headers["Authorization"] = "Bearer " + gh_token
-    url = (
-        "https://api.github.com/repos/Neurodesk/neurocontainers/contents/"
-        f"recipes/{provenance['recipe']}/build.yaml"
-    )
+
+def fetch_recipe(recipe_name, source_repository, revision):
+    """Read a recipe at an exact build revision from raw.githubusercontent.com.
+
+    Raw file reads do not count against the GitHub REST API quota.
+    """
+    url = (f"https://raw.githubusercontent.com/{source_repository}/{revision}/"
+           f"recipes/{recipe_name}/build.yaml")
     try:
-        response = requests.get(
-            url, headers=headers, params={"ref": provenance["revision"]}, timeout=(15, 60)
-        )
+        response = requests.get(url, timeout=(15, 60))
     except requests.RequestException as exc:
         raise ProvenanceServiceError(f"Could not fetch build-time recipe: {exc}") from exc
     if response.status_code == 404:
         raise LicenseValidationError(
-            f"Recipe {provenance['recipe']} is absent at build revision {provenance['revision']}"
+            f"Recipe {recipe_name} is absent at build revision {revision}"
         )
     if not response.ok:
-        raise ProvenanceServiceError(f"GitHub recipe API returned HTTP {response.status_code}")
-    payload = response.json()
-    if payload.get("encoding") == "base64" and payload.get("content"):
-        recipe_content = base64.b64decode(payload["content"])
-    else:
-        raw_url = (
-            "https://raw.githubusercontent.com/Neurodesk/neurocontainers/"
-            f"{provenance['revision']}/recipes/{provenance['recipe']}/build.yaml"
+        raise ProvenanceServiceError(
+            f"GitHub raw recipe endpoint returned HTTP {response.status_code}"
         )
-        try:
-            raw_response = requests.get(raw_url, timeout=(15, 60))
-        except requests.RequestException as exc:
-            raise ProvenanceServiceError(f"Could not fetch large build-time recipe: {exc}") from exc
-        if not raw_response.ok:
-            raise ProvenanceServiceError(
-                f"GitHub raw recipe endpoint returned HTTP {raw_response.status_code}"
-            )
-        recipe_content = raw_response.content
     try:
-        recipe = yaml.safe_load(recipe_content)
+        recipe = yaml.safe_load(response.content)
     except (ValueError, yaml.YAMLError) as exc:
         raise LicenseValidationError(f"Build-time recipe YAML is invalid: {exc}") from exc
     if not isinstance(recipe, dict):
         raise LicenseValidationError("Build-time recipe YAML is not an object")
-    return recipe, provenance
+    return recipe
 
 
-def get_license(container_name, gh_token, catalogue):
-    """Resolve and validate the recipe at the image's build revision."""
-    recipe, provenance = get_build_recipe(container_name, gh_token)
-    license_info = resolve_recipe_license(recipe, catalogue)
-    license_info["declared"] = declared_licenses(recipe)
-    license_info["license_details"] = license_details(recipe)
-    license_info.update(provenance)
-    return license_info
+def resolve_build_license(container_name, gh_token, source_repositories=None, catalogue=None):
+    """Resolve the license declared by the recipe this image was built from.
 
-def build_metadata(container_name, license_info):
-    metadata = {
-        "title": container_name,
-        "upload_type": "software",
-        "description": escape(container_name),
-        "creators": [{"name": "Neurodesk", "affiliation": "University of Queensland"}],
-        "license": license_info["zenodo_id"],
-    }
-    for entry in license_info["entries"]:
-        name = escape(entry["name"])
-        url = entry.get("url")
-        if url:
-            metadata["description"] += (
-                f'<p>License: <a href="{escape(url, quote=True)}">{name}</a></p>'
-            )
-        else:
-            metadata["description"] += f"<p>License: {name}</p>"
+    Strict: the OCI image must exist and carry its recipe revision labels.
+    Consolidate passes no catalogue (it records declarations only and never
+    depends on Zenodo); publish passes Zenodo's catalogue to get the deposit ID.
+    """
+    provenance = get_build_provenance(container_name, gh_token, source_repositories)
+    recipe = fetch_recipe(provenance["recipe"], provenance["source_repository"],
+                          provenance["revision"])
+    info = resolve_recipe_license(recipe, catalogue) if catalogue is not None else {}
+    info["declared"] = declared_licenses(recipe)
+    info["license_details"] = license_details(recipe)
+    info.update(provenance)
+    return info
+
+
+def build_metadata(container_name, license_info, today=None):
+    """Draft body for Zenodo's records API (InvenioRDM)."""
     revision = license_info["revision"]
     recipe = license_info["recipe"]
-    recipe_url = f"https://github.com/neurodesk/neurocontainers/tree/{revision}/recipes/{recipe}"
-    metadata["description"] += f'<p>Build recipe: <a href="{recipe_url}">{revision}</a></p>'
-    return {"metadata": metadata}
+    source_repository = license_info["source_repository"]
+    recipe_url = f"https://github.com/{source_repository}/tree/{revision}/recipes/{recipe}"
+    return {
+        "metadata": {
+            "resource_type": {"id": "software"},
+            "title": container_name,
+            "publication_date": (today or datetime.now(timezone.utc).date()).isoformat(),
+            "creators": [{
+                "person_or_org": {"type": "organizational", "name": "Neurodesk"},
+                "affiliations": [{"name": "University of Queensland"}],
+            }],
+            # Zenodo requires a publisher to register the DOI.
+            "publisher": "Zenodo",
+            "description": (f"<p>{escape(container_name)}</p>"
+                            f'<p>Build recipe: <a href="{recipe_url}">{revision}</a></p>'),
+            "rights": license_info["rights"],
+        },
+        "files": {"enabled": True},
+        "access": {"record": "public", "files": "public"},
+    }

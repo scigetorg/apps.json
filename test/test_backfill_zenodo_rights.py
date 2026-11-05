@@ -1,0 +1,104 @@
+"""The backfill edits only legacy records, and only their rights."""
+
+import unittest
+from unittest.mock import MagicMock, patch
+
+import requests
+
+from scripts import backfill_zenodo_rights as backfill
+from scripts.zenodo_catalog import ZENODO_API
+
+TITLE = "demo_1.0_20260101"
+DETAILS = [{"name": "Research terms", "url": "https://example.org/terms"}]
+ARTIFACTS = {
+    TITLE: {"license": ["MIT", "Research terms"], "license_details": DETAILS},
+    "single_1.0_20260101": {"license": ["MIT"]},
+}
+EXPECTED = [{"id": "mit"}, {"title": {"en": "Research terms"}, "link": "https://example.org/terms"}]
+
+
+def record(rights, title=TITLE, record_id="12"):
+    return {"id": record_id, "is_published": True,
+            "pids": {"doi": {"identifier": f"10.5281/zenodo.{record_id}"}},
+            "metadata": {"title": title, "rights": rights, "resource_type": {"id": "software"},
+                         "publisher": "Zenodo"},
+            "files": {"enabled": True}, "access": {"record": "public", "files": "public"}}
+
+
+RECORDS = {
+    TITLE: record([{"id": "other-open"}]),
+    "single_1.0_20260101": record([{"id": "mit"}], title="single_1.0_20260101", record_id="13"),
+}
+
+
+def reply(payload, status=200):
+    response = MagicMock()
+    response.status_code = status
+    response.json.return_value = payload
+    response.raise_for_status.side_effect = (
+        requests.HTTPError(str(status)) if status >= 400 else None)
+    return response
+
+
+def edit_session(update=None, publish=None):
+    session = MagicMock()
+    session.post.side_effect = [
+        reply({**record([{"id": "other-open", "title": {"en": "Other (Open)"}}]), "is_draft": True}),
+        publish or reply(record(EXPECTED)),
+    ]
+    session.put.return_value = update or reply({"errors": []})
+    return session
+
+
+def run(*argv, session=None):
+    session = session or edit_session()
+    with (patch("sys.argv", ["backfill", *argv]),
+          patch.dict("os.environ", {"ZENODO_TOKEN": "token"}, clear=True),
+          patch.object(backfill, "build_session", return_value=session),
+          patch.object(backfill, "catalog_artifacts", return_value=ARTIFACTS),
+          patch.object(backfill, "user_records", return_value=RECORDS)):
+        return backfill.main(), session
+
+
+class BackfillTests(unittest.TestCase):
+    def test_targets_only_verified_legacy_records(self):
+        rows = backfill.legacy_targets(ARTIFACTS, RECORDS)
+        self.assertEqual([row["title"] for row in rows], [TITLE])
+        self.assertEqual(backfill.legacy_targets(ARTIFACTS, RECORDS, {"other"}), [])
+
+    def test_dry_run_writes_nothing(self):
+        code, session = run()
+        self.assertEqual(code, 0)
+        session.post.assert_not_called()
+        session.put.assert_not_called()
+        session.delete.assert_not_called()
+
+    def test_apply_replaces_only_rights_and_keeps_the_doi(self):
+        code, session = run("--apply", "--limit", "1")
+        self.assertEqual(code, 0)
+        draft_url = f"{ZENODO_API}/records/12/draft"
+        self.assertEqual([call.args[0] for call in session.post.call_args_list],
+                         [draft_url, f"{draft_url}/actions/publish"])
+        sent = session.put.call_args.kwargs["json"]
+        self.assertEqual(sent["metadata"]["rights"], EXPECTED)
+        self.assertEqual(sent["metadata"]["publisher"], "Zenodo")
+        self.assertEqual(sent["access"], {"record": "public", "files": "public"})
+        self.assertNotIn("is_draft", sent)
+        session.delete.assert_not_called()
+
+    def test_rejected_update_discards_the_edit_draft(self):
+        code, session = run("--apply", session=edit_session(
+            update=reply({"errors": [{"field": "metadata.rights", "messages": ["bad"]}]})))
+        self.assertEqual(code, 1)
+        session.delete.assert_called_once()
+        self.assertEqual(session.delete.call_args.args[0], f"{ZENODO_API}/records/12/draft")
+
+    def test_changed_doi_after_publish_is_a_failure(self):
+        changed = record(EXPECTED)
+        changed["pids"]["doi"]["identifier"] = "10.5281/zenodo.99"
+        code, _ = run("--apply", session=edit_session(publish=reply(changed)))
+        self.assertEqual(code, 1)
+
+
+if __name__ == "__main__":
+    unittest.main()

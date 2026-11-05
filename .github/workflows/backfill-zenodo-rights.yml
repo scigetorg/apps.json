@@ -1,0 +1,48 @@
+name: Backfill Zenodo license lists
+
+# Manual only. Edits production Zenodo records published with one legacy
+# license so they list every apps.json license (same DOI). Dry run by default.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Write to Zenodo (unchecked = dry run)'
+        type: boolean
+        default: false
+      limit:
+        description: 'At most this many records (0 = all)'
+        type: string
+        default: '0'
+      title:
+        description: 'Only this image title (optional)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zenodo-rights-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests 'pyyaml>=6.0.2'
+      - name: Backfill legacy license lists
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+          APPLY: ${{ inputs.apply }}
+          LIMIT: ${{ inputs.limit }}
+          TITLE: ${{ inputs.title }}
+        run: |
+          args=(--catalog-root . --limit "$LIMIT")
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          if [ -n "$TITLE" ]; then args+=(--title "$TITLE"); fi
+          python -m scripts.backfill_zenodo_rights "${args[@]}"

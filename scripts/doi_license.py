@@ -10,10 +10,40 @@ from urllib.parse import urlsplit
 
 import requests
 
+from .license_terms import is_custom_term
+
 
 CATALOGUE_URL = "https://zenodo.org/api/licenses/"
 OTHER_IDS = {"other-open", "other-closed"}
 UNKNOWN_NAMES = {"none", "unknown", "noassertion"}
+# Deprecated SPDX IDs that Zenodo's legacy deposit API accepted, mapped to the
+# IDs in its current catalogue so already-published recipes stay valid.
+DEPRECATED_SPDX = {
+    **{f"{family}-{version}": f"{family}-{version}-only" for family, version in (
+        ("gpl", "1.0"), ("gpl", "2.0"), ("gpl", "3.0"), ("lgpl", "2.0"),
+        ("lgpl", "2.1"), ("lgpl", "3.0"), ("agpl", "1.0"), ("agpl", "3.0"))},
+    **{f"{family}-{version}+": f"{family}-{version}-or-later" for family, version in (
+        ("gpl", "1.0"), ("gpl", "2.0"), ("gpl", "3.0"), ("lgpl", "2.0"),
+        ("lgpl", "2.1"), ("lgpl", "3.0"))},
+}
+
+
+# Legacy spellings Zenodo has used for the same license. Comparison only: the
+# ID chosen for publication still comes from the live catalogue.
+LEGACY_IDS = {
+    "mit-license": "mit",
+    "apache2.0": "apache-2.0",
+    "apgl-v3": "agpl-3.0",
+    "bsd-2-clause-netbsd": "bsd-2-clause",
+}
+
+
+def license_equivalence_key(value):
+    """Fold license IDs that name the same terms onto one comparison key."""
+    key = value.strip().lower()
+    key = LEGACY_IDS.get(key, key)
+    key = DEPRECATED_SPDX.get(key, key)
+    return key.removesuffix("-only")
 
 
 class LicenseValidationError(ValueError):
@@ -82,7 +112,6 @@ def fetch_catalogue():
     while True:
         response = _get_with_retry(CATALOGUE_URL, params={"page": page, "size": 100})
         payload = response.json()
-        print(f"Fetched Zenodo license catalogue page {page} with {len(payload.get('hits', []))} entries: {response.url}")
         if isinstance(payload, dict):
             raw_hits = payload.get("hits")
             total = payload.get("total")
@@ -95,6 +124,7 @@ def fetch_catalogue():
             raw_hits, total = payload, None
         if not isinstance(raw_hits, list):
             raise CatalogueError("Unexpected Zenodo license catalogue response")
+        print(f"Fetched Zenodo license catalogue page {page} with {len(raw_hits)} entries")
         for raw in raw_hits:
             entry = _catalogue_entry(raw)
             entries[entry["id"]] = entry
@@ -181,21 +211,27 @@ def suggest_licenses(value, url, catalogue):
     return candidates
 
 
-def _category(value, catalogue, context):
-    if not isinstance(value, str) or value.strip().lower() not in OTHER_IDS:
-        raise LicenseValidationError(f"{context} must be other-open or other-closed")
-    category = value.strip().lower()
-    if category not in catalogue:
-        raise CatalogueError(f"Zenodo catalogue does not contain {category}")
-    return category
+def is_custom_license(identifier):
+    """Terms with no Zenodo catalogue ID: published by name and URL."""
+    value = (identifier or "").strip().lower()
+    return not value or value in OTHER_IDS or value.startswith("licenseref-")
+
+
+def custom_right(name, url):
+    return {"title": {"en": name}, "link": url}
 
 
 def resolve_recipe_license(recipe, catalogue):
-    """Return an exact Zenodo ID and every declared license for the description."""
+    """Return the recipe's licenses as Zenodo `rights` entries, one per copyright entry.
+
+    A catalogue license becomes {"id": ...}; custom terms (a name, other-open/
+    other-closed or LicenseRef-) become {"title", "link"} and need a name and URL.
+    Write these bare forms: Zenodo rejects its own expanded entries on update.
+    """
     copyrights = recipe.get("copyright") if isinstance(recipe, dict) else None
     if not isinstance(copyrights, list) or not copyrights:
         raise LicenseValidationError("Recipe has no copyright entries; add license and URL")
-    resolved = []
+    rights = []
     for number, item in enumerate(copyrights, 1):
         context = f"copyright entry {number}"
         if not isinstance(item, dict):
@@ -207,25 +243,35 @@ def resolve_recipe_license(recipe, catalogue):
             canonical_url(given_url)
         if "license" in item and (not isinstance(identifier, str) or not identifier.strip()):
             raise LicenseValidationError(f"{context} license must be a non-empty string")
-        if isinstance(identifier, str) and identifier.strip():
+        if is_custom_license(identifier):
+            stated = name.strip() if isinstance(name, str) and name.strip() else None
+            if stated is None and not identifier:
+                raise LicenseValidationError(f"{context} needs a license ID or custom name")
+            if stated is None:
+                raise LicenseValidationError(
+                    f"{context} custom license {identifier.strip()!r} needs a name and URL"
+                )
+            lowered = stated.lower()
+            if lowered in UNKNOWN_NAMES or any(
+                marker in lowered for marker in ("no licence published", "no license published", "does not declare a license")
+            ):
+                raise LicenseValidationError(
+                    f"{context} does not identify usable license terms: {stated!r}",
+                    suggest_licenses(stated, given_url, catalogue),
+                )
+            if not given_url:
+                raise LicenseValidationError(f"{context} custom license {stated!r} needs a URL")
+            right = custom_right(stated, given_url.strip())
+        else:
             stated = identifier.strip()
             license_id = stated.lower()
             if license_id not in catalogue:
+                license_id = DEPRECATED_SPDX.get(license_id, license_id)
+            if license_id not in catalogue:
                 raise LicenseValidationError(
                     f"{context} license {stated!r} is not a Zenodo catalogue ID; "
-                    "choose an exact ID or other-open/other-closed with a URL",
+                    "choose an exact ID, or give custom terms a name and URL",
                     suggest_licenses(stated, given_url, catalogue),
-                )
-            if item.get("zenodo_license") is not None:
-                raise LicenseValidationError(
-                    f"{context} already has a catalogue ID; remove its zenodo_license override"
-                )
-            if license_id in OTHER_IDS and not given_url:
-                raise LicenseValidationError(f"{context} {license_id} needs a license URL")
-            catalogue_url = catalogue[license_id].get("url")
-            if not given_url and not catalogue_url:
-                raise LicenseValidationError(
-                    f"{context} {license_id} has no URL in the recipe or Zenodo catalogue"
                 )
             if given_url:
                 matches = []
@@ -241,61 +287,49 @@ def resolve_recipe_license(recipe, catalogue):
                         f"{context} URL matches a different Zenodo license, not {stated!r}",
                         [{"id": entry["id"], "title": entry["title"], "reason": "exact URL match"} for entry in matches[:3]],
                     )
-            resolved.append({
-                "id": license_id,
-                "name": (
-                    name.strip()
-                    if license_id in OTHER_IDS and isinstance(name, str) and name.strip()
-                    else stated
-                ),
-                "url": given_url or catalogue_url,
-                "osi_approved": catalogue[license_id]["osi_approved"],
-                "custom": license_id in OTHER_IDS,
-            })
-        elif isinstance(name, str) and name.strip():
-            stated = name.strip()
-            lowered = stated.lower()
-            if lowered in UNKNOWN_NAMES or any(
-                marker in lowered for marker in ("no licence published", "no license published", "does not declare a license")
-            ):
-                raise LicenseValidationError(
-                    f"{context} does not identify usable license terms: {stated!r}",
-                    suggest_licenses(stated, given_url, catalogue),
-                )
-            if not given_url:
-                raise LicenseValidationError(f"{context} name-only custom license needs a URL")
-            selected = item.get("zenodo_license", recipe.get("zenodo_license"))
-            if selected is None:
-                raise LicenseValidationError(
-                    f"{context} custom license needs zenodo_license: other-open or other-closed"
-                )
-            category = _category(selected, catalogue, f"{context} zenodo_license")
-            resolved.append({"id": category, "name": stated, "url": given_url, "osi_approved": False, "custom": True})
-        else:
-            raise LicenseValidationError(f"{context} needs a license ID or custom name")
+            right = {"id": license_id}
+        if right not in rights:
+            rights.append(right)
+    return {"rights": rights}
 
-    ids = {item["id"] for item in resolved}
-    override = recipe.get("zenodo_license")
-    if override is not None:
-        if len(resolved) < 2 and not resolved[0]["custom"]:
-            raise LicenseValidationError("Top-level zenodo_license is only for custom or multiple copyright entries")
-        zenodo_id = _category(override, catalogue, "Top-level zenodo_license")
-        if len(resolved) == 1 and resolved[0]["custom"] and resolved[0]["id"] != zenodo_id:
-            raise LicenseValidationError("Top-level zenodo_license conflicts with the custom copyright entry")
-        if zenodo_id == "other-open" and any(item["id"] == "other-closed" for item in resolved):
-            raise LicenseValidationError(
-                "Top-level other-open conflicts with an other-closed copyright entry"
-            )
-    elif len(ids) == 1:
-        zenodo_id = next(iter(ids))
-    elif all(item["osi_approved"] and not item["custom"] for item in resolved):
-        zenodo_id = "other-open"
-    else:
-        raise LicenseValidationError(
-            "Multiple licenses cannot be classified safely; add top-level "
-            "zenodo_license: other-open or other-closed"
-        )
-    return {"zenodo_id": zenodo_id, "entries": resolved}
+
+def rights_from_catalog(entry):
+    """Rebuild bare `rights` from an apps.json entry's license and license_details.
+
+    Catalogue IDs keep the recipe's spelling; compare with same_rights.
+    """
+    custom = [detail for detail in entry.get("license_details") or []
+              if is_custom_term(detail.get("license"))]
+    rights = []
+    for detail in custom:
+        if not detail.get("name") or not detail.get("url"):
+            raise ValueError(f"Custom license {detail!r} needs a name and URL")
+        rights.append(custom_right(detail["name"], detail["url"]))
+    custom_values = {(detail.get("license") or detail["name"]).strip().lower() for detail in custom}
+    ids = sorted({value.strip().lower() for value in entry.get("license") or []} - custom_values)
+    for value in ids:
+        if is_custom_term(value):
+            raise ValueError(f"apps.json has no license_details (name and URL) for {value!r}")
+    return [{"id": value} for value in ids] + rights
+
+
+def rights_key(rights):
+    """Order-free comparison key for bare or Zenodo-expanded rights entries."""
+    keys = set()
+    for right in rights or []:
+        if right.get("id"):
+            keys.add(("id", license_equivalence_key(right["id"])))
+            continue
+        title = right.get("title") or ""
+        if isinstance(title, dict):
+            title = title.get("en") or next(iter(title.values()), "")
+        link = right.get("link")
+        keys.add(("custom", title.strip().lower(), canonical_url(link) if link else None))
+    return frozenset(keys)
+
+
+def same_rights(left, right):
+    return rights_key(left) == rights_key(right)
 
 
 def main():
