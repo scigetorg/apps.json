@@ -1,5 +1,6 @@
 """Resolve a container release's build-time recipe license and Zenodo metadata."""
 
+from datetime import datetime, timezone
 from html import escape
 
 import requests
@@ -55,26 +56,27 @@ def resolve_build_license(container_name, gh_token, source_repositories=None, ca
     return info
 
 
-def build_metadata(container_name, license_info):
-    metadata = {
-        "title": container_name,
-        "upload_type": "software",
-        "description": escape(container_name),
-        "creators": [{"name": "Neurodesk", "affiliation": "University of Queensland"}],
-        "license": license_info["zenodo_id"],
-    }
-    for entry in license_info["entries"]:
-        name = escape(entry["name"])
-        url = entry.get("url")
-        if url:
-            metadata["description"] += (
-                f'<p>License: <a href="{escape(url, quote=True)}">{name}</a></p>'
-            )
-        else:
-            metadata["description"] += f"<p>License: {name}</p>"
+def build_metadata(container_name, license_info, today=None):
+    """Draft body for Zenodo's records API (InvenioRDM)."""
     revision = license_info["revision"]
     recipe = license_info["recipe"]
     source_repository = license_info["source_repository"]
     recipe_url = f"https://github.com/{source_repository}/tree/{revision}/recipes/{recipe}"
-    metadata["description"] += f'<p>Build recipe: <a href="{recipe_url}">{revision}</a></p>'
-    return {"metadata": metadata}
+    return {
+        "metadata": {
+            "resource_type": {"id": "software"},
+            "title": container_name,
+            "publication_date": (today or datetime.now(timezone.utc).date()).isoformat(),
+            "creators": [{
+                "person_or_org": {"type": "organizational", "name": "Neurodesk"},
+                "affiliations": [{"name": "University of Queensland"}],
+            }],
+            # Zenodo requires a publisher to register the DOI.
+            "publisher": "Zenodo",
+            "description": (f"<p>{escape(container_name)}</p>"
+                            f'<p>Build recipe: <a href="{recipe_url}">{revision}</a></p>'),
+            "rights": license_info["rights"],
+        },
+        "files": {"enabled": True},
+        "access": {"record": "public", "files": "public"},
+    }
