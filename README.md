@@ -6,6 +6,44 @@ repository. The active domain is `neuroimaging`, sourced from
 configured source repositories; edit their recipe metadata and release files,
 not generated `apps.json` files.
 
+## Workflows
+
+```
+                     neurocontainers repo                      Zenodo (production)
+                (releases/*.json, recipes/*/build.yaml)
+                              │
+ ┌─ consolidate.yml ── daily 02:25 UTC ───────────────────────────────────────────┐
+ │  clone sources ─► build catalog from release JSON (domains from build.yaml)     │
+ │                   ├─ DOIs:     look up published records ◄──────────── Zenodo   │
+ │                   └─ licenses: new builds only, from OCI image labels           │
+ │                                → recipe @ build revision                        │
+ │  ─► write <domain>/apps.json + manifest.json                                    │
+ │  ─► commit + push main ─► publish to Cloudflare Worker                          │
+ └─────────────────────────────────────────────────────────────────────────────────┘
+                              │ apps.json on main
+                              ▼
+ ┌─ publish-dois.yml ── daily 04:25 UTC ──────────────────────────────────────────┐
+ │  plan:    unit tests ─► images in apps.json with no Zenodo record               │
+ │           ─► split into ≤ 6 batches (none missing → stop)                       │
+ │  publish: 6 parallel jobs, per image:                                           │
+ │           build-time license == apps.json license?                              │
+ │             no  ─► log FAILED, continue with the next image                     │
+ │             yes ─► Zenodo draft ─► stream S3 SIF ─► publish ─────────► DOI      │
+ │  (the DOI enters apps.json at the next 02:25 consolidate)                       │
+ └─────────────────────────────────────────────────────────────────────────────────┘
+
+ ┌─ audit-doi-licenses.yml ── Sundays 05:00 UTC (read-only) ──────────────────────┐
+ │  list Zenodo records ─► keep software records whose title is in apps.json       │
+ │  ─► Zenodo licenses vs apps.json licenses (all of them, any order)              │
+ │        verified │ verified_legacy │ mismatch │ no_catalog_license               │
+ │  ─► JSON report artifact; job fails on any mismatch                             │
+ └─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+`consolidate` and `publish-dois` share the `apps-catalog` concurrency group, so
+they never run at the same time. The `Test` workflow (not shown) runs the unit
+tests on pull requests and code pushes.
+
 ## Naming and layout
 
 A **domain ID** is a stable lowercase slug: letters, digits, and single
@@ -61,30 +99,29 @@ and does not stop catalog generation. Before publication it validates the licens
 against Zenodo's live license catalog and checks the recipe at the image's
 OCI build revision. It fails if `apps.json` licenses differ from that recipe.
 The DOI description records every declared license and the build recipe revision.
-A weekly read-only audit compares each published Zenodo record's license with
-the `apps.json` license for the same image. A single catalog license must match
-the Zenodo ID; known legacy Zenodo spellings (for example `mit-license`, or
-`gpl-3.0` for `gpl-3.0-only`) count as equal. Multiple licenses or custom terms
-must use `other-open` or `other-closed`. Images without a catalog license are
-reported as `no_catalog_license`. Records for images removed from the catalog
-are skipped. The audit uploads a JSON report and fails on mismatches. It does
-not fetch recipes: build-time recipes are checked when consolidation writes a
-license and again before publication, so a recipe license fixed without a
-rebuild is not detected by the audit.
+A weekly read-only audit compares each published Zenodo record's licenses with
+the licenses `apps.json` lists for the same image, ignoring order and legacy ID
+spellings. Records published before the records API carry one license each; a
+single `other-open`/`other-closed` license where `apps.json` lists several or
+custom terms is reported as `verified_legacy`, not as a failure. Images without
+a catalog license are reported as `no_catalog_license`. Records for images
+removed from the catalog are skipped. The audit uploads a JSON report and fails
+on mismatches. It does not fetch recipes: build-time recipes are checked when
+consolidation writes a license and again before publication, so a recipe
+license fixed without a rebuild is not detected by the audit.
 A Zenodo failure does not block catalog updates. Historical releases state their license
 through their build-time recipe, without edits to release JSON. These checks
 verify agreement between the recipe, catalog, and Zenodo; they cannot determine
 whether the original recipe described the upstream legal terms correctly.
 
-For DOI publication, each `copyright[].license` in the build-time recipe must
-match an ID in Zenodo's live license catalogue. List multiple licenses as
-separate `copyright` entries. An SPDX expression such as `MIT OR Apache-2.0`
-is not a single Zenodo license ID. For custom terms, provide a `name`, a URL
-linking to the license terms, and either `license: other-open` / `other-closed`
-in that copyright entry or an explicit `zenodo_license: other-open` /
-`other-closed`. A name and URL alone do not establish whether terms are open.
-The recipe can specify `zenodo_license` at the top level when its combined
-licenses need one Zenodo category.
+For DOI publication, records are created through Zenodo's records API, and
+every `copyright` entry in the build-time recipe becomes its own license on the
+record. A `license` must be an ID in Zenodo's live license catalogue (deprecated
+SPDX IDs such as `GPL-3.0` map to `gpl-3.0-only`). List multiple licenses as
+separate `copyright` entries; an SPDX expression such as `MIT OR Apache-2.0` is
+not one ID. Custom terms (a `name` only, `other-open`/`other-closed`, or a
+`LicenseRef-…` ID) are published under their `name` with a link to their `url`,
+so they need both. `zenodo_license` is no longer used and is ignored.
 
 ## Enable the schedule
 

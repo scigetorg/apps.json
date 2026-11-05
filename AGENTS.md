@@ -23,7 +23,7 @@ scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL veri
 scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
 scripts/doi_provenance.py    # reads OCI image build revision from the registry (GHCR, Docker Hub fallback)
-scripts/doi_metadata.py      # builds Zenodo deposition metadata
+scripts/doi_metadata.py      # build-time license resolution + records-API draft metadata
 scripts/audit_doi_licenses.py# weekly read-only audit: Zenodo license vs apps.json -> JSON report
 test/*.test.mjs              # node:test suites (catalog, workflow, cloudflare)
 test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses)
@@ -68,8 +68,13 @@ and keep unrelated regenerated diffs out of code PRs.
 - DOI publication validates the license against the recipe at the image's OCI
   build revision and fails if `apps.json` licenses disagree. The weekly audit
   compares each Zenodo record with apps.json only (no recipe or registry calls),
-  using `doi_license.license_equivalence_key` for legacy IDs. A Zenodo failure
-  must not block catalog updates.
+  using `doi_license.same_rights`. A Zenodo failure must not block catalog updates.
+- Zenodo is used through its records API (InvenioRDM). Always send
+  `Accept: application/vnd.inveniordm.v1+json` (otherwise `/api/user/records`
+  answers in the legacy format with one license and no `pids`), write `rights`
+  in bare form (`{id}` or `{title, link}`; Zenodo rejects its own expanded
+  entries), and treat a non-empty `errors` list on a draft write as a failure
+  even though the HTTP status is 200/201.
 
 ## Workflows (`.github/workflows/`)
 
