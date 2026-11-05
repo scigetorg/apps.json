@@ -1839,7 +1839,14 @@
                 "image": "brainstemnavigator_1.0.0",
                 "doi": "https://doi.org/10.5281/zenodo.23850188",
                 "license": [
-                    "MIT"
+                    "MIT",
+                    "User-supplied Brainstem Navigator atlas agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "User-supplied Brainstem Navigator atlas agreement",
+                        "url": "https://www.nitrc.org/frs/download.php/17380/BrainstemNavigatorv1.0.zip"
+                    }
                 ]
             }
         },
@@ -2302,7 +2309,19 @@
                 "apptainer_args": [],
                 "image": "chimera-brainparcellation_0.4.1",
                 "license": [
-                    "Apache-2.0"
+                    "Apache-2.0",
+                    "FSL license",
+                    "FreeSurfer software license"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer software license",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    },
+                    {
+                        "name": "FSL license",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html"
+                    }
                 ]
             }
         },
@@ -2693,7 +2712,14 @@
                 "apptainer_args": [],
                 "image": "cryosparc_1.0.0",
                 "license": [
+                    "CryoSPARC licence (not included; installed with each user's own licence ID)",
                     "MIT"
+                ],
+                "license_details": [
+                    {
+                        "name": "CryoSPARC licence (not included; installed with each user's own licence ID)",
+                        "url": "https://guide.cryosparc.com/licensing"
+                    }
                 ]
             }
         },
@@ -3032,6 +3058,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "datalad_arm64_1.8.0",
+                "doi": "https://doi.org/10.5281/zenodo.23969612",
                 "license": [
                     "MIT"
                 ]
@@ -3951,7 +3978,14 @@
                 "image": "enigma-pd-wml_1.2.0",
                 "doi": "https://doi.org/10.5281/zenodo.23630328",
                 "license": [
-                    "BSD-3-Clause"
+                    "BSD-3-Clause",
+                    "FSL License (free for non-commercial use)"
+                ],
+                "license_details": [
+                    {
+                        "name": "FSL License (free for non-commercial use)",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/#/license"
+                    }
                 ]
             }
         },
@@ -3970,7 +4004,14 @@
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
-                    "GPL-3.0-only"
+                    "GPL-3.0-only",
+                    "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)"
+                ],
+                "license_details": [
+                    {
+                        "name": "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)",
+                        "url": "https://github.com/mrphysics-bonn/ep3d-highres-preprocessing"
+                    }
                 ]
             }
         },
@@ -6005,7 +6046,19 @@
                 "image": "kul-vbg_0.61.0_23112021_beta",
                 "doi": "https://doi.org/10.5281/zenodo.23630402",
                 "license": [
+                    "FSL license",
+                    "FreeSurfer software license",
                     "MPL-2.0"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer software license",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    },
+                    {
+                        "name": "FSL license",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html"
+                    }
                 ]
             }
         },
@@ -6779,6 +6832,12 @@
                 "doi": "https://doi.org/10.5281/zenodo.23850166",
                 "license": [
                     "LicenseRef-Apache-2.0-Commons-Clause"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-Apache-2.0-Commons-Clause",
+                        "url": "https://github.com/TIO-IKIM/medical_image_deidentification/blob/main/LICENSE"
+                    }
                 ]
             }
         },
@@ -6796,6 +6855,12 @@
                 "doi": "https://doi.org/10.5281/zenodo.23850687",
                 "license": [
                     "LicenseRef-Apache-2.0-Commons-Clause"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-Apache-2.0-Commons-Clause",
+                        "url": "https://github.com/TIO-IKIM/medical_image_deidentification/blob/main/LICENSE"
+                    }
                 ]
             }
         },
@@ -7311,6 +7376,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
+                "doi": "https://doi.org/10.5281/zenodo.23969620",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7327,6 +7393,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
+                "doi": "https://doi.org/10.5281/zenodo.23969674",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7353,6 +7420,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.23969753",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -7370,6 +7438,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.23969618",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -9499,7 +9568,14 @@
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
-                    "GPL-3.0-only"
+                    "GPL-3.0-only",
+                    "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)"
+                ],
+                "license_details": [
+                    {
+                        "name": "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)",
+                        "url": "https://github.com/mrphysics-bonn/ep3d-highres-preprocessing"
+                    }
                 ]
             },
             "qsmxt 6.3.2": {
@@ -9723,8 +9799,21 @@
                 "image": "qsmxt_9.22.0",
                 "doi": "https://doi.org/10.5281/zenodo.23630243",
                 "license": [
+                    "Apache-2.0",
                     "BSD-2-Clause",
-                    "GPL-3.0-only"
+                    "GPL-3.0-only",
+                    "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)",
+                    "fsl license"
+                ],
+                "license_details": [
+                    {
+                        "name": "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)",
+                        "url": "https://github.com/mrphysics-bonn/ep3d-highres-preprocessing"
+                    },
+                    {
+                        "name": "fsl license",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/#/license"
+                    }
                 ]
             },
             "qsmxt 9.8.0": {
@@ -9759,6 +9848,12 @@
                     "Apache-2.0",
                     "BSD-3-Clause",
                     "LicenseRef-FSL"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-FSL",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html"
+                    }
                 ]
             },
             "quantiphyseGUI-quantiphyse 0.9.10": {
@@ -9771,6 +9866,12 @@
                     "Apache-2.0",
                     "BSD-3-Clause",
                     "LicenseRef-FSL"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-FSL",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html"
+                    }
                 ]
             }
         },
@@ -11265,7 +11366,21 @@
                 "image": "synthseg_8.2.0",
                 "doi": "https://doi.org/10.5281/zenodo.23850168",
                 "license": [
-                    "Apache-2.0"
+                    "Apache-2.0",
+                    "CC-BY-4.0",
+                    "CC-BY-SA-3.0",
+                    "FreeSurfer Software License Agreement",
+                    "ICBM2009a template redistribution notice"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    },
+                    {
+                        "name": "ICBM2009a template redistribution notice",
+                        "url": "https://www.bic.mni.mcgill.ca/ServicesAtlases/ICBM152NLin2009"
+                    }
                 ]
             },
             "synthseg 8.2.1": {
@@ -11305,6 +11420,12 @@
                 "doi": "https://doi.org/10.5281/zenodo.23850534",
                 "license": [
                     "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "license": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             }
         },
@@ -11323,6 +11444,12 @@
                 "doi": "https://doi.org/10.5281/zenodo.23850592",
                 "license": [
                     "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "license": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             }
         },
@@ -11530,6 +11657,12 @@
                 "license": [
                     "GPL-3.0-only",
                     "LicenseRef-FreeSurfer"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-FreeSurfer",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             }
         },
@@ -11908,6 +12041,12 @@
                 "license": [
                     "BSD-3-Clause",
                     "LicenseRef-TetGen-1.4.3"
+                ],
+                "license_details": [
+                    {
+                        "license": "LicenseRef-TetGen-1.4.3",
+                        "url": "https://github.com/vmtk/vmtk/blob/v1.5.2/vtkVmtk/Utilities/tetgen1.4.3/LICENSE"
+                    }
                 ]
             }
         },
@@ -11978,7 +12117,14 @@
                 "doi": "https://doi.org/10.5281/zenodo.23630373",
                 "license": [
                     "Apache-2.0",
-                    "CC-BY-4.0"
+                    "CC-BY-4.0",
+                    "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             },
             "whitematterlesions 0.3.20261015": {
@@ -11989,7 +12135,14 @@
                 "doi": "https://doi.org/10.5281/zenodo.23630179",
                 "license": [
                     "Apache-2.0",
-                    "CC-BY-4.0"
+                    "CC-BY-4.0",
+                    "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             },
             "whitematterlesions 0.5.20261022": {
@@ -12000,7 +12153,14 @@
                 "doi": "https://doi.org/10.5281/zenodo.23629972",
                 "license": [
                     "Apache-2.0",
-                    "CC-BY-4.0"
+                    "CC-BY-4.0",
+                    "FreeSurfer Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    }
                 ]
             },
             "whitematterlesions 0.5.20261103": {
@@ -12008,6 +12168,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "whitematterlesions_0.5.20261103",
+                "doi": "https://doi.org/10.5281/zenodo.23970243",
                 "license": [
                     "Apache-2.0",
                     "CC-BY-4.0",
