@@ -245,8 +245,10 @@ export async function collectDoiMetadata(
   return found;
 }
 
-export async function resolveBuildLicenses(titles, sourceRepositoriesByTitle = {}) {
-  if (!titles.length) return { resolved: {}, errors: {} };
+// Reads every title's license from its recipe history (scripts/recipe_history.py).
+// `titles` maps image title -> { repository, root } of its source clone.
+export async function resolveRecipeLicenses(titles) {
+  if (!Object.keys(titles).length) return { resolved: {}, errors: {} };
   return new Promise((resolve, reject) => {
     const child = spawn("python3", ["-m", "scripts.catalog_licenses"],
       { stdio: ["pipe", "pipe", "pipe"] });
@@ -261,29 +263,16 @@ export async function resolveBuildLicenses(titles, sourceRepositoriesByTitle = {
         try { resolve(JSON.parse(stdout)); } catch (error) { reject(error); }
       }
     });
-    child.stdin.end(JSON.stringify({ titles, source_repositories_by_title: sourceRepositoriesByTitle }));
+    child.stdin.end(JSON.stringify({ titles }));
   });
 }
 
-// Custom terms (other-*, LicenseRef-…, or a name such as "FreeSurfer Software
-// License Agreement") have no Zenodo license ID; DOIs need their name and URL
-// from license_details. Mirrors license_terms.is_custom_term.
-export function isCustomLicense(value) {
-  const id = value.trim().toLowerCase();
-  return id === "other-open" || id === "other-closed" || id.startsWith("licenseref-") ||
-    !/^[a-z0-9][a-z0-9.+-]*$/.test(id);
-}
-
-// Catalog entries written before license_details existed: re-read their
-// build-time recipe once so the details are filled in.
-function lacksLicenseDetails(previous) {
-  return !previous.license_details?.length && previous.license.some(isCustomLicense);
-}
-
-// `refresh` re-reads every image's build-time recipe (manual, after resolver
-// changes); otherwise only new builds and incomplete entries are looked up.
+// Every image's license is read from its recipe history on every run: the
+// newest commit declaring its version (local git, no network). The license
+// already in apps.json is kept only when that history has none for the version
+// (mostly build.sh-era images); otherwise the image has no license.
 export async function collectLicenseMetadata(catalog, sourceRoots, {
-  previousByImage = new Map(), resolve = resolveBuildLicenses, refresh = false,
+  previousByImage = new Map(), resolve = resolveRecipeLicenses,
 } = {}) {
   const artifacts = new Map();
   for (const [tool, entry] of Object.entries(catalog)) {
@@ -292,7 +281,7 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
       if (!source) continue;
       const title = `${app.image}_${app.version}`;
       const group = artifacts.get(title) ?? {
-        recipe: source.recipe, repository: source.repository, apps: [],
+        recipe: source.recipe, repository: source.repository, root: source.root, apps: [],
       };
       if (group.recipe !== source.recipe || (group.repository && source.repository &&
           group.repository !== source.repository))
@@ -301,52 +290,37 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
       artifacts.set(title, group);
     }
   }
-  const titles = [...artifacts].filter(([title, group]) => {
-    const previous = previousByImage.get(title);
-    if (refresh || !previous || lacksLicenseDetails(previous)) return true;
-    return group.apps.some(({ tool, name }) => {
-      const app = catalog[tool].apps[name];
-      return (app.license !== undefined &&
-          JSON.stringify(app.license) !== JSON.stringify(previous.license)) ||
-        (app.license_details !== undefined &&
-          JSON.stringify(app.license_details) !== JSON.stringify(previous.license_details));
-    });
-  }).map(([title]) => title);
-  const sourceRepositoriesByTitle = Object.fromEntries(titles
-    .map((title) => [title, artifacts.get(title).repository])
-    .filter(([, repository]) => repository)
-    .map(([title, repository]) => [title, [repository]]));
-  const { resolved = {}, errors = {} } = titles.length
-    ? await resolve(titles, sourceRepositoriesByTitle) : { resolved: {}, errors: {} };
-  const refreshed = new Set(titles);
+  const titles = Object.fromEntries([...artifacts].map(([title, group]) =>
+    [title, { repository: group.repository ?? "", root: group.root ?? "" }]));
+  const { resolved = {}, errors = {} } = await resolve(titles);
   const apps = {};
   let changed = 0;
+  let kept = 0;
+  const missing = [];
   for (const [title, group] of artifacts) {
-    const metadata = refreshed.has(title)
-      ? resolved[title] ?? previousByImage.get(title) : previousByImage.get(title);
-    const previous = previousByImage.get(title);
-    if (refresh && previous && resolved[title] &&
-        JSON.stringify(resolved[title]) !== JSON.stringify(previous)) {
-      changed += 1;
-      console.log(`Refreshed license for ${title}: ${JSON.stringify(previous.license)} -> ` +
-        JSON.stringify(resolved[title].license));
-    }
-    if (errors[title])
-      console.warn(`Could not verify build-time license for ${title}: ${errors[title]}`);
-    if (!metadata) {
-      if (!errors[title]) console.warn(`Could not verify build-time license for ${title}: no result`);
+    const stored = previousByImage.get(title);
+    const fresh = resolved[title];
+    let metadata;
+    if (fresh?.license.length) {
+      metadata = fresh;
+      if (stored && JSON.stringify(stored) !== JSON.stringify(fresh)) {
+        changed += 1;
+        console.log(`License for ${title} from recipe history: ${JSON.stringify(stored.license)} -> ` +
+          JSON.stringify(fresh.license));
+      }
+    } else if (stored) {
+      metadata = stored;
+      kept += 1;
+    } else {
+      missing.push(`${title}: ${errors[title] ?? "its recipe declares no license for this version"}`);
       continue;
     }
-    if (metadata.license.length) {
-      for (const { tool, name } of group.apps)
-        (apps[tool] ??= {})[name] = metadata;
-    } else {
-      console.warn(`Build-time recipe for ${title} declares no license`);
-    }
+    for (const { tool, name } of group.apps) (apps[tool] ??= {})[name] = metadata;
   }
-  if (refresh)
-    console.log(`License refresh: ${titles.length} image(s) looked up, ${changed} changed, ` +
-      `${Object.keys(errors).length} kept after lookup errors`);
+  console.log(`Licenses: ${Object.keys(resolved).length} image(s) read from recipe history, ` +
+    `${changed} changed, ${kept} kept from apps.json (no recipe license for their version), ` +
+    `${missing.length} without a license`);
+  for (const line of missing) console.log(`  no license: ${line}`);
   return apps;
 }
 
@@ -376,9 +350,8 @@ export async function consolidate({
   previous,
   previousByIdentity = new Map(),
   previousByImage = new Map(),
-  resolveLicenses = resolveBuildLicenses,
+  resolveLicenses = resolveRecipeLicenses,
   publishedDois = {},
-  refreshLicenses = false,
 }) {
   previous ??= await readPreviousCatalog(root);
   const releases = [];
@@ -402,7 +375,7 @@ export async function consolidate({
   const [dois, licenses] = await Promise.all([
     collectDoiMetadata(base, releases, publishedDois),
     collectLicenseMetadata(base, sourceRoots, {
-      previousByImage, resolve: resolveLicenses, refresh: refreshLicenses,
+      previousByImage, resolve: resolveLicenses,
     }),
   ]);
   const files = await makeFiles(

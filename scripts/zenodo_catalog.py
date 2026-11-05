@@ -10,7 +10,7 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import quote
 
 import requests
@@ -18,7 +18,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .doi_license import fetch_catalogue, rights_from_catalog, same_rights
-from .doi_metadata import build_metadata, resolve_build_license
+from .doi_metadata import build_metadata
+from .recipe_history import SourceRecipes, source_roots
 
 
 ZENODO_API = os.environ.get("ZENODO_API_ROOT", "https://zenodo.org/api").rstrip("/")
@@ -182,11 +183,21 @@ def unpublishable_reason(metadata: dict[str, Any]) -> str | None:
     return None if rights else "apps.json has no license"
 
 
+def recipe_reason(recipes: SourceRecipes, title: str, metadata: dict[str, Any]) -> str | None:
+    """Why the recipe history cannot back a publication for this image, or None."""
+    try:
+        info = recipes.license(title, metadata["source_repositories"])
+    except (OSError, RuntimeError, ValueError) as exc:
+        return str(exc)
+    return None if info["declared"] else f"recipe for version {info['version']} declares no license"
+
+
 def missing_batches(
     artifacts: dict[str, dict[str, Any]],
     published: dict[str, dict[str, Any]],
     jobs: int = PUBLISH_JOBS,
     limit: int = 0,
+    recipe_reason: Callable[[str], str | None] | None = None,
 ) -> tuple[list[list[str]], dict[str, str]]:
     """Split unpublished images across at most `jobs` parallel batches.
 
@@ -200,7 +211,7 @@ def missing_batches(
     for title, metadata in artifacts.items():
         if has_production_doi(metadata["doi"]) or title in published:
             continue
-        reason = unpublishable_reason(metadata)
+        reason = unpublishable_reason(metadata) or (recipe_reason and recipe_reason(title))
         if reason:
             skipped[title] = reason
         else:
@@ -288,7 +299,7 @@ def publish_deposition(
 
 def publish_batch(
     artifacts: dict[str, dict[str, Any]], selected: list[str], session: requests.Session,
-    catalogue: dict[str, dict[str, Any]], github_token: str, deadline: float | None = None,
+    catalogue: dict[str, dict[str, Any]], recipes: SourceRecipes, deadline: float | None = None,
 ) -> int:
     """Publish `selected`; start no new upload after `deadline` (time.monotonic())."""
     existing = user_records(session, set(selected))
@@ -310,13 +321,14 @@ def publish_batch(
                 print(f"{prefix}: already published, skipping", flush=True)
                 continue
             print(f"{prefix}: resolving license ...", flush=True)
-            license_info = resolve_build_license(
-                title, github_token, artifacts[title].get("source_repositories"), catalogue)
+            license_info = recipes.license(
+                title, artifacts[title]["source_repositories"], catalogue)
             expected = rights_from_catalog(artifacts[title])
             if not expected or not same_rights(license_info["rights"], expected):
                 raise ValueError(
-                    f"Catalog licenses {expected!r} differ from "
-                    f"build-time recipe {license_info['rights']!r}"
+                    f"Catalog licenses {expected!r} differ from the recipe for version "
+                    f"{license_info['version']} ({license_info['revision'][:12]}): "
+                    f"{license_info['rights']!r}"
                 )
             print(f"{prefix}: uploading to Zenodo ...", flush=True)
             doi = publish_deposition(title, license_info, session)
@@ -340,6 +352,8 @@ def main() -> int:
     parser.add_argument("command", choices=["plan", "publish", "lookup"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--artifacts-json")
+    parser.add_argument("--sources-root", type=Path,
+                        help="source clones with full history (default: <catalog-root>/.catalog-sources)")
     parser.add_argument("--limit", type=int, default=0,
                         help="plan: only the newest N publishable images (0 = all)")
     parser.add_argument("--time-budget-minutes", type=int, default=0,
@@ -354,10 +368,16 @@ def main() -> int:
                           if record_doi(row)}))
         return 0
     artifacts = catalog_artifacts(args.catalog_root)
+    repositories = sorted({repository for metadata in artifacts.values()
+                           for repository in metadata["source_repositories"]})
+    recipes = SourceRecipes(source_roots(
+        args.sources_root or args.catalog_root / ".catalog-sources", repositories))
     if args.command == "plan":
         if args.limit < 0:
             parser.error("--limit must be 0 or more")
-        batches, skipped = missing_batches(artifacts, user_records(session), limit=args.limit)
+        batches, skipped = missing_batches(
+            artifacts, user_records(session), limit=args.limit,
+            recipe_reason=lambda title: recipe_reason(recipes, title, artifacts[title]))
         if skipped:
             print(f"Skipping {len(skipped)} image(s) apps.json cannot license:", file=sys.stderr)
             for title, reason in sorted(skipped.items()):
@@ -371,11 +391,10 @@ def main() -> int:
         selected = json.loads(args.artifacts_json)
         if not isinstance(selected, list) or any(not isinstance(x, str) for x in selected):
             parser.error("--artifacts-json must be a JSON list of names")
-        github_token = os.environ.get("GITHUB_TOKEN", "")
         catalogue = fetch_catalogue()["entries"]
         deadline = (time.monotonic() + args.time_budget_minutes * 60
                     if args.time_budget_minutes > 0 else None)
-        count = publish_batch(artifacts, selected, session, catalogue, github_token, deadline)
+        count = publish_batch(artifacts, selected, session, catalogue, recipes, deadline)
         print(f"Published {count} Zenodo records")
     return 0
 

@@ -19,7 +19,8 @@ from scripts.zenodo_catalog import (
 
 LICENSE_INFO = {
     "rights": [{"id": "mit"}, {"title": {"en": "Research terms"}, "link": "https://example.org/terms"}],
-    "revision": "a" * 40, "recipe": "demo", "source_repository": "Example/microcontainers",
+    "revision": "a" * 40, "recipe": "demo", "version": "1.0",
+    "source_repository": "Example/microcontainers",
 }
 
 
@@ -185,6 +186,7 @@ class ZenodoCatalogTests(unittest.TestCase):
         self.assertEqual(metadata["publisher"], "Zenodo")
         self.assertEqual(metadata["creators"][0]["person_or_org"]["name"], "Neurodesk")
         self.assertIn("github.com/Example/microcontainers/tree/" + "a" * 40, metadata["description"])
+        self.assertIn("Recipe for version 1.0", metadata["description"])
         self.assertEqual(body["files"], {"enabled": True})
         session.delete.assert_not_called()
 

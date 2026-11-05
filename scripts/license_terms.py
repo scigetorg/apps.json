@@ -17,6 +17,18 @@ def is_custom_term(value):
             or not CATALOGUE_ID.fullmatch(value))
 
 
+def license_label(entry):
+    """How a copyright entry is listed in apps.json `license`.
+
+    Custom terms (other-*, LicenseRef-…, free text) are listed by their `name`
+    when they have one, so readers see e.g. "FSL license" rather than
+    "other-closed"; catalogue IDs such as "MIT" are listed as the ID.
+    """
+    license_id, name = (value.strip() if isinstance(value, str) else ""
+                        for value in (entry.get("license"), entry.get("name")))
+    return name if name and is_custom_term(license_id) else (license_id or name)
+
+
 def declared_licenses(recipe):
     entries = recipe.get("copyright") or []
     if not isinstance(entries, list):
@@ -25,10 +37,8 @@ def declared_licenses(recipe):
     for entry in entries:
         if not isinstance(entry, dict):
             raise ValueError("Recipe copyright entry must be an object")
-        value = next((candidate.strip() for candidate in
-                      (entry.get("license"), entry.get("name"))
-                      if isinstance(candidate, str) and candidate.strip()), None)
-        if value is None:
+        value = license_label(entry)
+        if not value:
             raise ValueError("Recipe copyright entry needs a license or name")
         licenses.add(value)
     return sorted(licenses)

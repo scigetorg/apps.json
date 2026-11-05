@@ -22,12 +22,12 @@ scripts/catalog.mjs          # reads releases, builds catalog/manifest, license 
 scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL verification
 scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
-scripts/doi_provenance.py    # reads OCI image build revision from the registry (GHCR, Docker Hub fallback)
-scripts/doi_metadata.py      # build-time license resolution + records-API draft metadata
+scripts/recipe_history.py    # license = newest recipe commit declaring the image's version (local git)
+scripts/doi_metadata.py      # records-API draft metadata
 scripts/audit_doi_licenses.py# weekly read-only audit: Zenodo license vs apps.json -> JSON report
 scripts/backfill_zenodo_rights.py # manual: rewrite verified_legacy records' rights from apps.json
 test/*.test.mjs              # node:test suites (catalog, workflow, cloudflare)
-test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses)
+test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses, recipe_history, backfill)
 ```
 
 `.catalog-sources/<owner>/<repo>/` holds local clones of source repositories
@@ -56,22 +56,30 @@ and keep unrelated regenerated diffs out of code PRs.
 - Each app carries the exact SIF `image` name (GUI launchers included).
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
-- Existing license values follow the same image build across domain moves.
-  New builds resolve their license from the build-time recipe
-  (`doi_metadata.resolve_build_license`: OCI revision labels, then the recipe
-  from raw.githubusercontent.com at that revision). Manifests do not cache
-  license provenance. Custom terms (`license_terms.is_custom_term`, mirrored
-  by `isCustomLicense` in `catalog.mjs`) keep their name and URL in
-  `license_details`; an entry with custom terms and no details is resolved
-  again, and `rights_from_catalog` refuses to turn such terms into IDs.
+- Licenses come from recipe history (`scripts/recipe_history.py`): the newest
+  commit of `recipes/<recipe>/build.yaml` whose `version:` equals the release
+  file name. Consolidate resolves every image on every run, and publish
+  resolves the same way; both need full-history source clones (`checkout`
+  never uses `--depth`). Versions are read with `yaml.BaseLoader`, so `1.10`
+  stays a string, and commits with invalid YAML are skipped. The stored
+  `apps.json` license is kept only when history has no license for the
+  version. Custom terms (`license_terms.is_custom_term`) are listed in
+  `license` by their `name` (`license_terms.license_label`) and keep their name and
+  URL in `license_details`; `rights_from_catalog` accepts the name or the older
+  `other-*`/`LicenseRef-` form, and `rights_from_catalog` refuses to turn such
+  terms into IDs. No registry (GHCR/Docker Hub) or OCI label is used.
+- Never borrow a license from another version of a tool: licenses change
+  between versions. An image with no recipe license for its version and none
+  stored stays unlicensed (logged by the catalog run).
 - Retiring an image = deleting its release JSON upstream; there is no
   `retired-images.json` any more. Deleting the last release produces an empty
   catalog. Cleanup is time-based: neurocontainers' `cleanup-stale-containers`
   (11:25 UTC) deletes SIFs absent from apps.json, releases and CVMFS once
   they are older than 7 days.
-- DOI publication validates the license against the recipe at the image's OCI
-  build revision and fails if `apps.json` licenses disagree. The weekly audit
-  compares each Zenodo record with apps.json only (no recipe or registry calls),
+- DOI publication validates the license from recipe history and fails if
+  `apps.json` licenses disagree; the plan skips images with no recipe license
+  for their version. The weekly audit
+  compares each Zenodo record with apps.json only (no recipe calls),
   using `doi_license.same_rights`. A Zenodo failure must not block catalog updates.
 - Zenodo is used through its records API (InvenioRDM). Always send
   `Accept: application/vnd.inveniordm.v1+json` (otherwise `/api/user/records`
@@ -86,7 +94,7 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `consolidate.yml` | daily 02:25 UTC, manual (`refresh_licenses` re-reads every license once) | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
+| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
 | `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan every missing licensed image (others skipped and listed; `limit` input for a smoke test) into ≤6 batches (`PUBLISH_JOBS`) → matrix publish, 6 in parallel, no new upload after 5 h (skipped when nothing is missing) |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
 | `backfill-zenodo-rights.yml` | manual only | dry run by default; `apply` edits `verified_legacy` records' license list (same DOI) |

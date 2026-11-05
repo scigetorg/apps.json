@@ -63,34 +63,29 @@ test("empty domain produces an empty catalog and manifest", async () => {
   assert.equal(Object.hasOwn(manifest, "logs_sha256"), false);
 });
 
-test("DOI and build-time recipe licenses enrich every launcher", async () => {
+test("DOI and recipe-history licenses enrich every launcher", async () => {
   const sourceRoot = await mkdtemp(join(tmpdir(), "catalog-license-"));
-  await mkdir(join(sourceRoot, "recipes", "demo"), { recursive: true });
-  await writeFile(join(sourceRoot, "recipes", "demo", "build.yaml"),
-    "domains: [neuroimaging]\ncopyright:\n  - license: Apache-2.0\n");
   const catalog = buildCatalog(rows, { catalog: {} });
-  {
-    const sourceRoots = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
-      .map((name) => [name, { root: sourceRoot, recipe: "demo", repository }])) };
-    const [dois, licenses] = await Promise.all([
-      collectDoiMetadata(catalog, rows, { "demo_1.0_20260921": "10.123/demo" }),
-      collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles, sources) => {
-        assert.deepEqual(titles, ["demo_1.0_20260921"]);
-        assert.deepEqual(sources, { "demo_1.0_20260921": [repository] });
-        return { resolved: { "demo_1.0_20260921": {
-          license: ["MIT"], license_details: [],
-        } }, errors: {} };
-      } }),
-    ]);
-    const enriched = applyMetadata(catalog, dois, licenses);
-    for (const app of Object.values(enriched.demo.apps)) {
-      assert.equal(app.doi, "https://doi.org/10.123/demo");
-      assert.deepEqual(app.license, ["MIT"]);
-    }
+  const sourceRoots = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
+    .map((name) => [name, { root: sourceRoot, recipe: "demo", repository }])) };
+  const [dois, licenses] = await Promise.all([
+    collectDoiMetadata(catalog, rows, { "demo_1.0_20260921": "10.123/demo" }),
+    collectLicenseMetadata(catalog, sourceRoots, { resolve: async (titles) => {
+      // One lookup per image (not per launcher), with its source clone.
+      assert.deepEqual(titles, { "demo_1.0_20260921": { repository, root: sourceRoot } });
+      return { resolved: { "demo_1.0_20260921": {
+        license: ["MIT"], license_details: [],
+      } }, errors: {} };
+    } }),
+  ]);
+  const enriched = applyMetadata(catalog, dois, licenses);
+  for (const app of Object.values(enriched.demo.apps)) {
+    assert.equal(app.doi, "https://doi.org/10.123/demo");
+    assert.deepEqual(app.license, ["MIT"]);
   }
 });
 
-test("the same image reuses its catalog license and custom terms", async () => {
+test("recipe history replaces a stored license; the stored one stays without history", async () => {
   const catalog = buildCatalog(rows, { catalog: {} });
   const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
     .map((name) => [name, { recipe: "demo" }])) };
@@ -99,57 +94,22 @@ test("the same image reuses its catalog license and custom terms", async () => {
   const previousByImage = new Map([["demo_1.0_20260921", {
     license: ["other-closed"], license_details: details,
   }]]);
-  const result = await collectLicenseMetadata(catalog, sources, {
-    previousByImage, resolve: async () => {
-      assert.fail("Existing image should not require a recipe lookup");
-    },
+  const fixed = { license: ["MIT", "other-closed"], license_details: details };
+  let result = await collectLicenseMetadata(catalog, sources, {
+    previousByImage,
+    resolve: async () => ({ resolved: { "demo_1.0_20260921": fixed }, errors: {} }),
   });
-  const enriched = applyMetadata(catalog, {}, result);
-  for (const app of Object.values(enriched.demo.apps)) {
+  let app = applyMetadata(catalog, {}, result).demo.apps["demo 1.0"];
+  assert.deepEqual(app.license, ["MIT", "other-closed"]);
+  // No commit declares the version (or it has no copyright): keep what apps.json has.
+  for (const answer of [
+    { resolved: {}, errors: { "demo_1.0_20260921": "No commit declares version '1.0'" } },
+    { resolved: { "demo_1.0_20260921": { license: [], license_details: [] } }, errors: {} },
+  ]) {
+    result = await collectLicenseMetadata(catalog, sources, { previousByImage, resolve: async () => answer });
+    app = applyMetadata(catalog, {}, result).demo.apps["demo 1.0"];
     assert.deepEqual(app.license, ["other-closed"]);
     assert.deepEqual(app.license_details, details);
-  }
-});
-
-test("a license refresh keeps the stored license when the lookup fails", async () => {
-  const catalog = buildCatalog(rows, { catalog: {} });
-  const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
-    .map((name) => [name, { recipe: "demo" }])) };
-  const previousByImage = new Map([["demo_1.0_20260921", { license: ["MIT"], license_details: [] }]]);
-  const result = await collectLicenseMetadata(catalog, sources, {
-    previousByImage, refresh: true,
-    resolve: async (titles) => ({ resolved: {}, errors: Object.fromEntries(
-      titles.map((title) => [title, "Build image lacks matching recipe revision labels"])) }),
-  });
-  assert.deepEqual(applyMetadata(catalog, {}, result).demo.apps["demo 1.0"].license, ["MIT"]);
-});
-
-test("custom catalog licenses without license_details are looked up again once", async () => {
-  const catalog = buildCatalog(rows, { catalog: {} });
-  const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
-    .map((name) => [name, { recipe: "demo" }])) };
-  const details = [{ license: "LicenseRef-FSL", name: "FSL licence",
-    url: "https://fsl.fmrib.ox.ac.uk/fsl/docs/license.html" }];
-  for (const [license, expected] of [
-    [["MIT", "LicenseRef-FSL"], ["demo_1.0_20260921"]],
-    [["FreeSurfer Software License Agreement"], ["demo_1.0_20260921"]],
-    [["other-closed"], ["demo_1.0_20260921"]],
-    [["MIT", "GPL-3.0-only"], []],
-  ]) {
-    const looked = [];
-    const result = await collectLicenseMetadata(catalog, sources, {
-      previousByImage: new Map([["demo_1.0_20260921", { license, license_details: [] }]]),
-      resolve: async (titles) => {
-        looked.push(...titles);
-        return { resolved: Object.fromEntries(titles.map((title) => [title, {
-          license: ["LicenseRef-FSL", "MIT"], license_details: details,
-        }])), errors: {} };
-      },
-    });
-    assert.deepEqual(looked, expected, license.join());
-    const app = applyMetadata(catalog, {}, result).demo.apps["demo 1.0"];
-    if (expected.length) assert.deepEqual(app.license_details, details);
-    else assert.equal(Object.hasOwn(app, "license_details"), false);
   }
 });
 
@@ -170,35 +130,12 @@ test("a new build does not inherit the previous build's license or DOI", async (
       license: ["MIT"], license_details: [],
     }]]),
     resolve: async (titles) => {
-      assert.deepEqual(titles, ["demo_1.0_20261010"]);
-      return { resolved: { "demo_1.0_20261010": {
-        license: ["Apache-2.0"], license_details: [],
-      } }, errors: {} };
+      assert.deepEqual(Object.keys(titles), ["demo_1.0_20261010"]);
+      return { resolved: {}, errors: { "demo_1.0_20261010": "No commit declares version '1.0'" } };
     },
   });
-  assert.deepEqual(applyMetadata(catalog, {}, licenses).demo.apps["demo 1.0"].license,
-    ["Apache-2.0"]);
-});
-
-test("changed release license is checked against the build-time recipe", async () => {
-  const changed = structuredClone(rows);
-  changed[0].data.apps["demo 1.0"].license = ["Apache-2.0"];
-  const catalog = buildCatalog(changed, { catalog: {} });
-  const previousByImage = new Map([["demo_1.0_20260921", {
-    license: ["MIT"], license_details: [],
-  }]]);
-  const licenses = await collectLicenseMetadata(catalog,
-    { demo: { "demo 1.0": { recipe: "demo" } } }, {
-      previousByImage,
-      resolve: async (titles) => {
-        assert.deepEqual(titles, ["demo_1.0_20260921"]);
-        return { resolved: { "demo_1.0_20260921": {
-          license: ["Apache-2.0"], license_details: [],
-        } }, errors: {} };
-      },
-    });
-  assert.deepEqual(applyMetadata(catalog, {}, licenses).demo.apps["demo 1.0"].license,
-    ["Apache-2.0"]);
+  assert.equal(Object.hasOwn(applyMetadata(catalog, {}, licenses).demo.apps["demo 1.0"], "license"),
+    false);
 });
 
 test("an account DOI replaces an old DOI for the same image", async () => {
