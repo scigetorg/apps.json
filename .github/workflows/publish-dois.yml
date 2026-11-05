@@ -3,7 +3,12 @@ name: Publish apps catalog DOIs
 on:
   schedule:
     - cron: '25 4 * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Publish only the newest N images (0 = all); use 1 for a first smoke test'
+        type: string
+        default: '0'
 
 concurrency:
   group: apps-catalog
@@ -30,9 +35,10 @@ jobs:
         id: plan
         env:
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+          LIMIT: ${{ inputs.limit || '0' }}
         run: |
           test -n "$ZENODO_TOKEN" || { echo 'ZENODO_TOKEN is required' >&2; exit 1; }
-          batches="$(python -m scripts.zenodo_catalog plan --catalog-root .)"
+          batches="$(python -m scripts.zenodo_catalog plan --catalog-root . --limit "$LIMIT")"
           echo "batches=$batches" >> "$GITHUB_OUTPUT"
 
   publish:
@@ -58,6 +64,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARTIFACTS_JSON: ${{ toJSON(matrix.artifacts) }}
         run: |
+          # Stop starting uploads an hour before the job timeout, so a killed
+          # job does not leave a half-uploaded Zenodo draft behind.
           python -m scripts.zenodo_catalog publish \
-            --catalog-root . --artifacts-json "$ARTIFACTS_JSON"
+            --catalog-root . --artifacts-json "$ARTIFACTS_JSON" --time-budget-minutes 300
 
