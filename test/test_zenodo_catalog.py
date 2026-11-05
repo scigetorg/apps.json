@@ -87,29 +87,44 @@ class ZenodoCatalogTests(unittest.TestCase):
                          ["NeuroDesk/neurocontainers"])
         self.assertEqual(artifacts["viewer_2.0_20261010"]["source_repositories"],
                          ["Example/microcontainers"])
-        self.assertEqual(missing_batches(artifacts, {}),
-                         [["viewer_2.0_20261010"], ["demo_1.0_20260101"]])
+        # viewer has no catalog license, so it cannot be published yet.
+        self.assertEqual(missing_batches(artifacts, {}), (
+            [["demo_1.0_20260101"]], {"viewer_2.0_20261010": "apps.json has no license"}))
 
     def test_every_missing_image_is_split_across_at_most_six_jobs(self) -> None:
-        artifacts = {f"tool_1.0_202601{day:02d}": {"doi": ""} for day in range(1, 15)}
-        artifacts["done_1.0_20260120"] = {"doi": "10.5281/zenodo.9"}
-        batches = missing_batches(artifacts, {"tool_1.0_20260114": {}})
+        artifacts = {f"tool_1.0_202601{day:02d}": {"doi": "", "license": ["MIT"]}
+                     for day in range(1, 15)}
+        artifacts["done_1.0_20260120"] = {"doi": "10.5281/zenodo.9", "license": ["MIT"]}
+        batches, skipped = missing_batches(artifacts, {"tool_1.0_20260114": {}})
+        self.assertEqual(skipped, {})
         self.assertEqual(len(batches), 6)
         self.assertEqual(sorted(sum(batches, [])),
                          sorted(f"tool_1.0_202601{day:02d}" for day in range(1, 14)))
         self.assertEqual([len(batch) for batch in batches], [3, 2, 2, 2, 2, 2])
         self.assertEqual([batch[0] for batch in batches],
                          [f"tool_1.0_202601{day:02d}" for day in range(13, 7, -1)])
-        self.assertEqual(missing_batches(artifacts, {}, jobs=20)[0], ["tool_1.0_20260114"])
+        self.assertEqual(missing_batches(artifacts, {}, jobs=20)[0][0], ["tool_1.0_20260114"])
         with self.assertRaises(ValueError):
             missing_batches(artifacts, {}, jobs=0)
+
+    def test_limit_keeps_newest_and_unlicensable_images_are_skipped(self) -> None:
+        artifacts = {f"tool_1.0_202601{day:02d}": {"doi": "", "license": ["MIT"]}
+                     for day in range(1, 5)}
+        artifacts["fsl_1.0_20260109"] = {"doi": "", "license": ["LicenseRef-FSL"]}
+        artifacts["old_1.0_20200101"] = {"doi": "", "license": []}
+        batches, skipped = missing_batches(artifacts, {}, limit=1)
+        self.assertEqual(batches, [["tool_1.0_20260104"]])
+        self.assertEqual(sorted(skipped), ["fsl_1.0_20260109", "old_1.0_20200101"])
+        self.assertIn("no license_details", skipped["fsl_1.0_20260109"])
+        self.assertEqual(missing_batches({"old_1.0_20200101": artifacts["old_1.0_20200101"]}, {})[0],
+                         [[]])
 
     def test_removed_releases_are_absent_from_doi_plan(self) -> None:
         for domain in ("neuroimaging", "microscopy"):
             (self.root / domain / "apps.json").write_text("{}\n")
         artifacts = catalog_artifacts(self.root)
         self.assertEqual(artifacts, {})
-        self.assertEqual(missing_batches(artifacts, {}), [[]])
+        self.assertEqual(missing_batches(artifacts, {}), ([[]], {}))
 
     def test_launcher_alias_uses_its_image_for_doi_identity(self) -> None:
         path = self.root / "neuroimaging/apps.json"
@@ -136,7 +151,7 @@ class ZenodoCatalogTests(unittest.TestCase):
         artifacts["demo_1.0_20260101"]["doi"] = "https://doi.org/10.5072/zenodo.1"
         artifacts["viewer_2.0_20261010"]["doi"] = "https://doi.org/10.5281/zenodo.2"
 
-        self.assertEqual(missing_batches(artifacts, {}), [["demo_1.0_20260101"]])
+        self.assertEqual(missing_batches(artifacts, {})[0], [["demo_1.0_20260101"]])
 
     def publish(self, session, download_length="3"):
         download = MagicMock()

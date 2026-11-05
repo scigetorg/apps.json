@@ -23,7 +23,7 @@ not generated `apps.json` files.
                               │ apps.json on main
                               ▼
  ┌─ publish-dois.yml ── daily 04:25 UTC ──────────────────────────────────────────┐
- │  plan:    unit tests ─► images in apps.json with no Zenodo record               │
+ │  plan:    unit tests ─► licensed images in apps.json with no Zenodo record      │
  │           ─► split into ≤ 6 batches (none missing → stop)                       │
  │  publish: 6 parallel jobs, per image:                                           │
  │           build-time license == apps.json license?                              │
@@ -156,15 +156,19 @@ Set `ZENODO_API_ROOT=https://sandbox.zenodo.org/api` with a sandbox token to try
    `Neurodesk/apps.json`. The workflow uses it to list and publish depositions.
    A sandbox Zenodo token is separate and will not work for production Zenodo.
    Each run publishes every missing SIF, newest first, split across at most 6
-   parallel jobs.
+   parallel jobs. Images `apps.json` cannot license yet (no license, or custom
+   terms without `license_details`) are skipped and listed in the plan log, not
+   failed. A job starts no new upload after 5 hours, so it is not killed
+   mid-upload; the rest waits for the next run.
 3. Update the website's app catalog source to
    `https://apps-json.<your-workers-subdomain>.workers.dev/neuroimaging/apps.json`
    after configuring the Cloudflare publishing described below.
    Website consumers should read the catalog directly and use
    `show_in_applist` to select visible entries. The catalog workflow sends
    no dispatch event and needs no website token.
-4. Run **Consolidate apps catalog**, then **Publish apps catalog DOIs** manually.
-   Check the files under `neuroimaging/` and website consumption before
+4. Run **Consolidate apps catalog**, then **Publish apps catalog DOIs** manually
+   with `limit: 1` first. Check that record on zenodo.org (licenses, file, DOI)
+   before the first full run, because DOIs are permanent. Check the files under `neuroimaging/` and website consumption before
    archiving `neurocommand` or disabling its old queue.
 
 The catalog workflow runs daily at 02:25 UTC; DOI publication runs at 04:25 UTC.

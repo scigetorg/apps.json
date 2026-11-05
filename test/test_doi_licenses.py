@@ -270,6 +270,20 @@ class DoiLicenseTests(unittest.TestCase):
         resolve_license.assert_not_called()
         publish.assert_not_called()
 
+    def test_publication_stops_starting_uploads_after_the_time_budget(self):
+        artifacts = {title: {"doi": "", "license": ["MIT"]}
+                     for title in ("a_1.0_20260101", "b_1.0_20260101")}
+        with (patch("scripts.zenodo_catalog.user_records", return_value={}),
+              patch("scripts.zenodo_catalog.resolve_build_license",
+                    return_value={"rights": [{"id": "mit"}]}),
+              patch("scripts.zenodo_catalog.publish_deposition", return_value="10.5281/zenodo.1") as publish,
+              patch("scripts.zenodo_catalog.time.monotonic", side_effect=[0, 61]),
+              patch("sys.stdout")):
+            count = publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(), "token",
+                                  deadline=60)
+        self.assertEqual(count, 1)
+        publish.assert_called_once()
+
     def test_recipe_is_fetched_raw_at_image_build_revision(self):
         revision = "a" * 40
         response = SimpleNamespace(ok=True, status_code=200,

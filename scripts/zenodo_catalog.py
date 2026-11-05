@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -172,24 +173,46 @@ def record_doi(row: dict[str, Any]) -> str | None:
 PUBLISH_JOBS = 6
 
 
+def unpublishable_reason(metadata: dict[str, Any]) -> str | None:
+    """Why apps.json cannot back a publication for this image, or None."""
+    try:
+        rights = rights_from_catalog(metadata)
+    except ValueError as exc:
+        return str(exc)
+    return None if rights else "apps.json has no license"
+
+
 def missing_batches(
     artifacts: dict[str, dict[str, Any]],
     published: dict[str, dict[str, Any]],
     jobs: int = PUBLISH_JOBS,
-) -> list[list[str]]:
-    """Split every unpublished image across at most `jobs` parallel batches."""
-    if jobs < 1:
-        raise ValueError("jobs must be positive")
-    missing = [
-        title for title, metadata in artifacts.items()
-        if not has_production_doi(metadata["doi"]) and title not in published
-    ]
-    if not missing:
-        return [[]]
+    limit: int = 0,
+) -> tuple[list[list[str]], dict[str, str]]:
+    """Split unpublished images across at most `jobs` parallel batches.
+
+    Images apps.json cannot license are returned as skipped (title -> reason)
+    instead of failing every run; consolidate fills their licenses when it can.
+    `limit` keeps only the newest N images (0 = all).
+    """
+    if jobs < 1 or limit < 0:
+        raise ValueError("jobs must be positive and limit 0 or more")
+    missing, skipped = [], {}
+    for title, metadata in artifacts.items():
+        if has_production_doi(metadata["doi"]) or title in published:
+            continue
+        reason = unpublishable_reason(metadata)
+        if reason:
+            skipped[title] = reason
+        else:
+            missing.append(title)
     missing.sort(key=lambda title: (-int(title.rsplit("_", 1)[1]), title))
+    if limit:
+        missing = missing[:limit]
+    if not missing:
+        return [[]], skipped
     # Round-robin keeps batches within one image of each other and starts the
     # newest builds first in every job.
-    return [missing[i::jobs] for i in range(min(jobs, len(missing)))]
+    return [missing[i::jobs] for i in range(min(jobs, len(missing)))], skipped
 
 
 class RemoteStream:
@@ -265,13 +288,20 @@ def publish_deposition(
 
 def publish_batch(
     artifacts: dict[str, dict[str, Any]], selected: list[str], session: requests.Session,
-    catalogue: dict[str, dict[str, Any]], github_token: str,
+    catalogue: dict[str, dict[str, Any]], github_token: str, deadline: float | None = None,
 ) -> int:
+    """Publish `selected`; start no new upload after `deadline` (time.monotonic())."""
     existing = user_records(session, set(selected))
     count = 0
     failures = {}
     total = len(selected)
     for i, title in enumerate(selected, 1):
+        if deadline is not None and time.monotonic() > deadline:
+            # A job killed mid-upload cannot discard its draft; stop cleanly and
+            # leave the rest to the next scheduled run.
+            print(f"Time budget reached; leaving {total - i + 1} image(s) for the next run",
+                  flush=True)
+            break
         prefix = f"[{i}/{total}] {title}"
         try:
             if title not in artifacts:
@@ -310,6 +340,10 @@ def main() -> int:
     parser.add_argument("command", choices=["plan", "publish", "lookup"])
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--artifacts-json")
+    parser.add_argument("--limit", type=int, default=0,
+                        help="plan: only the newest N publishable images (0 = all)")
+    parser.add_argument("--time-budget-minutes", type=int, default=0,
+                        help="publish: start no new upload after this many minutes (0 = none)")
     args = parser.parse_args()
     token = os.environ.get("ZENODO_TOKEN")
     if not token:
@@ -321,7 +355,16 @@ def main() -> int:
         return 0
     artifacts = catalog_artifacts(args.catalog_root)
     if args.command == "plan":
-        print(json.dumps(missing_batches(artifacts, user_records(session))))
+        if args.limit < 0:
+            parser.error("--limit must be 0 or more")
+        batches, skipped = missing_batches(artifacts, user_records(session), limit=args.limit)
+        if skipped:
+            print(f"Skipping {len(skipped)} image(s) apps.json cannot license:", file=sys.stderr)
+            for title, reason in sorted(skipped.items()):
+                print(f"  {title}: {reason}", file=sys.stderr)
+        print(f"Planned {sum(map(len, batches))} image(s) in {len(batches)} batch(es)",
+              file=sys.stderr)
+        print(json.dumps(batches))
     elif args.command == "publish":
         if args.artifacts_json is None:
             parser.error("--artifacts-json is required for publish")
@@ -330,7 +373,10 @@ def main() -> int:
             parser.error("--artifacts-json must be a JSON list of names")
         github_token = os.environ.get("GITHUB_TOKEN", "")
         catalogue = fetch_catalogue()["entries"]
-        print(f"Published {publish_batch(artifacts, selected, session, catalogue, github_token)} Zenodo records")
+        deadline = (time.monotonic() + args.time_budget_minutes * 60
+                    if args.time_budget_minutes > 0 else None)
+        count = publish_batch(artifacts, selected, session, catalogue, github_token, deadline)
+        print(f"Published {count} Zenodo records")
     return 0
 
 
