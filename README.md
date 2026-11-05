@@ -15,8 +15,8 @@ not generated `apps.json` files.
  ┌─ consolidate.yml ── daily 02:25 UTC ───────────────────────────────────────────┐
  │  clone sources ─► build catalog from release JSON (domains from build.yaml)     │
  │                   ├─ DOIs:     look up published records ◄──────────── Zenodo   │
- │                   └─ licenses: new builds only, from OCI image labels           │
- │                                → recipe @ build revision                        │
+ │                   └─ licenses: every image, from recipe git history             │
+ │                                → newest commit declaring its version            │
  │  ─► write <domain>/apps.json + manifest.json                                    │
  │  ─► commit + push main ─► publish to Cloudflare Worker                          │
  └─────────────────────────────────────────────────────────────────────────────────┘
@@ -26,7 +26,7 @@ not generated `apps.json` files.
  │  plan:    unit tests ─► licensed images in apps.json with no Zenodo record      │
  │           ─► split into ≤ 6 batches (none missing → stop)                       │
  │  publish: 6 parallel jobs, per image:                                           │
- │           build-time license == apps.json license?                              │
+ │           recipe-history license == apps.json license?                          │
  │             no  ─► log FAILED, continue with the next image                     │
  │             yes ─► Zenodo draft ─► stream S3 SIF ─► publish ─────────► DOI      │
  │  (the DOI enters apps.json at the next 02:25 consolidate)                       │
@@ -88,29 +88,43 @@ Zenodo lookup is unavailable.
 
 Deleting a release JSON retires that version from the next catalog while
 retaining other versions. Deleting the last release produces an empty catalog.
-`manifest.json` records the image count and source commits. The catalog workflow
-reuses licenses for unchanged image builds and reads the OCI build revision and
-historical recipe for new builds or images without a catalog license. It does
-not carry an older build's license onto a new build. An image whose license
-includes custom terms (`other-*`, `LicenseRef-…` or a free-text name) but has no
-`license_details` is looked up again, so the name and URL that DOI publication
-needs are filled in; until then, publication and the audit report that
-`apps.json` lacks them.
+`manifest.json` records the image count and source commits.
 
-Stored licenses are otherwise reused, because an image's build-time recipe never
-changes. After a change to the license-reading code, run **Consolidate apps
-catalog** manually with `refresh_licenses` checked. It re-reads every released
-image's license from its build-time recipe (about 5–6 minutes) and logs each
-changed license as `Refreshed license for <image>: [old] -> [new]`. Images whose
-lookup fails keep their stored license. Run the audit afterwards to see the
-effect on Zenodo records. A separate DOI workflow
-publishes missing SIF records to production Zenodo. The next catalog run reads
-this account's published depositions once and adds their DOIs to every launcher
-for the image. A Zenodo lookup failure leaves existing catalog DOIs in place
-and does not stop catalog generation. Before publication it validates the license
-against Zenodo's live license catalog and checks the recipe at the image's
-OCI build revision. It fails if `apps.json` licenses differ from that recipe.
-The DOI description records every declared license and the build recipe revision.
+### Where licenses come from
+
+An image `<image>_<build date>` comes from `releases/<tool>/<release>.json`, and
+the release file name is the recipe version. Its license is the `copyright` of
+the **newest commit of `recipes/<recipe>/build.yaml` whose `version:` equals that
+release** (`scripts/recipe_history.py`). The recipe is the release JSON's
+`recipe`, else the tool name (`<tool>_arm64` falls back to `<tool>`); deleted
+recipes are still found in history. Every catalog run resolves every image this
+way. It is local git on a full clone of the source repository, with no registry
+or network calls, so a license fixed in a recipe without a version bump reaches
+`apps.json` on the next run, with no rebuild. The `license` list shows catalogue
+IDs such as `MIT` as the ID, and custom terms (`other-*`, `LicenseRef-…`) by their
+`name`, e.g. `FreeSurfer Software License Agreement`; their name and URL are also
+in `license_details`.
+
+This states what the recipe declares for that version, not what the image was
+built with: a build made before a license fix shows the fixed license. The
+license in `apps.json` is kept when no commit declares the version or that
+commit has no `copyright`. That mostly happens for images built before
+2025-03-27, which came from `build.sh` recipes. An image with neither has no
+license in `apps.json`; no license is borrowed from another version, because
+licenses can change between versions. The catalog run logs these images.
+
+### DOIs and the audit
+
+A separate DOI workflow publishes missing SIF records to production Zenodo. The
+next catalog run reads this account's published records once and adds their
+DOIs to every launcher for the image. A Zenodo lookup failure leaves existing
+catalog DOIs in place and does not stop catalog generation. Before publication
+the workflow reads the license from recipe history the same way, validates it
+against Zenodo's live license catalog, and fails if the `apps.json` licenses
+differ. Images whose recipe history has no license for their version are
+skipped by the plan, with the reason in its log. The DOI description links the
+recipe commit for that version.
+
 A weekly read-only audit compares each published Zenodo record's licenses with
 the licenses `apps.json` lists for the same image, ignoring order and legacy ID
 spellings. Records published before the records API carry one license each; a
@@ -118,16 +132,13 @@ single `other-open`/`other-closed` license where `apps.json` lists several or
 custom terms is reported as `verified_legacy`, not as a failure. Images without
 a catalog license are reported as `no_catalog_license`. Records for images
 removed from the catalog are skipped. The audit uploads a JSON report and fails
-on mismatches. It does not fetch recipes: build-time recipes are checked when
-consolidation writes a license and again before publication, so a recipe
-license fixed without a rebuild is not detected by the audit.
-A Zenodo failure does not block catalog updates. Historical releases state their license
-through their build-time recipe, without edits to release JSON. These checks
-verify agreement between the recipe, catalog, and Zenodo; they cannot determine
-whether the original recipe described the upstream legal terms correctly.
+on mismatches. It does not read recipes; the catalog run does that every night.
+A Zenodo failure does not block catalog updates. These checks verify agreement
+between the recipe, catalog, and Zenodo; they cannot determine whether the
+recipe described the upstream legal terms correctly.
 
 For DOI publication, records are created through Zenodo's records API, and
-every `copyright` entry in the build-time recipe becomes its own license on the
+every `copyright` entry in the recipe becomes its own license on the
 record. A `license` must be an ID in Zenodo's live license catalogue (deprecated
 SPDX IDs such as `GPL-3.0` map to `gpl-3.0-only`). List multiple licenses as
 separate `copyright` entries; an SPDX expression such as `MIT OR Apache-2.0` is

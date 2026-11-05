@@ -46,7 +46,8 @@ export async function checkoutSources(root, domains) {
   const repositories = new Set(Object.values(domains).flatMap((config) => config.source_repositories));
   await Promise.all([...repositories].map(async (repository) => {
     const destination = sourcePath(root, repository);
-    await exec("git", ["clone", "--depth=1", `https://github.com/${repository}.git`, destination]);
+    // Full history: licenses are read from recipe commits (scripts/recipe_history.py).
+    await exec("git", ["clone", `https://github.com/${repository}.git`, destination]);
     console.log(`Checked out ${repository}`);
   }));
 }
@@ -99,7 +100,6 @@ export async function lookupPublishedDois() {
 
 export async function consolidateDomains(root, domains, {
   sourceCommits = {}, resolveLicenses, publishedDois, lookupDois = lookupPublishedDois,
-  refreshLicenses = false,
 } = {}) {
   const repositories = [...new Set(Object.values(domains).flatMap((config) => config.source_repositories))];
   const sources = new Map();
@@ -156,7 +156,7 @@ export async function consolidateDomains(root, domains, {
     const files = await consolidate({
       root: join(root, id), domain: id, sources: selected,
       previous: previousByDomain[id], previousByIdentity, publishedDois: dois,
-      previousByImage, resolveLicenses, refreshLicenses,
+      previousByImage, resolveLicenses,
     });
     rememberBuildLicenses(previousByImage, JSON.parse(files["apps.json"]), { replace: true });
     console.log(`Generated ${id}: ${Object.keys(files).join(", ")} from ${config.source_repositories.join(", ")}`);
@@ -170,8 +170,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (command === "checkout") {
     await checkoutSources(root, domains);
   } else if (command === "run") {
-    await consolidateDomains(root, domains,
-      { refreshLicenses: process.env.REFRESH_LICENSES === "true" });
+    await consolidateDomains(root, domains);
   } else if (command === "output-paths") {
     process.stdout.write(`${outputPaths(domains).join("\n")}\n`);
   } else if (command === "source-repository") {

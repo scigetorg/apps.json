@@ -3,12 +3,7 @@ name: Consolidate apps catalog
 on:
   schedule:
     - cron: '25 2 * * *'
-  workflow_dispatch:
-    inputs:
-      refresh_licenses:
-        description: 'Re-read every image license from its build-time recipe (one-off, after license-code changes)'
-        type: boolean
-        default: false
+  workflow_dispatch: {}
 
 concurrency:
   group: apps-catalog
@@ -42,9 +37,7 @@ jobs:
         run: node scripts/workflow.mjs checkout
       - name: Consolidate every domain and recipe licenses
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
-          REFRESH_LICENSES: ${{ inputs.refresh_licenses && 'true' || '' }}
         run: npm run consolidate
       - name: Commit domain catalog files
         shell: bash

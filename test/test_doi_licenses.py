@@ -5,11 +5,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from scripts import (audit_doi_licenses, catalog_licenses, doi_license, doi_metadata,
-                     doi_provenance, zenodo_catalog)
+from scripts import audit_doi_licenses, doi_license, zenodo_catalog
 from scripts.audit_doi_licenses import audit_record
 from scripts.license_terms import declared_licenses, license_details
 from scripts.zenodo_catalog import publish_batch
@@ -30,9 +28,12 @@ def catalogue():
 TITLE = "demo_1.0_20260101"
 
 
-def provenance(revision="a" * 40):
-    return {"revision": revision, "recipe": "demo", "source_repository": "Example/microcontainers",
-            "image": "ghcr.io/neurodesk/demo_1.0:20260101"}
+def recipes(result=None, side_effect=None):
+    """Stub SourceRecipes: `license(title, repositories, catalogue)` from recipe history."""
+    stub = MagicMock()
+    stub.license.return_value = {"version": "1.0", "revision": "a" * 40, **(result or {})}
+    stub.license.side_effect = side_effect
+    return stub
 
 
 DETAILS = [{"name": "Research terms", "url": "https://example.org/terms"}]
@@ -120,6 +121,20 @@ class DoiLicenseTests(unittest.TestCase):
             doi_license.rights_from_catalog({"license": ["other-open"],
                                              "license_details": [{"license": "other-open"}]})
 
+    def test_custom_terms_are_listed_by_name_in_apps_json(self):
+        terms = {"license": "other-closed", "name": "FSL license", "url": "https://example.org/fsl"}
+        recipe = {"copyright": [{"license": "MIT", "name": "MIT License"}, terms,
+                                {"license": "LicenseRef-X", "url": "https://example.org/x"},
+                                {"name": "Viewer terms", "url": "https://example.org/viewer"}]}
+        self.assertEqual(declared_licenses(recipe),
+                         ["FSL license", "LicenseRef-X", "MIT", "Viewer terms"])
+        # Entries written before this change list the ID instead; both give the same rights.
+        details = [terms]
+        expected = [{"id": "mit"}, {"title": {"en": "FSL license"}, "link": "https://example.org/fsl"}]
+        for listed in (["FSL license", "MIT"], ["MIT", "other-closed"]):
+            self.assertEqual(doi_license.rights_from_catalog(
+                {"license": listed, "license_details": details}), expected, listed)
+
     def test_custom_catalog_license_without_details_is_refused(self):
         # Entries written before license_details existed: never turn them into IDs.
         for value in ("other-closed", "LicenseRef-FSL", "FreeSurfer Software License Agreement"):
@@ -137,89 +152,23 @@ class DoiLicenseTests(unittest.TestCase):
         self.assertEqual(row["status"], "mismatch")
         self.assertIn("no license_details", row["problems"][0])
 
-    def test_image_labels_must_match_container(self):
-        revision = "a" * 40
-        labels = {
-            "org.opencontainers.image.revision": revision,
-            "org.opencontainers.image.title": "demo",
-            "org.opencontainers.image.version": "1.0_20260101",
-            "org.opencontainers.image.source": "https://github.com/neurodesk/neurocontainers",
-            "org.opencontainers.image.documentation": f"https://github.com/neurodesk/neurocontainers/tree/{revision}/recipes/demo",
-        }
-        with patch.object(doi_provenance.RegistryReader, "image_labels", return_value=labels):
-            self.assertEqual(doi_provenance.get_build_provenance("demo_1.0_20260101")["revision"], revision)
-        labels["org.opencontainers.image.source"] = "https://github.com/Example/microcontainers"
-        labels["org.opencontainers.image.documentation"] = (
-            f"https://github.com/Example/microcontainers/tree/{revision}/recipes/demo"
-        )
-        with patch.object(doi_provenance.RegistryReader, "image_labels", return_value=labels):
-            info = doi_provenance.get_build_provenance(
-                "demo_1.0_20260101", source_repositories=[
-                    "NeuroDesk/neurocontainers", "Example/microcontainers"
-                ]
-            )
-            self.assertEqual(info["source_repository"], "Example/microcontainers")
-            with self.assertRaises(doi_license.LicenseValidationError):
-                doi_provenance.get_build_provenance(
-                    "demo_1.0_20260101", source_repositories=["Other/repo"]
-                )
-        labels["org.opencontainers.image.title"] = "wrong"
-        with patch.object(doi_provenance.RegistryReader, "image_labels", return_value=labels):
-            with self.assertRaises(doi_license.LicenseValidationError):
-                doi_provenance.get_build_provenance("demo_1.0_20260101")
-
-    def test_ghcr_token_denial_falls_back_to_docker_hub(self):
-        revision = "b" * 40
-        labels = {
-            "org.opencontainers.image.revision": revision,
-            "org.opencontainers.image.title": "demo",
-            "org.opencontainers.image.version": "1.0_20260101",
-            "org.opencontainers.image.source": "https://github.com/neurodesk/neurocontainers",
-            "org.opencontainers.image.documentation":
-                f"https://github.com/neurodesk/neurocontainers/tree/{revision}/recipes/demo",
-        }
-
-        def reply(status, payload=None, headers=None):
-            return SimpleNamespace(status_code=status, ok=status < 400,
-                                   headers=headers or {}, json=lambda: payload or {})
-
-        def fake_get(token_status):
-            def get(url, **kwargs):
-                if url.startswith("https://ghcr.io/v2/"):
-                    return reply(401, headers={"WWW-Authenticate":
-                        'Bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:x:pull"'})
-                if url == "https://ghcr.io/token":
-                    return reply(token_status)
-                if url.endswith("/manifests/20260101"):
-                    return reply(200, {"config": {"digest": "sha256:c"}})
-                if url.endswith("/blobs/sha256:c"):
-                    return reply(200, {"config": {"Labels": labels}})
-                raise AssertionError(url)
-            return get
-
-        with patch.object(doi_provenance.requests, "get", side_effect=fake_get(403)):
-            info = doi_provenance.get_build_provenance("demo_1.0_20260101", "token")
-        self.assertEqual(info["image"], "registry-1.docker.io/vnmd/demo_1.0:20260101")
-        self.assertEqual(info["revision"], revision)
-        # A real token-service outage is reported, not mistaken for a missing image.
-        with (patch.object(doi_provenance.requests, "get", side_effect=fake_get(500)),
-              self.assertRaisesRegex(doi_provenance.ProvenanceServiceError, "HTTP 500")):
-            doi_provenance.get_build_provenance("demo_1.0_20260101", "token")
-
     def test_catalog_license_mismatch_blocks_publication(self):
-        artifacts = {"demo_1.0_20260101": {"doi": "", "license": ["Apache-2.0"]}}
+        artifacts = {"demo_1.0_20260101": {"doi": "", "license": ["Apache-2.0"],
+                                           "source_repositories": ["Example/microcontainers"]}}
         expected = {"rights": [{"id": "mit"}], "declared": ["MIT"], "license_details": []}
         with (patch("scripts.zenodo_catalog.user_records", return_value={}),
-              patch("scripts.zenodo_catalog.resolve_build_license", return_value=expected),
               patch("scripts.zenodo_catalog.publish_deposition") as publish):
-            with self.assertRaisesRegex(RuntimeError, "demo_1.0_20260101: ValueError: Catalog licenses"):
-                publish_batch(artifacts, ["demo_1.0_20260101"], MagicMock(), catalogue(), "token")
+            with self.assertRaisesRegex(RuntimeError, "demo_1.0_20260101: ValueError: Catalog licenses"
+                                        r".*recipe for version 1\.0"):
+                publish_batch(artifacts, ["demo_1.0_20260101"], MagicMock(), catalogue(),
+                              recipes(expected))
         publish.assert_not_called()
 
     def test_license_failure_names_image_and_batch_continues(self):
-        artifacts = {"bad_1.0_20260101": {"doi": "", "license": ["Odd"]},
-                     "good_1.0_20260101": {"doi": "", "license": ["MIT"]}}
-        good = {"rights": [{"id": "mit"}], "declared": ["MIT"], "license_details": []}
+        artifacts = {"bad_1.0_20260101": {"doi": "", "license": ["Odd"], "source_repositories": []},
+                     "good_1.0_20260101": {"doi": "", "license": ["MIT"], "source_repositories": []}}
+        good = {"rights": [{"id": "mit"}], "declared": ["MIT"], "license_details": [],
+                "version": "1.0", "revision": "a" * 40}
 
         def get_license(title, *_):
             if title.startswith("bad"):
@@ -227,13 +176,13 @@ class DoiLicenseTests(unittest.TestCase):
             return good
 
         with (patch("scripts.zenodo_catalog.user_records", return_value={}),
-              patch("scripts.zenodo_catalog.resolve_build_license", side_effect=get_license),
               patch("scripts.zenodo_catalog.publish_deposition",
                     return_value="10.123/good") as publish):
             with self.assertRaisesRegex(
                 RuntimeError, r"(?s)Published 1; .*bad_1\.0_20260101: LicenseValidationError"
             ):
-                publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(), "token")
+                publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(),
+                              recipes(side_effect=get_license))
         publish.assert_called_once()
         self.assertEqual(publish.call_args.args[0], "good_1.0_20260101")
 
@@ -245,15 +194,13 @@ class DoiLicenseTests(unittest.TestCase):
                              "source_repositories": ["Example/microcontainers"]}}
         expected = {"rights": [{"title": {"en": "Research terms"}, "link": "https://example.org/terms"}],
                     "declared": ["Research terms"], "license_details": details}
+        lookup = recipes(expected)
         with (patch("scripts.zenodo_catalog.user_records", return_value={}),
-              patch("scripts.zenodo_catalog.resolve_build_license", return_value=expected) as lookup,
               patch("scripts.zenodo_catalog.publish_deposition",
                     return_value="10.123/demo") as publish):
-            count = publish_batch(artifacts, [title], MagicMock(), catalogue(), "token")
+            count = publish_batch(artifacts, [title], MagicMock(), catalogue(), lookup)
         self.assertEqual(count, 1)
-        lookup.assert_called_once_with(
-            title, "token", ["Example/microcontainers"], catalogue()
-        )
+        lookup.license.assert_called_once_with(title, ["Example/microcontainers"], catalogue())
         publish.assert_called_once()
 
     def test_publication_skips_record_published_since_planning(self):
@@ -261,74 +208,26 @@ class DoiLicenseTests(unittest.TestCase):
         artifacts = {title: {"doi": "", "license": ["MIT"]}}
         with (patch("scripts.zenodo_catalog.user_records",
                     return_value={title: {"pids": {"doi": {"identifier": "10.123/demo"}}}}) as lookup,
-              patch("scripts.zenodo_catalog.resolve_build_license") as resolve_license,
               patch("scripts.zenodo_catalog.publish_deposition") as publish):
-            count = publish_batch(artifacts, [title], MagicMock(), catalogue(), "token")
+            resolve_license = recipes()
+            count = publish_batch(artifacts, [title], MagicMock(), catalogue(), resolve_license)
         self.assertEqual(count, 0)
         lookup.assert_called_once()
         self.assertEqual(lookup.call_args.args[1], {title})
-        resolve_license.assert_not_called()
+        resolve_license.license.assert_not_called()
         publish.assert_not_called()
 
     def test_publication_stops_starting_uploads_after_the_time_budget(self):
-        artifacts = {title: {"doi": "", "license": ["MIT"]}
+        artifacts = {title: {"doi": "", "license": ["MIT"], "source_repositories": []}
                      for title in ("a_1.0_20260101", "b_1.0_20260101")}
         with (patch("scripts.zenodo_catalog.user_records", return_value={}),
-              patch("scripts.zenodo_catalog.resolve_build_license",
-                    return_value={"rights": [{"id": "mit"}]}),
               patch("scripts.zenodo_catalog.publish_deposition", return_value="10.5281/zenodo.1") as publish,
               patch("scripts.zenodo_catalog.time.monotonic", side_effect=[0, 61]),
               patch("sys.stdout")):
-            count = publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(), "token",
-                                  deadline=60)
+            count = publish_batch(artifacts, list(artifacts), MagicMock(), catalogue(),
+                                  recipes({"rights": [{"id": "mit"}]}), deadline=60)
         self.assertEqual(count, 1)
         publish.assert_called_once()
-
-    def test_recipe_is_fetched_raw_at_image_build_revision(self):
-        revision = "a" * 40
-        response = SimpleNamespace(ok=True, status_code=200,
-                                   content=json.dumps({"copyright": [{"license": "MIT"}]}).encode())
-        with (patch.object(doi_metadata, "get_build_provenance", return_value=provenance(revision))
-              as lookup, patch.object(doi_metadata.requests, "get", return_value=response) as get):
-            info = doi_metadata.resolve_build_license(
-                "demo_1.0_20260101", "token", ["Example/microcontainers"], catalogue()
-            )
-        lookup.assert_called_once_with("demo_1.0_20260101", "token", ["Example/microcontainers"])
-        self.assertEqual(get.call_args.args[0],
-                         f"https://raw.githubusercontent.com/Example/microcontainers/{revision}/"
-                         "recipes/demo/build.yaml")
-        self.assertEqual(info["rights"], [{"id": "mit"}])
-        self.assertEqual(info["declared"], ["MIT"])
-        self.assertEqual(info["revision"], revision)
-
-    def test_recipe_fetch_errors_are_classified(self):
-        for status, error in ((404, doi_license.LicenseValidationError),
-                              (500, doi_provenance.ProvenanceServiceError)):
-            response = SimpleNamespace(ok=False, status_code=status, content=b"")
-            with (patch.object(doi_metadata.requests, "get", return_value=response),
-                  self.assertRaises(error)):
-                doi_metadata.fetch_recipe("demo", "Example/microcontainers", "a" * 40)
-
-    def test_consolidate_resolver_needs_no_zenodo_catalogue(self):
-        recipe = {"copyright": [{"license": "other-closed", "name": "Research terms",
-                                 "url": "https://example.org/terms"}]}
-        with (patch.object(doi_metadata, "get_build_provenance", return_value=provenance()),
-              patch.object(doi_metadata, "fetch_recipe", return_value=recipe),
-              patch.object(doi_metadata, "resolve_recipe_license") as zenodo):
-            result = catalog_licenses.resolve_one(
-                "demo_1.0_20260101", "token", ["Example/microcontainers"]
-            )
-        zenodo.assert_not_called()
-        self.assertEqual(result, {"license": ["other-closed"],
-                                  "license_details": recipe["copyright"]})
-
-    def test_missing_build_image_is_strict(self):
-        with (patch.object(doi_metadata, "get_build_provenance", side_effect=
-                           doi_license.LicenseValidationError("Build image is unavailable")),
-              patch.object(doi_metadata, "fetch_recipe") as fetch,
-              self.assertRaisesRegex(doi_license.LicenseValidationError, "unavailable")):
-            doi_metadata.resolve_build_license("demo_1.0_20260101", "token", catalogue=catalogue())
-        fetch.assert_not_called()
 
     def test_license_equivalence_folds_legacy_ids_without_cycles(self):
         key = doi_license.license_equivalence_key

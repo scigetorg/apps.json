@@ -13,7 +13,7 @@ const domains = {
 };
 const sha = "a".repeat(40);
 const resolveLicenses = async (titles) => ({
-  resolved: Object.fromEntries(titles.map((title) => [title, {
+  resolved: Object.fromEntries(Object.keys(titles).map((title) => [title, {
     license: ["MIT"], license_details: [],
   }])), errors: {},
 });
@@ -77,20 +77,16 @@ test("domain move routes every version and carries established license", async (
     "license_provenance"), false);
 });
 
-test("refreshLicenses re-reads an already licensed image from its recipe", async () => {
+test("every run reads an already licensed image from its recipe history", async () => {
   const { root } = await fixture();
   const looked = [];
   const resolve = async (titles) => {
-    looked.push(...titles);
-    return { resolved: Object.fromEntries(titles.map((title) => [title, {
+    looked.push(...Object.keys(titles));
+    return { resolved: Object.fromEntries(Object.keys(titles).map((title) => [title, {
       license: ["Apache-2.0", "MIT"], license_details: [],
     }])), errors: {} };
   };
   await consolidateDomains(root, domains, { sourceCommits: { [repo]: sha }, resolveLicenses: resolve });
-  assert.deepEqual(looked, []);
-  await consolidateDomains(root, domains, {
-    sourceCommits: { [repo]: sha }, resolveLicenses: resolve, refreshLicenses: true,
-  });
   assert.deepEqual(looked, ["demo_1.0_20260921"]);
   const neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
   assert.deepEqual(neuro.demo.apps["demo 1.0"].license, ["Apache-2.0", "MIT"]);
@@ -138,7 +134,7 @@ test("a corrected release license can replace the previous build's value", async
   }));
   await consolidateDomains(root, domains, {
     sourceCommits: { [repo]: sha }, publishedDois: {},
-    resolveLicenses: async (titles) => ({ resolved: Object.fromEntries(titles.map(
+    resolveLicenses: async (titles) => ({ resolved: Object.fromEntries(Object.keys(titles).map(
       (title) => [title, { license: ["Apache-2.0"], license_details: [] }])), errors: {} }),
   });
   const catalog = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
