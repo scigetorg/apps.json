@@ -6,12 +6,50 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import requests
+
 from scripts.zenodo_catalog import (
+    RDM_JSON,
     catalog_artifacts,
     missing_batches,
-    published_depositions,
     publish_deposition,
+    record_doi,
+    user_records,
 )
+
+LICENSE_INFO = {
+    "rights": [{"id": "mit"}, {"title": {"en": "Research terms"}, "link": "https://example.org/terms"}],
+    "revision": "a" * 40, "recipe": "demo", "source_repository": "Example/microcontainers",
+}
+
+
+def reply(payload, status=200):
+    response = MagicMock()
+    response.status_code = status
+    response.json.return_value = payload
+    response.raise_for_status.side_effect = (
+        requests.HTTPError(str(status)) if status >= 400 else None)
+    return response
+
+
+def records_session(created_errors=None, **overrides):
+    """Stub session answering the records API publish sequence.
+
+    Override one step's reply by name: create, init, commit, publish or upload.
+    """
+    steps = {
+        "create": reply({"id": "12", "errors": created_errors or []}),
+        "init": reply({"entries": []}),
+        "commit": reply({"size": 3}),
+        "publish": reply({"id": "12", "is_published": True,
+                          "pids": {"doi": {"identifier": "10.5281/zenodo.12"}}}),
+        "upload": reply({"size": 3}),
+        **overrides,
+    }
+    session = MagicMock()
+    session.post.side_effect = [steps[name] for name in ("create", "init", "commit", "publish")]
+    session.put.return_value = steps["upload"]
+    return session
 
 
 class ZenodoCatalogTests(unittest.TestCase):
@@ -100,50 +138,93 @@ class ZenodoCatalogTests(unittest.TestCase):
 
         self.assertEqual(missing_batches(artifacts, {}), [["demo_1.0_20260101"]])
 
-    def test_public_sif_download_has_no_zenodo_token(self) -> None:
+    def publish(self, session, download_length="3"):
         download = MagicMock()
-        download.headers = {"Content-Length": "3"}
+        download.headers = {"Content-Length": download_length}
         download.raw.read.return_value = b"sif"
-        created = MagicMock()
-        created.json.return_value = {"id": 12, "links": {
-            "bucket": "https://zenodo.org/api/files/bucket"
-        }}
-        published = MagicMock()
-        published.json.return_value = {"doi": "10.5281/zenodo.12"}
-        session = MagicMock()
-        session.post.side_effect = [created, published]
-        session.put.return_value = MagicMock()
-
         with patch("scripts.zenodo_catalog.requests.get", return_value=download) as get:
-            doi = publish_deposition("demo_1.0_20260101", {
-                "zenodo_id": "mit", "entries": [{"name": "MIT", "url": None}],
-                "revision": "a" * 40, "recipe": "demo",
-                "source_repository": "Example/microcontainers",
-            }, session)
+            try:
+                return publish_deposition("demo_1.0_20260101", LICENSE_INFO, session)
+            finally:
+                self.assertEqual(get.call_args.kwargs, {"stream": True, "timeout": (15, 300)})
+                self.assertNotIn("headers", get.call_args.kwargs)
+                download.close.assert_called_once()
 
-        self.assertEqual(doi, "10.5281/zenodo.12")
-        self.assertEqual(get.call_args.kwargs, {
-            "stream": True, "timeout": (15, 300)
-        })
-        download.close.assert_called_once()
-        metadata = session.put.call_args_list[1].kwargs["json"]["metadata"]
-        self.assertEqual(metadata["license"], "mit")
-        self.assertIn("Build recipe:", metadata["description"])
-        self.assertIn("github.com/Example/microcontainers", metadata["description"])
+    def test_publish_creates_draft_uploads_and_publishes_through_records_api(self) -> None:
+        session = records_session()
+        self.assertEqual(self.publish(session), "10.5281/zenodo.12")
+        draft = "https://zenodo.org/api/records/12/draft"
+        key = "demo_1.0_20260101.simg"
+        self.assertEqual([(c.args[0]) for c in session.post.call_args_list], [
+            "https://zenodo.org/api/records", f"{draft}/files",
+            f"{draft}/files/{key}/commit", f"{draft}/actions/publish",
+        ])
+        self.assertEqual(session.put.call_args.args[0], f"{draft}/files/{key}/content")
+        self.assertEqual(session.put.call_args.kwargs["headers"]["Content-Length"], "3")
+        self.assertTrue(all(c.kwargs["headers"]["Accept"] == RDM_JSON
+                            for c in session.post.call_args_list))
+        body = session.post.call_args_list[0].kwargs["json"]
+        metadata = body["metadata"]
+        self.assertEqual(metadata["rights"], LICENSE_INFO["rights"])
+        self.assertEqual(metadata["resource_type"], {"id": "software"})
+        self.assertEqual(metadata["publisher"], "Zenodo")
+        self.assertEqual(metadata["creators"][0]["person_or_org"]["name"], "Neurodesk")
+        self.assertIn("github.com/Example/microcontainers/tree/" + "a" * 40, metadata["description"])
+        self.assertEqual(body["files"], {"enabled": True})
+        session.delete.assert_not_called()
 
-    def test_published_lookup_limits_titles_and_checks_exact_match(self) -> None:
+    def test_failed_publication_discards_the_draft(self) -> None:
+        cases = {
+            "upload": {"upload": reply({}, status=503)},
+            "size": {"commit": reply({"size": 2})},
+            "publish": {"publish": reply({}, status=400)},
+            "field errors": {"create": reply({"id": "12", "errors": [
+                {"field": "metadata.publisher", "messages": ["Missing"]}]})},
+        }
+        for label, overrides in cases.items():
+            session = records_session(**overrides)
+            with self.assertRaises((requests.HTTPError, ValueError), msg=label):
+                self.publish(session)
+            session.delete.assert_called_once()
+            self.assertEqual(session.delete.call_args.args[0],
+                             "https://zenodo.org/api/records/12/draft", label)
+
+    def test_missing_files_error_on_new_draft_is_expected(self) -> None:
+        session = records_session(created_errors=[{"field": "files.enabled",
+                                                   "messages": ["Missing uploaded files."]}])
+        self.assertEqual(self.publish(session), "10.5281/zenodo.12")
+
+    def test_user_records_keeps_published_exact_titles_newest_first(self) -> None:
         session = MagicMock()
-        response = MagicMock()
-        response.json.return_value = [
-            {"title": "demo_1.0_20260101", "doi": "10.123/demo"},
-            {"title": "demo_1.0_20260101-extra", "doi": "10.123/wrong"},
-        ]
-        session.get.return_value = response
-        rows = published_depositions(session, {"demo_1.0_20260101"})
+        session.get.return_value = reply({"hits": {"hits": [
+            {"is_published": True, "updated": "2026-01-01", "metadata": {"title": "demo_1.0_20260101"},
+             "pids": {"doi": {"identifier": "10.123/old"}}},
+            {"is_published": True, "updated": "2026-02-01", "metadata": {"title": "demo_1.0_20260101"},
+             "pids": {"doi": {"identifier": "10.123/new"}}},
+            {"is_published": False, "metadata": {"title": "demo_1.0_20260101"}},
+            {"is_published": True, "metadata": {"title": "demo_1.0_20260101-extra"}},
+        ]}})
+        rows = user_records(session, {"demo_1.0_20260101"})
         self.assertEqual(set(rows), {"demo_1.0_20260101"})
-        self.assertEqual(session.get.call_args.kwargs["params"]["q"],
-                         'metadata.title:"demo_1.0_20260101"')
+        self.assertEqual(record_doi(rows["demo_1.0_20260101"]), "10.123/new")
+        call = session.get.call_args
+        self.assertEqual(call.args[0], "https://zenodo.org/api/user/records")
+        self.assertEqual(call.kwargs["headers"], {"Accept": RDM_JSON})
+        self.assertEqual(call.kwargs["params"]["q"],
+                         'is_published:true AND (metadata.title:"demo_1.0_20260101")')
+        self.assertEqual(user_records(session, set()), {})
 
+    def test_user_records_pages_and_chunks_title_queries(self) -> None:
+        session = MagicMock()
+        full = {"hits": {"hits": [{"is_published": True, "metadata": {"title": f"t_1_{i:08d}"}}
+                                  for i in range(100)]}}
+        session.get.side_effect = [reply(full), reply({"hits": {"hits": []}})]
+        self.assertEqual(len(user_records(session)), 100)
+        self.assertEqual([c.kwargs["params"]["page"] for c in session.get.call_args_list], [1, 2])
+        session = MagicMock()
+        session.get.return_value = reply({"hits": {"hits": []}})
+        user_records(session, {f"t_1_{i:08d}" for i in range(120)})
+        self.assertEqual(session.get.call_count, 3)
 
 if __name__ == "__main__":
     unittest.main()

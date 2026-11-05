@@ -16,7 +16,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .doi_license import fetch_catalogue
+from .doi_license import fetch_catalogue, rights_from_catalog, same_rights
 from .doi_metadata import build_metadata, resolve_build_license
 
 
@@ -27,6 +27,10 @@ SIF_BASE = os.environ.get(
 IMAGE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 BUILDDATE = re.compile(r"^[0-9]{8}$")
 MAX_FILE_BYTES = 50_000_000_000
+# Without this Accept header Zenodo answers /api/user/records in its legacy
+# format, which shows only the first license and no `pids`.
+RDM_JSON = "application/vnd.inveniordm.v1+json"
+TITLES_PER_QUERY = 50
 
 
 def build_session(token: str) -> requests.Session:
@@ -117,38 +121,51 @@ def has_production_doi(doi: Any) -> bool:
     return isinstance(doi, str) and bool(doi) and "10.5072/" not in doi
 
 
-def published_depositions(
+def user_records(
     session: requests.Session, titles: set[str] | None = None
 ) -> dict[str, dict[str, Any]]:
+    """Published records of this account by exact title, newest wins.
+
+    Zenodo's search stops at about 10,000 results, far above this catalog.
+    """
     if titles is not None and not titles:
         return {}
+    queries = ["is_published:true"] if titles is None else [
+        "is_published:true AND (" + " OR ".join(
+            f'metadata.title:"{title}"' for title in chunk) + ")"
+        for chunk in (sorted(titles)[i:i + TITLES_PER_QUERY]
+                      for i in range(0, len(titles), TITLES_PER_QUERY))
+    ]
     result: dict[str, dict[str, Any]] = {}
-    page = 1
-    while True:
-        params = {"status": "published", "all_versions": 1, "page": page, "size": 100}
-        if titles is not None:
-            params["q"] = " OR ".join(
-                f'metadata.title:"{title}"' for title in sorted(titles)
+    for query in queries:
+        page = 1
+        while True:
+            response = session.get(
+                f"{ZENODO_API}/user/records",
+                params={"q": query, "allversions": "true", "sort": "newest",
+                        "page": page, "size": 100},
+                headers={"Accept": RDM_JSON},
+                timeout=(10, 60),
             )
-        response = session.get(
-            f"{ZENODO_API}/deposit/depositions",
-            params=params,
-            timeout=(10, 60),
-        )
-        response.raise_for_status()
-        rows = response.json()
-        if not isinstance(rows, list):
-            raise ValueError("Zenodo depositions response must be a list")
-        for row in rows:
-            title = row.get("title") or row.get("metadata", {}).get("title")
-            if isinstance(title, str) and (titles is None or title in titles) and (
-                title not in result or str(row.get("modified", "")) >
-                str(result[title].get("modified", ""))
-            ):
-                result[title] = row
-        if len(rows) < 100:
-            return result
-        page += 1
+            response.raise_for_status()
+            hits = (response.json().get("hits") or {}).get("hits")
+            if not isinstance(hits, list):
+                raise ValueError("Zenodo records response has no hits list")
+            for row in hits:
+                title = (row.get("metadata") or {}).get("title")
+                if (row.get("is_published") is not True or not isinstance(title, str)
+                        or (titles is not None and title not in titles)):
+                    continue
+                if title not in result or str(row.get("updated", "")) > str(result[title].get("updated", "")):
+                    result[title] = row
+            if len(hits) < 100:
+                break
+            page += 1
+    return result
+
+
+def record_doi(row: dict[str, Any]) -> str | None:
+    return ((row.get("pids") or {}).get("doi") or {}).get("identifier")
 
 
 # Keep in step with `max-parallel` in .github/workflows/publish-dois.yml.
@@ -187,9 +204,17 @@ class RemoteStream:
         return self.response.raw.read(size)
 
 
+def raise_draft_errors(body: dict[str, Any], ignore: tuple[str, ...] = ()) -> None:
+    # Draft writes answer HTTP 200/201 even when fields fail validation.
+    errors = [error for error in body.get("errors") or [] if error.get("field") not in ignore]
+    if errors:
+        raise ValueError(f"Zenodo rejected draft fields: {errors}")
+
+
 def publish_deposition(
     title: str, license_info: dict[str, Any], session: requests.Session
 ) -> str:
+    """Create a draft, stream the SIF from S3 into it, and publish; return the DOI."""
     source_url = f"{SIF_BASE}/{quote(title, safe='')}.simg"
     # The public S3 request must never receive the Zenodo bearer token.
     download = requests.get(source_url, stream=True, timeout=(15, 300))
@@ -198,43 +223,41 @@ def publish_deposition(
         length = int(download.headers.get("Content-Length", "0"))
         if length < 1 or length > MAX_FILE_BYTES:
             raise ValueError(f"Unsupported SIF size for {title}: {length}")
-        created = session.post(
-            f"{ZENODO_API}/deposit/depositions", json={}, timeout=(15, 60)
-        )
+        headers = {"Accept": RDM_JSON}
+        created = session.post(f"{ZENODO_API}/records", json=build_metadata(title, license_info),
+                               headers=headers, timeout=(15, 60))
         created.raise_for_status()
-        deposition = created.json()
-        deposition_id = deposition["id"]
+        draft = created.json()
+        draft_url = f"{ZENODO_API}/records/{draft['id']}/draft"
         try:
-            uploaded = session.put(
-                f"{deposition['links']['bucket']}/{quote(title, safe='')}.simg",
-                data=RemoteStream(download, length),
-                headers={"Content-Length": str(length)},
-                timeout=(30, 300),
-            )
-            uploaded.raise_for_status()
-            metadata = build_metadata(title, license_info)["metadata"]
-            updated = session.put(
-                f"{ZENODO_API}/deposit/depositions/{deposition_id}",
-                json={"metadata": metadata}, timeout=(15, 60),
-            )
-            updated.raise_for_status()
-            published = session.post(
-                f"{ZENODO_API}/deposit/depositions/{deposition_id}/actions/publish",
-                timeout=(15, 60),
-            )
+            # The file is attached next, so "missing uploaded files" is expected here.
+            raise_draft_errors(draft, ignore=("files.enabled",))
+            key = f"{title}.simg"
+            file_url = f"{draft_url}/files/{quote(key, safe='')}"
+            session.post(f"{draft_url}/files", json=[{"key": key}], headers=headers,
+                         timeout=(15, 60)).raise_for_status()
+            session.put(f"{file_url}/content", data=RemoteStream(download, length),
+                        headers={**headers, "Content-Type": "application/octet-stream",
+                                 "Content-Length": str(length)},
+                        timeout=(30, 300)).raise_for_status()
+            committed = session.post(f"{file_url}/commit", headers=headers, timeout=(30, 600))
+            committed.raise_for_status()
+            if committed.json().get("size") != length:
+                raise ValueError(f"Zenodo stored {committed.json().get('size')} bytes, expected {length}")
+            published = session.post(f"{draft_url}/actions/publish", headers=headers,
+                                     timeout=(15, 120))
             published.raise_for_status()
-            doi = published.json().get("doi")
+            record = published.json()
+            raise_draft_errors(record)
+            doi = record_doi(record)
             if not isinstance(doi, str) or not doi:
-                raise ValueError(f"Published Zenodo deposition has no DOI: {title}")
+                raise ValueError(f"Published Zenodo record has no DOI: {title}")
             return doi
         except Exception:
             try:
-                session.delete(
-                    f"{ZENODO_API}/deposit/depositions/{deposition_id}",
-                    timeout=(15, 60),
-                )
+                session.delete(draft_url, headers=headers, timeout=(15, 60))
             except requests.RequestException as error:
-                print(f"Could not discard failed draft {deposition_id}: {error}", file=sys.stderr)
+                print(f"Could not discard failed draft {draft['id']}: {error}", file=sys.stderr)
             raise
     finally:
         download.close()
@@ -244,7 +267,7 @@ def publish_batch(
     artifacts: dict[str, dict[str, Any]], selected: list[str], session: requests.Session,
     catalogue: dict[str, dict[str, Any]], github_token: str,
 ) -> int:
-    existing = published_depositions(session, set(selected))
+    existing = user_records(session, set(selected))
     count = 0
     failures = {}
     total = len(selected)
@@ -259,18 +282,15 @@ def publish_batch(
             print(f"{prefix}: resolving license ...", flush=True)
             license_info = resolve_build_license(
                 title, github_token, artifacts[title].get("source_repositories"), catalogue)
-            catalog_ids = {value.lower() for value in artifacts[title]["license"]}
-            recipe_ids = {value.lower() for value in license_info["declared"]}
-            if not catalog_ids or catalog_ids != recipe_ids:
+            expected = rights_from_catalog(artifacts[title])
+            if not expected or not same_rights(license_info["rights"], expected):
                 raise ValueError(
-                    f"Catalog licenses {sorted(catalog_ids)!r} differ from "
-                    f"build-time recipe {sorted(recipe_ids)!r}"
+                    f"Catalog licenses {expected!r} differ from "
+                    f"build-time recipe {license_info['rights']!r}"
                 )
-            if artifacts[title].get("license_details", []) != license_info["license_details"]:
-                raise ValueError("Catalog license details differ from build-time recipe")
             print(f"{prefix}: uploading to Zenodo ...", flush=True)
             doi = publish_deposition(title, license_info, session)
-            existing[title] = {"doi": doi}
+            existing[title] = {"pids": {"doi": {"identifier": doi}}}
             count += 1
             print(f"{prefix}: published {doi}", flush=True)
         except Exception as exc:
@@ -296,13 +316,12 @@ def main() -> int:
         parser.error("ZENODO_TOKEN is required")
     session = build_session(token)
     if args.command == "lookup":
-        print(json.dumps({title: row.get("doi") or (row.get("metadata") or {}).get("doi")
-                          for title, row in published_depositions(session).items()
-                          if row.get("doi") or (row.get("metadata") or {}).get("doi")}))
+        print(json.dumps({title: record_doi(row) for title, row in user_records(session).items()
+                          if record_doi(row)}))
         return 0
     artifacts = catalog_artifacts(args.catalog_root)
     if args.command == "plan":
-        print(json.dumps(missing_batches(artifacts, published_depositions(session))))
+        print(json.dumps(missing_batches(artifacts, user_records(session))))
     elif args.command == "publish":
         if args.artifacts_json is None:
             parser.error("--artifacts-json is required for publish")
