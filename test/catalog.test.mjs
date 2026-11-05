@@ -111,6 +111,19 @@ test("the same image reuses its catalog license and custom terms", async () => {
   }
 });
 
+test("a license refresh keeps the stored license when the lookup fails", async () => {
+  const catalog = buildCatalog(rows, { catalog: {} });
+  const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)
+    .map((name) => [name, { recipe: "demo" }])) };
+  const previousByImage = new Map([["demo_1.0_20260921", { license: ["MIT"], license_details: [] }]]);
+  const result = await collectLicenseMetadata(catalog, sources, {
+    previousByImage, refresh: true,
+    resolve: async (titles) => ({ resolved: {}, errors: Object.fromEntries(
+      titles.map((title) => [title, "Build image lacks matching recipe revision labels"])) }),
+  });
+  assert.deepEqual(applyMetadata(catalog, {}, result).demo.apps["demo 1.0"].license, ["MIT"]);
+});
+
 test("custom catalog licenses without license_details are looked up again once", async () => {
   const catalog = buildCatalog(rows, { catalog: {} });
   const sources = { demo: Object.fromEntries(Object.keys(catalog.demo.apps)

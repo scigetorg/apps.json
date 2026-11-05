@@ -77,6 +77,25 @@ test("domain move routes every version and carries established license", async (
     "license_provenance"), false);
 });
 
+test("refreshLicenses re-reads an already licensed image from its recipe", async () => {
+  const { root } = await fixture();
+  const looked = [];
+  const resolve = async (titles) => {
+    looked.push(...titles);
+    return { resolved: Object.fromEntries(titles.map((title) => [title, {
+      license: ["Apache-2.0", "MIT"], license_details: [],
+    }])), errors: {} };
+  };
+  await consolidateDomains(root, domains, { sourceCommits: { [repo]: sha }, resolveLicenses: resolve });
+  assert.deepEqual(looked, []);
+  await consolidateDomains(root, domains, {
+    sourceCommits: { [repo]: sha }, resolveLicenses: resolve, refreshLicenses: true,
+  });
+  assert.deepEqual(looked, ["demo_1.0_20260921"]);
+  const neuro = JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+  assert.deepEqual(neuro.demo.apps["demo 1.0"].license, ["Apache-2.0", "MIT"]);
+});
+
 test("deleting a release JSON removes that image and keeps another version", async () => {
   const { root, source } = await fixture();
   await writeFile(join(source, "releases", "demo", "2.0.json"), JSON.stringify({

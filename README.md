@@ -95,7 +95,15 @@ not carry an older build's license onto a new build. An image whose license
 includes custom terms (`other-*`, `LicenseRef-…` or a free-text name) but has no
 `license_details` is looked up again, so the name and URL that DOI publication
 needs are filled in; until then, publication and the audit report that
-`apps.json` lacks them. A separate DOI workflow
+`apps.json` lacks them.
+
+Stored licenses are otherwise reused, because an image's build-time recipe never
+changes. After a change to the license-reading code, run **Consolidate apps
+catalog** manually with `refresh_licenses` checked. It re-reads every released
+image's license from its build-time recipe (about 5–6 minutes) and logs each
+changed license as `Refreshed license for <image>: [old] -> [new]`. Images whose
+lookup fails keep their stored license. Run the audit afterwards to see the
+effect on Zenodo records. A separate DOI workflow
 publishes missing SIF records to production Zenodo. The next catalog run reads
 this account's published depositions once and adds their DOIs to every launcher
 for the image. A Zenodo lookup failure leaves existing catalog DOIs in place
