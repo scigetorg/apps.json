@@ -25,6 +25,7 @@ scripts/doi_license.py       # recipe license resolution against Zenodo's live l
 scripts/doi_provenance.py    # reads OCI image build revision from the registry (GHCR, Docker Hub fallback)
 scripts/doi_metadata.py      # build-time license resolution + records-API draft metadata
 scripts/audit_doi_licenses.py# weekly read-only audit: Zenodo license vs apps.json -> JSON report
+scripts/backfill_zenodo_rights.py # manual: rewrite verified_legacy records' rights from apps.json
 test/*.test.mjs              # node:test suites (catalog, workflow, cloudflare)
 test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses)
 ```
@@ -85,6 +86,7 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 | `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
 | `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan every missing image into ≤6 batches (`PUBLISH_JOBS`) → matrix publish, 6 in parallel (skipped when nothing is missing) |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
+| `backfill-zenodo-rights.yml` | manual only | dry run by default; `apply` edits `verified_legacy` records' license list (same DOI) |
 | `test.yml` | PRs and code pushes to `main` | `npm test` + Python unittest, no secrets |
 
 Never add `pull_request` triggers to workflows that receive `ZENODO_TOKEN`:
@@ -116,6 +118,7 @@ Run Python scripts as modules (`python -m scripts.<name>`) from the repo root.
 
 - `npm run publish:cloudflare` updates the public Worker.
 - `python -m scripts.zenodo_catalog publish` mints permanent production DOIs.
+- `python -m scripts.backfill_zenodo_rights --apply` edits published production records.
 
 Tests must not hit the network; existing tests stub `fetch`/`requests`.
 Follow that pattern when adding tests.

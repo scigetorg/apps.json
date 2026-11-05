@@ -25,10 +25,9 @@
   without a name cannot be published.
 - **Depends on:** the records-API publication change in this repo being on `main`.
 
-## Backfill multi-license `rights` on legacy Zenodo records
+## Decide whether `other-at` records count as legacy
 
-- **What:** Step 5 of the records-API plan: a manual, dry-run-by-default job that edits the audit's
-  `verified_legacy` records so their `rights` list every license from apps.json (same DOI).
-- **Why:** Records published through the legacy API carry one license each.
-- **Context:** Verified on sandbox: edit draft → PUT bare rights → publish keeps the DOI, version
-  and files. Decide whether legacy `other-at` records count as legacy too (seen on sandbox).
+- **What:** Records published with the old `other-at` ("Other (Attribution)") ID are reported as
+  `mismatch`, not `verified_legacy`, so the backfill skips them.
+- **Why:** Seen on sandbox (4 records). If they are legacy single-license records, add `other-at`
+  to the audit's legacy rule and the backfill will fix them too.

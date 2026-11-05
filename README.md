@@ -123,6 +123,24 @@ not one ID. Custom terms (a `name` only, `other-open`/`other-closed`, or a
 `LicenseRef-…` ID) are published under their `name` with a link to their `url`,
 so they need both. `zenodo_license` is no longer used and is ignored.
 
+## Backfill legacy license lists
+
+Records published before the records API carry one license each. The manual
+**Backfill Zenodo license lists** workflow edits the audit's `verified_legacy`
+records so they list every license from `apps.json`. It changes only the
+license list: the record, DOI, version and files stay the same. It is a dry run
+unless `apply` is checked; `limit` and `title` narrow it. Suggested order: dry
+run, then `apply` with `limit: 5`, check those records on zenodo.org, then a full
+run. Re-running is safe because finished records are no longer `verified_legacy`.
+Locally:
+
+```bash
+ZENODO_TOKEN=... python -m scripts.backfill_zenodo_rights --catalog-root .            # dry run
+ZENODO_TOKEN=... python -m scripts.backfill_zenodo_rights --catalog-root . --apply --limit 5
+```
+
+Set `ZENODO_API_ROOT=https://sandbox.zenodo.org/api` with a sandbox token to try it there first.
+
 ## Enable the schedule
 
 1. Create a public `Neurodesk/apps.json` repository with a `main` branch and

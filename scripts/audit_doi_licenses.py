@@ -69,6 +69,14 @@ def audit_record(record, entry):
     return row
 
 
+def audit_rows(artifacts, records):
+    """Audit rows for published software records whose title is in apps.json."""
+    return [audit_record(record, artifacts[title])
+            for title, record in sorted(records.items())
+            if title in artifacts and
+            ((record.get("metadata") or {}).get("resource_type") or {}).get("id") == "software"]
+
+
 def write_summary(path, report):
     lines = [
         "## Zenodo license audit",
@@ -97,10 +105,7 @@ def main():
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     artifacts = catalog_artifacts(args.catalog_root)
-    rows = [audit_record(record, artifacts[title])
-            for title, record in sorted(user_records(build_session(zenodo_token)).items())
-            if title in artifacts and
-            ((record.get("metadata") or {}).get("resource_type") or {}).get("id") == "software"]
+    rows = audit_rows(artifacts, user_records(build_session(zenodo_token)))
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1
