@@ -5,114 +5,67 @@ consolidate writes them into apps.json, and publish refuses to mint a DOI when
 apps.json and the build-time recipe disagree. This audit catches what can drift
 afterwards, between each Zenodo record and the catalog entry for its title.
 
-    Zenodo record (title, metadata.license)
+    Zenodo record (title, metadata.rights)          from /api/user/records
         │ title in apps.json?  no → skipped (retired image; DOI stays)
         ▼
-    apps.json license ─► expected Zenodo IDs ─► equivalent? ─► verified / mismatch
+    rights_from_catalog(apps.json) ─► same rights? ─► verified
+        │                               └─ single other-* for multi/custom → verified_legacy
+        │                               └─ otherwise                       → mismatch
         └ no license ─► no_catalog_license
 """
 
 import argparse
 import json
 import os
-import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
-
-from .doi_license import OTHER_IDS, license_equivalence_key
-from .zenodo_catalog import catalog_artifacts
+from .doi_license import OTHER_IDS, rights_from_catalog, rights_key
+from .zenodo_catalog import build_session, catalog_artifacts, record_doi, user_records
 
 
-DEPOSITIONS_URL = "https://zenodo.org/api/deposit/depositions"
-RELEASE_TITLE = re.compile(r".+_.+_[0-9]{8}\Z")
+def describe(rights):
+    """Readable form of bare or Zenodo-expanded rights for the report."""
+    labels = []
+    for right in rights:
+        if right.get("id"):
+            labels.append(right["id"])
+            continue
+        title = right.get("title") or ""
+        if isinstance(title, dict):
+            title = title.get("en") or next(iter(title.values()), "")
+        labels.append(f"{title} <{right.get('link') or 'no link'}>")
+    return sorted(labels)
 
 
-def is_release_title(title):
-    return isinstance(title, str) and RELEASE_TITLE.fullmatch(title) is not None
-
-
-def fetch_depositions(token):
-    depositions = []
-    page = 1
-    while True:
-        for attempt in range(3):
-            try:
-                response = requests.get(
-                    DEPOSITIONS_URL,
-                    params={"status": "published", "all_versions": 1, "page": page, "size": 100},
-                    headers={"Authorization": f"Bearer {token}"},
-                    timeout=(15, 60),
-                )
-            except requests.RequestException as exc:
-                if attempt == 2:
-                    raise RuntimeError(f"Could not list Zenodo depositions: {exc}") from exc
-                time.sleep(2 ** attempt)
-                continue
-            if response.status_code == 429 or response.status_code >= 500:
-                if attempt == 2:
-                    raise RuntimeError(
-                        f"Zenodo deposition list returned HTTP {response.status_code}"
-                    )
-                time.sleep(2 ** attempt)
-                continue
-            if not response.ok:
-                raise RuntimeError(
-                    f"Zenodo deposition list returned HTTP {response.status_code}: "
-                    f"{response.text[:500]}"
-                )
-            break
-        batch = response.json()
-        if not isinstance(batch, list):
-            raise RuntimeError("Zenodo deposition list response was not an array")
-        depositions.extend(batch)
-        if len(batch) < 100:
-            return depositions
-        page += 1
-
-
-def expected_zenodo_licenses(entry):
-    """Zenodo IDs that can represent an apps.json license entry, or None."""
-    licenses = sorted({value.strip().lower() for value in entry.get("license") or []})
-    if not licenses:
-        return None
-    if len(licenses) == 1 and (licenses[0] in OTHER_IDS or not entry.get("license_details")):
-        return licenses
-    # Several licenses or custom terms publish under an Other category; which
-    # one is the recipe's zenodo_license choice, which apps.json does not keep.
-    return sorted(OTHER_IDS)
-
-
-def audit_deposition(deposition, artifacts):
-    metadata = deposition.get("metadata") or {}
-    title = deposition.get("title") or metadata.get("title") or ""
-    published = metadata.get("license")
-    if isinstance(published, dict):
-        published = published.get("id")
-    published = published.lower() if isinstance(published, str) else None
-    doi_url = deposition.get("doi_url")
-    if not doi_url and deposition.get("doi"):
-        doi_url = f"https://doi.org/{deposition['doi']}"
-    row = {"id": deposition.get("id"), "title": title, "doi_url": doi_url,
-           "published_license": published}
-    entry = artifacts[title]
-    row["catalog_license"] = sorted({value.lower() for value in entry.get("license") or []})
-    expected = expected_zenodo_licenses(entry)
-    if expected is None:
+def audit_record(record, entry):
+    metadata = record.get("metadata") or {}
+    published = metadata.get("rights") or []
+    doi = record_doi(record)
+    row = {"id": record.get("id"), "title": metadata.get("title"),
+           "doi_url": f"https://doi.org/{doi}" if doi else None,
+           "published_license": describe(published)}
+    if not entry.get("license"):
         row.update(status="no_catalog_license", problems=[],
                    reason="apps.json has no license for this image")
         return row
-    row["expected_zenodo_license"] = expected
-    matches = published is not None and any(
-        license_equivalence_key(published) == license_equivalence_key(candidate)
-        for candidate in expected
-    )
-    problems = [] if matches else [
-        f"Zenodo license {published!r} differs from apps.json {expected!r}"
-    ]
-    row.update(status="mismatch" if problems else "verified", problems=problems)
+    try:
+        expected = rights_from_catalog(entry)
+    except ValueError as exc:
+        row.update(status="mismatch", problems=[f"apps.json license is incomplete: {exc}"])
+        return row
+    row["catalog_license"] = describe(expected)
+    published_key, expected_key = rights_key(published), rights_key(expected)
+    if published_key == expected_key:
+        row.update(status="verified", problems=[])
+    elif (len(published_key) == 1 and next(iter(published_key)) in {("id", other) for other in OTHER_IDS}
+          and (len(expected_key) > 1 or any(kind == "custom" for kind, *_ in expected_key))):
+        # Published through the legacy API, which allowed one license per record.
+        row.update(status="verified_legacy", problems=[])
+    else:
+        row.update(status="mismatch", problems=[
+            f"Zenodo licenses {row['published_license']!r} differ from apps.json {row['catalog_license']!r}"
+        ])
     return row
 
 
@@ -144,17 +97,10 @@ def main():
     if not zenodo_token:
         parser.error("ZENODO_TOKEN is required")
     artifacts = catalog_artifacts(args.catalog_root)
-    rows = []
-    for deposition in fetch_depositions(zenodo_token):
-        metadata = deposition.get("metadata") or {}
-        resource = metadata.get("resource_type") or {}
-        if not isinstance(resource, dict):
-            resource = {}
-        if metadata.get("upload_type") != "software" and resource.get("type") != "software":
-            continue
-        title = deposition.get("title") or metadata.get("title")
-        if is_release_title(title) and title in artifacts:
-            rows.append(audit_deposition(deposition, artifacts))
+    rows = [audit_record(record, artifacts[title])
+            for title, record in sorted(user_records(build_session(zenodo_token)).items())
+            if title in artifacts and
+            ((record.get("metadata") or {}).get("resource_type") or {}).get("id") == "software"]
     summary = {}
     for row in rows:
         summary[row["status"]] = summary.get(row["status"], 0) + 1
