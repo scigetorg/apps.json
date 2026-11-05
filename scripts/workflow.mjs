@@ -99,6 +99,7 @@ export async function lookupPublishedDois() {
 
 export async function consolidateDomains(root, domains, {
   sourceCommits = {}, resolveLicenses, publishedDois, lookupDois = lookupPublishedDois,
+  refreshLicenses = false,
 } = {}) {
   const repositories = [...new Set(Object.values(domains).flatMap((config) => config.source_repositories))];
   const sources = new Map();
@@ -155,7 +156,7 @@ export async function consolidateDomains(root, domains, {
     const files = await consolidate({
       root: join(root, id), domain: id, sources: selected,
       previous: previousByDomain[id], previousByIdentity, publishedDois: dois,
-      previousByImage, resolveLicenses,
+      previousByImage, resolveLicenses, refreshLicenses,
     });
     rememberBuildLicenses(previousByImage, JSON.parse(files["apps.json"]), { replace: true });
     console.log(`Generated ${id}: ${Object.keys(files).join(", ")} from ${config.source_repositories.join(", ")}`);
@@ -169,7 +170,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (command === "checkout") {
     await checkoutSources(root, domains);
   } else if (command === "run") {
-    await consolidateDomains(root, domains);
+    await consolidateDomains(root, domains,
+      { refreshLicenses: process.env.REFRESH_LICENSES === "true" });
   } else if (command === "output-paths") {
     process.stdout.write(`${outputPaths(domains).join("\n")}\n`);
   } else if (command === "source-repository") {

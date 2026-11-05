@@ -86,7 +86,7 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
+| `consolidate.yml` | daily 02:25 UTC, manual (`refresh_licenses` re-reads every license once) | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
 | `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan every missing licensed image (others skipped and listed; `limit` input for a smoke test) into ≤6 batches (`PUBLISH_JOBS`) → matrix publish, 6 in parallel, no new upload after 5 h (skipped when nothing is missing) |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
 | `backfill-zenodo-rights.yml` | manual only | dry run by default; `apply` edits `verified_legacy` records' license list (same DOI) |
