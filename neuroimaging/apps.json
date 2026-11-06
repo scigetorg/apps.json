@@ -232,6 +232,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "afni_26.3.07",
+                "doi": "https://doi.org/10.5281/zenodo.23995574",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -248,6 +249,7 @@
                 "exec": "suma",
                 "apptainer_args": [],
                 "image": "afni_26.3.07",
+                "doi": "https://doi.org/10.5281/zenodo.23995574",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -367,6 +369,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "amico_2.1.0_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23996643",
                 "license": [
                     "AMICO software license agreement"
                 ],
@@ -536,6 +539,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "apptainer_1.4.4_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23997079",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -872,6 +876,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "batchheudiconv_1.0.0_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23996477",
                 "license": [
                     "GPL-3.0-only"
                 ]
@@ -1154,6 +1159,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "bidscoin_4.6.2_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23997600",
                 "license": [
                     "GPL-3.0-or-later"
                 ]
@@ -1453,6 +1459,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidsvue_0.1.20260704",
+                "doi": "https://doi.org/10.5281/zenodo.23996369",
                 "license": [
                     "BSD-2-Clause"
                 ]
@@ -1462,6 +1469,7 @@
                 "exec": "bidsvue",
                 "apptainer_args": [],
                 "image": "bidsvue_0.1.20260704",
+                "doi": "https://doi.org/10.5281/zenodo.23996369",
                 "license": [
                     "BSD-2-Clause"
                 ]
@@ -2222,6 +2230,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cat12_26.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995804",
                 "license": [
                     "GPL-2.0"
                 ]
@@ -2231,6 +2240,7 @@
                 "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
                 "apptainer_args": [],
                 "image": "cat12_26.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995804",
                 "license": [
                     "GPL-2.0"
                 ]
@@ -2359,6 +2369,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "chimera-brainparcellation_0.4.1",
+                "doi": "https://doi.org/10.5281/zenodo.23996230",
                 "license": [
                     "Apache-2.0",
                     "FSL license",
@@ -2794,6 +2805,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cryosparc_1.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995580",
                 "license": [
                     "CryoSPARC licence (not included; installed with each user's own licence ID)",
                     "MIT"
@@ -2936,6 +2948,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "datalad_1.3.1_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23996074",
                 "license": [
                     "MIT"
                 ]
@@ -3035,6 +3048,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "datalad_1.8.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995582",
                 "license": [
                     "MIT"
                 ]
@@ -3204,6 +3218,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "dcm2niix_v1.0.20240202_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23997598",
                 "license": [
                     "dcm2niix license"
                 ],
@@ -3251,6 +3266,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dcm2niix_v1.0.20261029",
+                "doi": "https://doi.org/10.5281/zenodo.23995584",
                 "license": [
                     "dcm2niix license"
                 ],
@@ -3289,6 +3305,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dcm2niix_arm64_v1.0.20261029",
+                "doi": "https://doi.org/10.5281/zenodo.23995572",
                 "license": [
                     "dcm2niix license"
                 ],
@@ -3311,6 +3328,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "deep-quality-estimation_0.0.3",
+                "doi": "https://doi.org/10.5281/zenodo.23995891",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -3556,6 +3574,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "deepretinotopy_1.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996019",
                 "license": [
                     "GPL-3.0"
                 ]
@@ -3744,6 +3763,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dicomtools_1.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995604",
                 "license": [
                     "dcm2niix license",
                     "dcmtk license"
@@ -3771,6 +3791,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dicomtools_arm64_1.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995864",
                 "license": [
                     "dcm2niix license",
                     "dcmtk license"
@@ -4173,6 +4194,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "ep3d_1.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995722",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
@@ -4474,6 +4496,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "flames_arm64_1.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996071",
                 "license": [
                     "CC-BY-NC-4.0"
                 ]
@@ -5444,6 +5467,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "glmsingle_1.2_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23996065",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -5453,6 +5477,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "glmsingle_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995587",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -5478,6 +5503,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "glmsingle_arm64_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995620",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -5752,6 +5778,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "hdbet_2.0.1",
+                "doi": "https://doi.org/10.5281/zenodo.23995730",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -5961,6 +5988,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "irkernel_4.4.3_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23997953",
                 "license": [
                     "GPL-2.0-or-later"
                 ]
@@ -7114,6 +7142,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "matlab_2026b",
+                "doi": "https://doi.org/10.5281/zenodo.23997672",
                 "license": [
                     "MATLAB"
                 ],
@@ -8370,6 +8399,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "musclemap_1.4.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995590",
                 "license": [
                     "CC-BY-4.0",
                     "LGPL-3.0",
@@ -8981,6 +9011,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "niimath_1.0.20250804_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.23998157",
                 "license": [
                     "BSD-2-Clause"
                 ]
@@ -9020,6 +9051,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "niimath_1.0.20261016",
+                "doi": "https://doi.org/10.5281/zenodo.23996348",
                 "license": [
                     "BSD-2-Clause"
                 ]
@@ -9175,6 +9207,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "openads_1.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996692",
                 "license": [
                     "JHU Non-Profit Research Software License Agreement"
                 ],
@@ -9618,6 +9651,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "petprep_0.0.10",
+                "doi": "https://doi.org/10.5281/zenodo.23996080",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -9747,6 +9781,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "prostatefiducialseg_8.0.3",
+                "doi": "https://doi.org/10.5281/zenodo.23995576",
                 "license": [
                     "seedseg"
                 ],
@@ -9821,6 +9856,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "pyem_0.69.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996060",
                 "license": [
                     "GPL-3.0-or-later"
                 ]
@@ -9910,6 +9946,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "qsiprep_26.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995598",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -9919,6 +9956,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "qsiprep_26.1.1",
+                "doi": "https://doi.org/10.5281/zenodo.23996101",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -10504,6 +10542,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "rabies_0.6.2",
+                "doi": "https://doi.org/10.5281/zenodo.23995950",
                 "license": [
                     "ACADEMIC PUBLIC LICENSE (Non-Commercial Use)"
                 ],
@@ -10650,6 +10689,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "relion_5.1.1",
+                "doi": "https://doi.org/10.5281/zenodo.23995622",
                 "license": [
                     "GPL-2.0-only"
                 ]
@@ -10819,6 +10859,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "rshrf_arm64_1.8.0",
+                "doi": "https://doi.org/10.5281/zenodo.23995873",
                 "license": [
                     "MIT"
                 ]
@@ -11284,6 +11325,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "slicer_5.12.4",
+                "doi": "https://doi.org/10.5281/zenodo.23996405",
                 "license": [
                     "3D Slicer Software License Agreement"
                 ],
@@ -11300,6 +11342,7 @@
                 "exec": "Slicer",
                 "apptainer_args": [],
                 "image": "slicer_5.12.4",
+                "doi": "https://doi.org/10.5281/zenodo.23996405",
                 "license": [
                     "3D Slicer Software License Agreement"
                 ],
@@ -11495,6 +11538,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "spant_arm64_4.5.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996624",
                 "license": [
                     "GPL-3.0-only"
                 ]
@@ -12116,6 +12160,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "terastitcher_1.11.10",
+                "doi": "https://doi.org/10.5281/zenodo.23996621",
                 "license": [
                     "TeraStitcher non-profit research license"
                 ],
@@ -12537,6 +12582,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "vesselboost_2.0.5",
+                "doi": "https://doi.org/10.5281/zenodo.23995788",
                 "license": [
                     "MIT"
                 ]
@@ -12592,6 +12638,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "vessynth_2026.10.9",
+                "doi": "https://doi.org/10.5281/zenodo.23996422",
                 "license": [
                     "MIT"
                 ]
@@ -12918,6 +12965,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "xmipp_6.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.23996212",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
