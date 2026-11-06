@@ -127,10 +127,17 @@ recipe commit for that version.
 
 A weekly read-only audit compares each published Zenodo record's licenses with
 the licenses `apps.json` lists for the same image, ignoring order and legacy ID
-spellings. Records published before the records API carry one license each; a
-single license, either an `other-*` category (`other-open`, `-closed`, `-at`, `-nc`, `-pd`) or one of the licenses
-`apps.json` lists, where `apps.json` lists several or custom terms, is reported as
-`verified_legacy`, not as a failure. Images without
+spellings. Records published by neurocommand's old pipeline carry one license
+each, and it is often not a real statement: that pipeline sent `other-at` when it
+could not read the recipe, `other-open` for a name-only entry, `other-closed` for
+matlab, nothing at all when the recipe had no `copyright` (Zenodo then shows its
+default, `cc-by-4.0`), and otherwise only the first license of the current recipe.
+Any one-license record that differs from `apps.json` is therefore reported as
+`verified_legacy` with its reason (placeholder category, Zenodo's default, a
+subset of `apps.json`, or the first license of the recipe at publish time), not
+as a failure, and the backfill replaces it with the licenses `apps.json` takes
+from recipe history. A record with several licenses that differ from `apps.json`
+can only have come from the records API, and is a `mismatch` to review. Images without
 a catalog license are reported as `no_catalog_license`. Records for images
 removed from the catalog are skipped. The audit uploads a JSON report and fails
 on mismatches. It does not read recipes; the catalog run does that every night.

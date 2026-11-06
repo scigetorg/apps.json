@@ -277,24 +277,34 @@ class DoiLicenseTests(unittest.TestCase):
             for other in ("other-open", "other-closed", "other-at", "other-nc", "other-pd"):
                 row = audit_record(record([{"id": other}]), entry)
                 self.assertEqual(row["status"], "verified_legacy", (entry, other))
-        row = audit_record(record([{"id": "other-open"}]), {"license": ["MIT"]})
-        self.assertEqual(row["status"], "mismatch")
+        # Old publish-doi.py placeholders, even when apps.json has one license:
+        # other-at = recipe could not be read; cc-by-4.0 = Zenodo's default when
+        # no license was sent.
+        for published, listed in ((["other-at"], ["MIT"]), (["other-open"], ["MIT"]),
+                                  (["cc-by-4.0"], ["Apache-2.0"]), (["cc-by-4.0"], ["BSD-3-Clause"])):
+            row = audit_record(record([{"id": value} for value in published]), {"license": listed})
+            self.assertEqual(row["status"], "verified_legacy", (published, listed))
+            self.assertTrue(row["reason"])
+        # A real cc-by-4.0 that apps.json lists is checked like any license.
+        row = audit_record(record([{"id": "cc-by-4.0"}]), {"license": ["CC-BY-4.0"]})
+        self.assertEqual(row["status"], "verified")
         # The legacy API also kept one real license of several (dsistudio).
         entry = {"license": ["CC-BY-NC-SA-4.0", "LGPL-3.0"]}
         row = audit_record(record([{"id": "cc-by-nc-sa-4.0"}]), entry)
         self.assertEqual(row["status"], "verified_legacy")
-        # A single license apps.json does not list is a real disagreement.
+        # Any other single license came from the old pipeline reading the first
+        # license of the recipe on main, not this version's: replace it too.
         row = audit_record(record([{"id": "mit"}]), entry)
-        self.assertEqual(row["status"], "mismatch")
+        self.assertEqual(row["status"], "verified_legacy")
+        self.assertIn("first license of the recipe on main", row["reason"])
 
     def test_audit_flags_rights_that_differ_from_apps_json(self):
-        row = audit_record(record([{"id": "apache-2.0"}]), {"license": ["MIT"]})
-        self.assertEqual(row["status"], "mismatch")
-        self.assertEqual(row["catalog_license"], ["mit"])
-        self.assertIn("apache-2.0", row["problems"][0])
+        # Several licenses can only come from the records API: a real disagreement.
         row = audit_record(record([{"id": "apache-2.0"}, {"id": "gpl-3.0-only"}]),
                            {"license": ["Apache-2.0", "MIT"]})
         self.assertEqual(row["status"], "mismatch")
+        self.assertEqual(row["catalog_license"], ["apache-2.0", "mit"])
+        self.assertIn("gpl-3.0-only", row["problems"][0])
         row = audit_record(record([{"id": "other-open"}]), {
             "license": ["other-open"], "license_details": [{"license": "other-open"}]})
         self.assertEqual(row["status"], "mismatch")
@@ -308,7 +318,7 @@ class DoiLicenseTests(unittest.TestCase):
         current = "demo_1.0_20260201"
         records = {
             TITLE: record([{"id": "mit"}]),
-            current: record([{"id": "apache-2.0"}], title=current),
+            current: record([{"id": "apache-2.0"}, {"id": "gpl-3.0-only"}], title=current),
             "dataset_1.0_20260201": record([{"id": "mit"}], title="dataset_1.0_20260201",
                                            resource_type="dataset"),
         }
