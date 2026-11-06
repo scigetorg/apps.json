@@ -25,10 +25,3 @@
   entry and custom terms publish by name + URL. `zenodo_license` is ignored, and custom entries
   without a name cannot be published.
 - **Depends on:** the records-API publication change in this repo being on `main`.
-
-## Decide whether `other-at` records count as legacy
-
-- **What:** Records published with the old `other-at` ("Other (Attribution)") ID are reported as
-  `mismatch`, not `verified_legacy`, so the backfill skips them.
-- **Why:** Seen on sandbox (4 records). If they are legacy single-license records, add `other-at`
-  to the audit's legacy rule and the backfill will fix them too.

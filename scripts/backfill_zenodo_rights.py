@@ -1,7 +1,7 @@
 """Backfill full license lists onto records published with one legacy license.
 
 The legacy deposit API allowed one license per record, so images with several
-or custom licenses were published as a single `other-open`/`other-closed`.
+or custom licenses were published as a single `other-*` category or one of them.
 This edits exactly the audit's `verified_legacy` records so their `rights`
 list every license from apps.json. Nothing else changes: same record, DOI,
 version and files. Dry run by default; `--apply` writes.

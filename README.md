@@ -128,8 +128,9 @@ recipe commit for that version.
 A weekly read-only audit compares each published Zenodo record's licenses with
 the licenses `apps.json` lists for the same image, ignoring order and legacy ID
 spellings. Records published before the records API carry one license each; a
-single `other-open`/`other-closed` license where `apps.json` lists several or
-custom terms is reported as `verified_legacy`, not as a failure. Images without
+single license, either an `other-*` category (`other-open`, `-closed`, `-at`, `-nc`, `-pd`) or one of the licenses
+`apps.json` lists, where `apps.json` lists several or custom terms, is reported as
+`verified_legacy`, not as a failure. Images without
 a catalog license are reported as `no_catalog_license`. Records for images
 removed from the catalog are skipped. The audit uploads a JSON report and fails
 on mismatches. It does not read recipes; the catalog run does that every night.
@@ -142,7 +143,8 @@ every `copyright` entry in the recipe becomes its own license on the
 record. A `license` must be an ID in Zenodo's live license catalogue (deprecated
 SPDX IDs such as `GPL-3.0` map to `gpl-3.0-only`). List multiple licenses as
 separate `copyright` entries; an SPDX expression such as `MIT OR Apache-2.0` is
-not one ID. Custom terms (a `name` only, `other-open`/`other-closed`, or a
+not one ID. Custom terms (a `name` only, an `other-*` category such as
+`other-closed` or `other-nc`, or a
 `LicenseRef-…` ID) are published under their `name` with a link to their `url`,
 so they need both. `zenodo_license` is no longer used and is ignored.
 

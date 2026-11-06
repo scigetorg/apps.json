@@ -2,6 +2,12 @@
 
 import re
 
+# Zenodo's catch-all "Other" licenses (Open, Not Open, Attribution, Non-Commercial,
+# Public Domain). They name no actual terms, so a recipe using one must give the
+# terms' name and URL; the legacy deposit API also used them when a record could
+# carry only one license.
+OTHER_IDS = frozenset({"other-open", "other-closed", "other-at", "other-nc", "other-pd"})
+
 # Shape of a license catalogue ID such as "gpl-3.0-only".
 CATALOGUE_ID = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
 
@@ -13,7 +19,7 @@ def is_custom_term(value):
     isCustomLicense in scripts/catalog.mjs.
     """
     value = (value or "").strip().lower()
-    return (value in {"other-open", "other-closed"} or value.startswith("licenseref-")
+    return (value in OTHER_IDS or value.startswith("licenseref-")
             or not CATALOGUE_ID.fullmatch(value))
 
 
