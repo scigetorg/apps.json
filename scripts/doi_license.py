@@ -19,6 +19,7 @@ UNKNOWN_NAMES = {"none", "unknown", "noassertion"}
 SUGGESTED_OTHER_IDS = frozenset({"other-open", "other-closed"})
 # Deprecated SPDX IDs that Zenodo's legacy deposit API accepted, mapped to the
 # IDs in its current catalogue so already-published recipes stay valid.
+# Also published as `deprecated_aliases` in licenses/zenodo.json (zenodo_licenses.py).
 DEPRECATED_SPDX = {
     **{f"{family}-{version}": f"{family}-{version}-only" for family, version in (
         ("gpl", "1.0"), ("gpl", "2.0"), ("gpl", "3.0"), ("lgpl", "2.0"),

@@ -17,11 +17,13 @@ container images, and commit the results back to `main`.
 domains.json                 # allowed domains -> source_repositories (owner/repo array)
 <domain>/apps.json           # GENERATED catalog (neuroimaging is the only domain today)
 <domain>/manifest.json       # GENERATED image count and source commits
+licenses/zenodo.json         # GENERATED Zenodo∩SPDX license IDs, served for neurocontainers-ui
 scripts/workflow.mjs         # CLI: checkout | run | output-paths; multi-domain orchestration
 scripts/catalog.mjs          # reads releases, builds catalog/manifest, license + DOI carry-over
 scripts/cloudflare.mjs       # Worker static-asset upload + post-deploy URL verification
 scripts/zenodo_catalog.py    # DOI CLI: plan | publish
 scripts/doi_license.py       # recipe license resolution against Zenodo's live license catalog
+scripts/zenodo_licenses.py   # writes licenses/zenodo.json (public Zenodo API, no token)
 scripts/recipe_history.py    # license = newest recipe commit declaring the image's version (local git)
 scripts/doi_metadata.py      # records-API draft metadata
 scripts/audit_doi_licenses.py# weekly read-only audit: Zenodo license vs apps.json -> JSON report
@@ -35,7 +37,7 @@ test/test_*.py               # unittest suites (zenodo_catalog, doi_licenses, re
 
 ## Generated files — do not hand-edit
 
-`*/apps.json` and `*/manifest.json` are rewritten by CI. Most
+`*/apps.json`, `*/manifest.json` and `licenses/zenodo.json` are rewritten by CI. Most
 commits on `main` are bot commits ("Update domain apps catalogs from container
 releases", "Add published DOI metadata ..."). Fix data problems in the source
 repository's recipes / release JSON, or fix the generator here. When a
@@ -81,6 +83,13 @@ and keep unrelated regenerated diffs out of code PRs.
   for their version. The weekly audit
   compares each Zenodo record with apps.json only (no recipe calls),
   using `doi_license.same_rights`. A Zenodo failure must not block catalog updates.
+- `licenses/zenodo.json` lists Zenodo license IDs that are also non-deprecated
+  SPDX IDs in Python `packaging` (what the neurocontainers builder accepts), in
+  SPDX casing, plus `deprecated_aliases` from `DEPRECATED_SPDX`. The
+  neurocontainers-ui editor fetches it from the Worker and treats anything else
+  as a custom license. DOI publication still validates against Zenodo live.
+  A Cloudflare deploy replaces every asset, so `catalogAssets` always ships
+  this file with the catalogs; never publish it on its own.
 - Zenodo is used through its records API (InvenioRDM). Always send
   `Accept: application/vnd.inveniordm.v1+json` (otherwise `/api/user/records`
   answers in the legacy format with one license and no `pids`), write `rights`
@@ -94,7 +103,7 @@ All catalog-writing workflows share the `apps-catalog` concurrency group.
 
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → commit outputs → Cloudflare publish |
+| `consolidate.yml` | daily 02:25 UTC, manual | checkout sources → `npm run consolidate` → refresh `licenses/zenodo.json` (failure keeps the old file) → commit outputs → Cloudflare publish |
 | `publish-dois.yml` | daily 04:25 UTC, manual | Python tests → plan every missing licensed image (others skipped and listed; `limit` input for a smoke test) into ≤6 batches (`PUBLISH_JOBS`) → matrix publish, 6 in parallel, no new upload after 5 h (skipped when nothing is missing) |
 | `audit-doi-licenses.yml` | Sundays 05:00 UTC, manual | read-only audit, uploads JSON artifact |
 | `backfill-zenodo-rights.yml` | manual only | dry run by default; `apply` edits `verified_legacy` records' license list (same DOI) |
