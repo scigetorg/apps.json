@@ -240,3 +240,15 @@ test("verifies public bytes, content type, and CORS after deployment", async () 
     /Could not verify .*access-control-allow-origin mismatch \(missing\)/,
   );
 });
+
+test("ships the Zenodo license list with the catalogs when present", async () => {
+  const root = await fixture();
+  assert.equal((await catalogAssets(root)).has("/licenses/zenodo.json"), false);
+  await mkdir(join(root, "licenses"));
+  const list = JSON.stringify({ licenses: [{ id: "MIT" }] });
+  await writeFile(join(root, "licenses", "zenodo.json"), list);
+  const assets = await catalogAssets(root);
+  assert.equal(assets.get("/licenses/zenodo.json").bytes.toString(), list);
+  await writeFile(join(root, "licenses", "zenodo.json"), '{"licenses": []}');
+  await assert.rejects(catalogAssets(root), /must list licenses/);
+});

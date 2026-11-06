@@ -18,6 +18,7 @@ not generated `apps.json` files.
  │                   └─ licenses: every image, from recipe git history             │
  │                                → newest commit declaring its version            │
  │  ─► write <domain>/apps.json + manifest.json                                    │
+ │  ─► refresh licenses/zenodo.json from Zenodo ∩ SPDX (failure keeps old file)    │
  │  ─► commit + push main ─► publish to Cloudflare Worker                          │
  └─────────────────────────────────────────────────────────────────────────────────┘
                               │ apps.json on main
@@ -221,7 +222,10 @@ CVMFS. Unreferenced SIFs older than 7 days are deleted from Nectar and S3.
 ## Publish on Cloudflare Workers
 
 The workflow commits the generated catalogs, then publishes every configured
-domain as a Worker static asset at `/<domain>/apps.json`. If the push fails,
+domain as a Worker static asset at `/<domain>/apps.json`, together with
+`/licenses/zenodo.json`: the license IDs a recipe can use and still get a DOI
+(Zenodo's catalogue intersected with the SPDX IDs the builder accepts). The
+neurocontainers-ui recipe editor reads that list. If the push fails,
 nothing is published. The GitHub
 repository remains the source of truth. Cloudflare serves the latest deployed
 catalog.
