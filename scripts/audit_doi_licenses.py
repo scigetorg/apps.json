@@ -9,9 +9,8 @@ afterwards, between each Zenodo record and the catalog entry for its title.
         │ title in apps.json?  no → skipped (retired image; DOI stays)
         ▼
     rights_from_catalog(apps.json) ─► same rights? ─► verified
-        │                               └─ one license (an other-* category or one of
-        │                                  apps.json's) where apps.json has more → verified_legacy
-        │                               └─ otherwise                       → mismatch
+        │                               └─ one license (old pipeline)    → verified_legacy
+        │                               └─ several, differing            → mismatch
         └ no license ─► no_catalog_license
 """
 
@@ -21,9 +20,38 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .doi_license import rights_from_catalog, rights_key
+from .doi_license import license_equivalence_key, rights_from_catalog, rights_key
 from .license_terms import OTHER_IDS
 from .zenodo_catalog import build_session, catalog_artifacts, record_doi, user_records
+
+# Zenodo's default license for software deposited without one. neurocommand's old
+# publish-doi.py sent no license when a recipe had no `copyright`, so a lone
+# cc-by-4.0 that apps.json does not list is that default, not a statement.
+ZENODO_DEFAULT = ("id", license_equivalence_key("cc-by-4.0"))
+PLACEHOLDERS = {("id", license_equivalence_key(other)) for other in OTHER_IDS}
+
+
+def legacy_reason(published_key, expected_key):
+    """Why a one-license record is a legacy-pipeline artefact, or None.
+
+    neurocommand's publish-doi.py (deposit API, one license per record) sent:
+    other-at when it failed to read the recipe, other-open for a name-only first
+    entry, other-closed for matlab, nothing (-> Zenodo's cc-by-4.0) without
+    copyright, and otherwise only the first license of the recipe on main at the
+    time, not the published version's. So any one-license record is replaced by
+    apps.json (recipe history); records with several licenses that differ stay a
+    mismatch, since only the records API could have written them.
+    """
+    if len(published_key) != 1 or not expected_key:
+        return None
+    (single,) = published_key
+    if single in PLACEHOLDERS:
+        return "legacy placeholder category"
+    if single == ZENODO_DEFAULT and single not in expected_key:
+        return "Zenodo's default license (none was sent)"
+    if published_key < expected_key:
+        return "legacy one-license record, a subset of apps.json"
+    return "legacy one-license record (the old pipeline read the first license of the recipe on main)"
 
 
 def describe(rights):
@@ -60,13 +88,9 @@ def audit_record(record, entry):
     published_key, expected_key = rights_key(published), rights_key(expected)
     if published_key == expected_key:
         row.update(status="verified", problems=[])
-    elif (len(published_key) == 1 and (len(expected_key) > 1 or any(kind == "custom" for kind, *_ in expected_key))
-          and (published_key < expected_key
-               or next(iter(published_key)) in {("id", other) for other in OTHER_IDS})):
-        # Published through the legacy API, which allowed one license per record:
-        # either collapsed to an other-* category or kept one of the real ones.
-        # The backfill writes the full list, adding licenses without removing any.
-        row.update(status="verified_legacy", problems=[])
+    elif reason := legacy_reason(published_key, expected_key):
+        # The backfill replaces it with apps.json's licenses (recipe history).
+        row.update(status="verified_legacy", problems=[], reason=reason)
     else:
         row.update(status="mismatch", problems=[
             f"Zenodo licenses {row['published_license']!r} differ from apps.json {row['catalog_license']!r}"

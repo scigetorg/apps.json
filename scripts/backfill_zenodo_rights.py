@@ -1,9 +1,10 @@
 """Backfill full license lists onto records published with one legacy license.
 
-The legacy deposit API allowed one license per record, so images with several
-or custom licenses were published as a single `other-*` category or one of them.
-This edits exactly the audit's `verified_legacy` records so their `rights`
-list every license from apps.json. Nothing else changes: same record, DOI,
+neurocommand's old pipeline (deposit API) gave each record one license, often a
+placeholder: an `other-*` category, Zenodo's default `cc-by-4.0` when none was
+sent, or just the first of several. This edits exactly the audit's
+`verified_legacy` records so their `rights` are apps.json's licenses (recipe
+history); the placeholder is replaced, not kept. Nothing else changes: same record, DOI,
 version and files. Dry run by default; `--apply` writes.
 
     audit_rows(apps.json, /api/user/records) ─► status verified_legacy
@@ -102,7 +103,8 @@ def main():
           f"{'' if args.apply else ' (dry run, nothing is written)'}", flush=True)
     updated, failures = 0, 0
     for row in targets:
-        line = f"{row['title']} {row['doi_url']}: {row['published_license']} -> {row['catalog_license']}"
+        line = (f"{row['title']} {row['doi_url']}: {row['published_license']} -> "
+                f"{row['catalog_license']} ({row['reason']})")
         try:
             expected = rights_from_catalog(artifacts[row["title"]])
             if unknown := unknown_ids(expected, catalogue):
