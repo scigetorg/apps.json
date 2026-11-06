@@ -261,10 +261,17 @@ class DoiLicenseTests(unittest.TestCase):
     def test_audit_accepts_single_other_category_from_legacy_publication(self):
         for entry in ({"license": ["Apache-2.0", "MIT"]},
                       {"license": ["Research terms"], "license_details": DETAILS}):
-            for other in ("other-open", "other-closed"):
+            for other in ("other-open", "other-closed", "other-at"):
                 row = audit_record(record([{"id": other}]), entry)
                 self.assertEqual(row["status"], "verified_legacy", (entry, other))
         row = audit_record(record([{"id": "other-open"}]), {"license": ["MIT"]})
+        self.assertEqual(row["status"], "mismatch")
+        # The legacy API also kept one real license of several (dsistudio).
+        entry = {"license": ["CC-BY-NC-SA-4.0", "LGPL-3.0"]}
+        row = audit_record(record([{"id": "cc-by-nc-sa-4.0"}]), entry)
+        self.assertEqual(row["status"], "verified_legacy")
+        # A single license apps.json does not list is a real disagreement.
+        row = audit_record(record([{"id": "mit"}]), entry)
         self.assertEqual(row["status"], "mismatch")
 
     def test_audit_flags_rights_that_differ_from_apps_json(self):
@@ -272,7 +279,8 @@ class DoiLicenseTests(unittest.TestCase):
         self.assertEqual(row["status"], "mismatch")
         self.assertEqual(row["catalog_license"], ["mit"])
         self.assertIn("apache-2.0", row["problems"][0])
-        row = audit_record(record([{"id": "mit"}]), {"license": ["Apache-2.0", "MIT"]})
+        row = audit_record(record([{"id": "apache-2.0"}, {"id": "gpl-3.0-only"}]),
+                           {"license": ["Apache-2.0", "MIT"]})
         self.assertEqual(row["status"], "mismatch")
         row = audit_record(record([{"id": "other-open"}]), {
             "license": ["other-open"], "license_details": [{"license": "other-open"}]})
