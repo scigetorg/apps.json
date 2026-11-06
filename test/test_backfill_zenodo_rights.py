@@ -50,13 +50,17 @@ def edit_session(update=None, publish=None):
     return session
 
 
-def run(*argv, session=None):
+ZENODO_IDS = {"mit": {}, "gpl-2.0-only": {}, "lgpl-2.1-only": {}}
+
+
+def run(*argv, session=None, artifacts=ARTIFACTS, records=RECORDS):
     session = session or edit_session()
     with (patch("sys.argv", ["backfill", *argv]),
           patch.dict("os.environ", {"ZENODO_TOKEN": "token"}, clear=True),
           patch.object(backfill, "build_session", return_value=session),
-          patch.object(backfill, "catalog_artifacts", return_value=ARTIFACTS),
-          patch.object(backfill, "user_records", return_value=RECORDS)):
+          patch.object(backfill, "catalog_artifacts", return_value=artifacts),
+          patch.object(backfill, "user_records", return_value=records),
+          patch.object(backfill, "fetch_catalogue", return_value={"entries": ZENODO_IDS})):
         return backfill.main(), session
 
 
@@ -92,6 +96,33 @@ class BackfillTests(unittest.TestCase):
         self.assertEqual(code, 1)
         session.delete.assert_called_once()
         self.assertEqual(session.delete.call_args.args[0], f"{ZENODO_API}/records/12/draft")
+
+    def test_deprecated_spdx_ids_are_written_as_zenodo_ids(self):
+        # civet: apps.json lists GPL-2.0 and LGPL-2.1; Zenodo only knows -only/-or-later
+        # and answers "400 Invalid value gpl-2.0." to the old spelling.
+        artifacts = {TITLE: {"license": ["GPL-2.0", "LGPL-2.1", "Research terms"],
+                             "license_details": DETAILS}}
+        expected = [{"id": "gpl-2.0-only"}, {"id": "lgpl-2.1-only"},
+                    {"title": {"en": "Research terms"}, "link": "https://example.org/terms"}]
+        code, session = run("--apply", artifacts=artifacts, session=edit_session(
+            publish=reply(record(expected))))
+        self.assertEqual(code, 0)
+        self.assertEqual(session.put.call_args.kwargs["json"]["metadata"]["rights"], expected)
+
+    def test_unknown_license_id_fails_before_any_write(self):
+        artifacts = {TITLE: {"license": ["Odd-1.0", "Research terms"], "license_details": DETAILS}}
+        for argv in ((), ("--apply",)):
+            with patch("sys.stderr") as stderr:
+                code, session = run(*argv, artifacts=artifacts)
+            self.assertEqual(code, 1, argv)
+            session.post.assert_not_called()
+            self.assertIn("not Zenodo license IDs: ['odd-1.0']",
+                          "".join(str(c.args[0]) for c in stderr.write.call_args_list))
+
+    def test_zenodo_error_message_is_reported(self):
+        rejected = reply({"status": 400, "message": "Invalid value gpl-2.0."}, status=400)
+        with self.assertRaisesRegex(Exception, "HTTP 400 from Zenodo: Invalid value gpl-2.0."):
+            backfill.raise_for_zenodo(rejected)
 
     def test_changed_doi_after_publish_is_a_failure(self):
         changed = record(EXPECTED)

@@ -297,7 +297,8 @@ def resolve_recipe_license(recipe, catalogue):
 def rights_from_catalog(entry):
     """Rebuild bare `rights` from an apps.json entry's license and license_details.
 
-    Catalogue IDs keep the recipe's spelling; compare with same_rights.
+    Deprecated SPDX IDs (gpl-2.0, lgpl-2.1, ...) map to Zenodo's IDs as in
+    resolve_recipe_license; Zenodo rejects the old spellings ("Invalid value").
     """
     custom = [detail for detail in entry.get("license_details") or []
               if is_custom_term(detail.get("license"))]
@@ -314,6 +315,7 @@ def rights_from_catalog(entry):
     for value in ids:
         if is_custom_term(value):
             raise ValueError(f"apps.json has no license_details (name and URL) for {value!r}")
+    ids = sorted({DEPRECATED_SPDX.get(value, value) for value in ids})
     return [{"id": value} for value in ids] + rights
 
 
