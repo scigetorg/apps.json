@@ -130,6 +130,10 @@ class DoiLicenseTests(unittest.TestCase):
                          [{"title": {"en": "Research terms"}, "link": "https://example.org/terms"}])
         self.assertEqual(declared_licenses({"copyright": [terms]}), ["Research terms"])
 
+    def test_catalog_rights_use_current_zenodo_ids_for_deprecated_spdx(self):
+        self.assertEqual(doi_license.rights_from_catalog({"license": ["GPL-2.0", "LGPL-2.1", "MIT"]}),
+                         [{"id": "gpl-2.0-only"}, {"id": "lgpl-2.1-only"}, {"id": "mit"}])
+
     def test_custom_terms_are_listed_by_name_in_apps_json(self):
         terms = {"license": "other-closed", "name": "FSL license", "url": "https://example.org/fsl"}
         recipe = {"copyright": [{"license": "MIT", "name": "MIT License"}, terms,

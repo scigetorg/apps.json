@@ -21,7 +21,7 @@ from pathlib import Path
 import requests
 
 from .audit_doi_licenses import audit_rows
-from .doi_license import rights_from_catalog, same_rights
+from .doi_license import fetch_catalogue, rights_from_catalog, same_rights
 from .zenodo_catalog import (
     RDM_JSON, ZENODO_API, build_session, catalog_artifacts, raise_draft_errors,
     record_doi, user_records,
@@ -36,21 +36,37 @@ def legacy_targets(artifacts, records, titles=None):
             if row["status"] == "verified_legacy" and (not titles or row["title"] in titles)]
 
 
+def raise_for_zenodo(response):
+    """raise_for_status, keeping Zenodo's own explanation (e.g. "Invalid value gpl-2.0.")."""
+    if response.status_code >= 400:
+        try:
+            detail = response.json()
+            detail = detail.get("message") or detail.get("errors") or detail
+        except ValueError:
+            detail = response.text[:300]
+        raise requests.HTTPError(f"HTTP {response.status_code} from Zenodo: {detail}", response=response)
+
+
+def unknown_ids(rights, catalogue):
+    """License IDs Zenodo's live catalogue does not know (they would be rejected)."""
+    return sorted(right["id"] for right in rights if right.get("id") and right["id"] not in catalogue)
+
+
 def replace_rights(session, record_id, rights):
     """Edit one published record so its rights are exactly `rights`; return it."""
     headers = {"Accept": RDM_JSON}
     draft_url = f"{ZENODO_API}/records/{record_id}/draft"
     opened = session.post(draft_url, headers=headers, timeout=(15, 60))
-    opened.raise_for_status()
+    raise_for_zenodo(opened)
     try:
         draft = opened.json()
         draft["metadata"]["rights"] = rights
         updated = session.put(draft_url, json={key: draft[key] for key in EDITABLE if key in draft},
                               headers=headers, timeout=(15, 60))
-        updated.raise_for_status()
+        raise_for_zenodo(updated)
         raise_draft_errors(updated.json())
         published = session.post(f"{draft_url}/actions/publish", headers=headers, timeout=(15, 120))
-        published.raise_for_status()
+        raise_for_zenodo(published)
     except Exception:
         try:
             session.delete(draft_url, headers=headers, timeout=(15, 60))
@@ -77,6 +93,8 @@ def main():
     session = build_session(token)
     artifacts = catalog_artifacts(args.catalog_root)
     targets = legacy_targets(artifacts, user_records(session), set(args.title))
+    # Checked in the dry run too, so IDs Zenodo would reject show up before --apply.
+    catalogue = fetch_catalogue()["entries"]
     total = len(targets)
     if args.limit:
         targets = targets[:args.limit]
@@ -85,11 +103,13 @@ def main():
     updated, failures = 0, 0
     for row in targets:
         line = f"{row['title']} {row['doi_url']}: {row['published_license']} -> {row['catalog_license']}"
-        if not args.apply:
-            print(f"would update {line}", flush=True)
-            continue
         try:
             expected = rights_from_catalog(artifacts[row["title"]])
+            if unknown := unknown_ids(expected, catalogue):
+                raise ValueError(f"not Zenodo license IDs: {unknown} (fix the recipe license)")
+            if not args.apply:
+                print(f"would update {line}", flush=True)
+                continue
             record = replace_rights(session, row["id"], expected)
             raise_draft_errors(record)
             doi = record_doi(record)
