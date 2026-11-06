@@ -10,12 +10,13 @@ from urllib.parse import urlsplit
 
 import requests
 
-from .license_terms import is_custom_term
+from .license_terms import OTHER_IDS, is_custom_term
 
 
 CATALOGUE_URL = "https://zenodo.org/api/licenses/"
-OTHER_IDS = {"other-open", "other-closed"}
 UNKNOWN_NAMES = {"none", "unknown", "noassertion"}
+# The "Other" categories offered when a recipe license needs review.
+SUGGESTED_OTHER_IDS = frozenset({"other-open", "other-closed"})
 # Deprecated SPDX IDs that Zenodo's legacy deposit API accepted, mapped to the
 # IDs in its current catalogue so already-published recipes stay valid.
 DEPRECATED_SPDX = {
@@ -135,7 +136,7 @@ def fetch_catalogue():
         page += 1
         if page > 100:
             raise CatalogueError("Zenodo license catalogue pagination did not finish")
-    if not entries or not OTHER_IDS.issubset(entries):
+    if not entries or not SUGGESTED_OTHER_IDS.issubset(entries):
         raise CatalogueError("Zenodo license catalogue is empty or lacks Other categories")
     return {"fetched_at": datetime.now(timezone.utc).isoformat(), "entries": entries}
 
@@ -144,7 +145,7 @@ def load_catalogue(path):
     with open(path, encoding="utf-8") as stream:
         payload = json.load(stream)
     entries = payload.get("entries")
-    if not isinstance(entries, dict) or not OTHER_IDS.issubset(entries):
+    if not isinstance(entries, dict) or not SUGGESTED_OTHER_IDS.issubset(entries):
         raise CatalogueError("Downloaded Zenodo license catalogue is incomplete")
     return entries
 
@@ -203,7 +204,7 @@ def suggest_licenses(value, url, catalogue):
     if len(candidates) < 3 and (
         not candidates or value.lower().startswith("licenseref-") or value.lower() in {"custom", "custome"}
     ):
-        for category in sorted(OTHER_IDS):
+        for category in sorted(SUGGESTED_OTHER_IDS):
             if category in catalogue and not any(row["id"] == category for row in candidates):
                 candidates.append({"id": category, "title": catalogue[category]["title"], "reason": "custom terms; choose after review"})
                 if len(candidates) == 3:
@@ -224,8 +225,8 @@ def custom_right(name, url):
 def resolve_recipe_license(recipe, catalogue):
     """Return the recipe's licenses as Zenodo `rights` entries, one per copyright entry.
 
-    A catalogue license becomes {"id": ...}; custom terms (a name, other-open/
-    other-closed or LicenseRef-) become {"title", "link"} and need a name and URL.
+    A catalogue license becomes {"id": ...}; custom terms (a name, an other-*
+    category or LicenseRef-) become {"title", "link"} and need a name and URL.
     Write these bare forms: Zenodo rejects its own expanded entries on update.
     """
     copyrights = recipe.get("copyright") if isinstance(recipe, dict) else None

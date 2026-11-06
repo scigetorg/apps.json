@@ -9,7 +9,7 @@ afterwards, between each Zenodo record and the catalog entry for its title.
         │ title in apps.json?  no → skipped (retired image; DOI stays)
         ▼
     rights_from_catalog(apps.json) ─► same rights? ─► verified
-        │                               └─ one license (other-open/closed/at or one of
+        │                               └─ one license (an other-* category or one of
         │                                  apps.json's) where apps.json has more → verified_legacy
         │                               └─ otherwise                       → mismatch
         └ no license ─► no_catalog_license
@@ -21,12 +21,9 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .doi_license import OTHER_IDS, rights_from_catalog, rights_key
+from .doi_license import rights_from_catalog, rights_key
+from .license_terms import OTHER_IDS
 from .zenodo_catalog import build_session, catalog_artifacts, record_doi, user_records
-
-# Catch-all categories the legacy deposit API used when a record could carry only
-# one license: "Other (Open)", "Other (Closed)", "Other (Attribution)".
-LEGACY_CATEGORIES = OTHER_IDS | {"other-at"}
 
 
 def describe(rights):
@@ -65,9 +62,9 @@ def audit_record(record, entry):
         row.update(status="verified", problems=[])
     elif (len(published_key) == 1 and (len(expected_key) > 1 or any(kind == "custom" for kind, *_ in expected_key))
           and (published_key < expected_key
-               or next(iter(published_key)) in {("id", other) for other in LEGACY_CATEGORIES})):
+               or next(iter(published_key)) in {("id", other) for other in OTHER_IDS})):
         # Published through the legacy API, which allowed one license per record:
-        # either collapsed to other-open/other-closed or kept one of the real ones.
+        # either collapsed to an other-* category or kept one of the real ones.
         # The backfill writes the full list, adding licenses without removing any.
         row.update(status="verified_legacy", problems=[])
     else:
