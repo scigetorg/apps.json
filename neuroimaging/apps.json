@@ -632,7 +632,16 @@
                 "version": "20210105",
                 "exec": "",
                 "image": "ashs_2.0.0",
-                "doi": "https://doi.org/10.5281/zenodo.18932049"
+                "doi": "https://doi.org/10.5281/zenodo.18932049",
+                "license": [
+                    "GNU General Public License (version unspecified)"
+                ],
+                "license_details": [
+                    {
+                        "name": "GNU General Public License (version unspecified)",
+                        "url": "https://www.nitrc.org/projects/ashs/"
+                    }
+                ]
             }
         },
         "categories": [
@@ -948,7 +957,16 @@
                 "version": "20230613",
                 "exec": "",
                 "image": "bidsappaa_0.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.18931280"
+                "doi": "https://doi.org/10.5281/zenodo.18931280",
+                "license": [
+                    "Automatic Analysis Software Licence Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "Automatic Analysis Software Licence Agreement",
+                        "url": "https://github.com/bids-apps/aa/blob/master/license.txt"
+                    }
+                ]
             }
         },
         "categories": [
@@ -961,7 +979,10 @@
                 "version": "20230612",
                 "exec": "",
                 "image": "bidsappbaracus_1.1.4",
-                "doi": "https://doi.org/10.5281/zenodo.18931481"
+                "doi": "https://doi.org/10.5281/zenodo.18931481",
+                "license": [
+                    "Apache-2.0"
+                ]
             }
         },
         "categories": [
@@ -982,7 +1003,10 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidsappbrainsuite_23a",
-                "doi": "https://doi.org/10.5281/zenodo.22730985"
+                "doi": "https://doi.org/10.5281/zenodo.22730985",
+                "license": [
+                    "GPL-2.0-only"
+                ]
             }
         },
         "categories": [
@@ -996,7 +1020,26 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidsapphcppipelines_4.3.0",
-                "doi": "https://doi.org/10.5281/zenodo.21436264"
+                "doi": "https://doi.org/10.5281/zenodo.21436264",
+                "license": [
+                    "FSL Software License",
+                    "FreeSurfer Software License Agreement",
+                    "HCP Pipelines license"
+                ],
+                "license_details": [
+                    {
+                        "name": "HCP Pipelines license",
+                        "url": "https://github.com/Washington-University/HCPpipelines/blob/master/LICENSE.md"
+                    },
+                    {
+                        "name": "FreeSurfer Software License Agreement",
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                    },
+                    {
+                        "name": "FSL Software License",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/#/license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -1063,7 +1106,11 @@
                 "version": "20230629",
                 "exec": "",
                 "image": "bidsappspm_0.0.20",
-                "doi": "https://doi.org/10.5281/zenodo.18931549"
+                "doi": "https://doi.org/10.5281/zenodo.18931549",
+                "license": [
+                    "Apache-2.0",
+                    "GPL-2.0-or-later"
+                ]
             }
         },
         "categories": [
@@ -1425,7 +1472,33 @@
                 "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "bidstools_1.3.0"
+                "image": "bidstools_1.3.0",
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "Bru2Nii Perl license",
+                    "DCMTK copyright and license"
+                ],
+                "license_details": [
+                    {
+                        "license": "Apache-2.0",
+                        "name": "HeuDiConv license",
+                        "url": "https://github.com/nipy/heudiconv/blob/master/LICENSE"
+                    },
+                    {
+                        "license": "BSD-2-Clause",
+                        "name": "dcm2niix license",
+                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
+                    },
+                    {
+                        "name": "DCMTK copyright and license",
+                        "url": "https://support.dcmtk.org/docs/file_copyright.html"
+                    },
+                    {
+                        "name": "Bru2Nii Perl license",
+                        "url": "https://github.com/neurolabusc/Bru2Nii?tab=readme-ov-file#license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -1445,7 +1518,33 @@
                 "version": "20261030",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "bidstools_arm64_1.3.0"
+                "image": "bidstools_arm64_1.3.0",
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "Bru2Nii Perl license",
+                    "DCMTK copyright and license"
+                ],
+                "license_details": [
+                    {
+                        "license": "Apache-2.0",
+                        "name": "HeuDiConv license",
+                        "url": "https://github.com/nipy/heudiconv/blob/master/LICENSE"
+                    },
+                    {
+                        "license": "BSD-2-Clause",
+                        "name": "dcm2niix license",
+                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
+                    },
+                    {
+                        "name": "DCMTK copyright and license",
+                        "url": "https://support.dcmtk.org/docs/file_copyright.html"
+                    },
+                    {
+                        "name": "Bru2Nii Perl license",
+                        "url": "https://github.com/neurolabusc/Bru2Nii?tab=readme-ov-file#license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -2197,7 +2296,12 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cartool_5.06.05",
-                "doi": "https://doi.org/10.5281/zenodo.22984839"
+                "doi": "https://doi.org/10.5281/zenodo.22984839",
+                "license": [
+                    "Apache-2.0",
+                    "CC-BY-NC-ND-4.0",
+                    "CC-BY-NC-SA-4.0"
+                ]
             }
         },
         "categories": [
@@ -2355,7 +2459,22 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cbsb0stats_1.4.0",
-                "doi": "https://doi.org/10.5281/zenodo.22851308"
+                "doi": "https://doi.org/10.5281/zenodo.22851308",
+                "license": [
+                    "FSL Software License",
+                    "MIT"
+                ],
+                "license_details": [
+                    {
+                        "license": "MIT",
+                        "name": "NeuroContainers integration",
+                        "url": "https://github.com/NeuroDesk/neurocontainers/blob/main/LICENSE"
+                    },
+                    {
+                        "name": "FSL Software License",
+                        "url": "https://fsl.fmrib.ox.ac.uk/fsl/docs/#/license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -2498,7 +2617,10 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "clinica_0.12.0",
-                "doi": "https://doi.org/10.5281/zenodo.23129754"
+                "doi": "https://doi.org/10.5281/zenodo.23129754",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -2671,13 +2793,19 @@
                 "version": "20231115",
                 "exec": "conn",
                 "image": "conn_22a",
-                "doi": "https://doi.org/10.5281/zenodo.18931910"
+                "doi": "https://doi.org/10.5281/zenodo.18931910",
+                "license": [
+                    "MIT"
+                ]
             },
             "conn 22a": {
                 "version": "20231115",
                 "exec": "",
                 "image": "conn_22a",
-                "doi": "https://doi.org/10.5281/zenodo.18931910"
+                "doi": "https://doi.org/10.5281/zenodo.18931910",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -2765,14 +2893,20 @@
                 "exec": "",
                 "apptainer_args": [],
                 "architecture": "aarch64",
-                "image": "cosmomvpa_1.1.0_arm64"
+                "image": "cosmomvpa_1.1.0_arm64",
+                "license": [
+                    "MIT"
+                ]
             },
             "cosmomvpa 1.1.0": {
                 "version": "20260512",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cosmomvpa_1.1.0",
-                "doi": "https://doi.org/10.5281/zenodo.20685637"
+                "doi": "https://doi.org/10.5281/zenodo.20685637",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -3268,13 +3402,7 @@
                 "image": "dcm2niix_v1.0.20261029",
                 "doi": "https://doi.org/10.5281/zenodo.23995584",
                 "license": [
-                    "dcm2niix license"
-                ],
-                "license_details": [
-                    {
-                        "name": "dcm2niix license",
-                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
-                    }
+                    "BSD-2-Clause"
                 ]
             }
         },
@@ -3307,13 +3435,7 @@
                 "image": "dcm2niix_arm64_v1.0.20261029",
                 "doi": "https://doi.org/10.5281/zenodo.23995572",
                 "license": [
-                    "dcm2niix license"
-                ],
-                "license_details": [
-                    {
-                        "name": "dcm2niix license",
-                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
-                    }
+                    "BSD-2-Clause"
                 ]
             }
         },
@@ -3765,17 +3887,13 @@
                 "image": "dicomtools_1.1.0",
                 "doi": "https://doi.org/10.5281/zenodo.23995604",
                 "license": [
-                    "dcm2niix license",
-                    "dcmtk license"
+                    "BSD-2-Clause",
+                    "DCMTK copyright and license"
                 ],
                 "license_details": [
                     {
-                        "name": "dcmtk license",
+                        "name": "DCMTK copyright and license",
                         "url": "https://support.dcmtk.org/docs/file_copyright.html"
-                    },
-                    {
-                        "name": "dcm2niix license",
-                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
                     }
                 ]
             }
@@ -3793,17 +3911,13 @@
                 "image": "dicomtools_arm64_1.1.0",
                 "doi": "https://doi.org/10.5281/zenodo.23995864",
                 "license": [
-                    "dcm2niix license",
-                    "dcmtk license"
+                    "BSD-2-Clause",
+                    "DCMTK copyright and license"
                 ],
                 "license_details": [
                     {
-                        "name": "dcmtk license",
+                        "name": "DCMTK copyright and license",
                         "url": "https://support.dcmtk.org/docs/file_copyright.html"
-                    },
-                    {
-                        "name": "dcm2niix license",
-                        "url": "https://github.com/rordenlab/dcm2niix/blob/master/license.txt"
                     }
                 ]
             }
@@ -3818,7 +3932,16 @@
                 "version": "20220303",
                 "exec": "",
                 "image": "diffusiontoolkit_0.6.4.1",
-                "doi": "https://doi.org/10.5281/zenodo.18931573"
+                "doi": "https://doi.org/10.5281/zenodo.18931573",
+                "license": [
+                    "TrackVis and Diffusion Toolkit Academic Research End-User Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "TrackVis and Diffusion Toolkit Academic Research End-User Software License Agreement",
+                        "url": "https://trackvis.org/docs/?subsect=license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -5323,14 +5446,20 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "gimp_2.10.36",
-                "doi": "https://doi.org/10.5281/zenodo.22731002"
+                "doi": "https://doi.org/10.5281/zenodo.22731002",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
             },
             "gimpGUI-gimp 2.10.36": {
                 "version": "20260911",
                 "exec": "gimp",
                 "apptainer_args": [],
                 "image": "gimp_2.10.36",
-                "doi": "https://doi.org/10.5281/zenodo.22731002"
+                "doi": "https://doi.org/10.5281/zenodo.22731002",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
             }
         },
         "categories": [
@@ -5344,14 +5473,20 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "gimp_arm64_2.10.36",
-                "doi": "https://doi.org/10.5281/zenodo.22851370"
+                "doi": "https://doi.org/10.5281/zenodo.22851370",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
             },
             "gimpGUI-gimp_arm64 2.10.36": {
                 "version": "20260911",
                 "exec": "gimp",
                 "apptainer_args": [],
                 "image": "gimp_arm64_2.10.36",
-                "doi": "https://doi.org/10.5281/zenodo.22851370"
+                "doi": "https://doi.org/10.5281/zenodo.22851370",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
             }
         },
         "categories": [
@@ -5966,14 +6101,34 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "ilastik_1.4.2",
-                "doi": "https://doi.org/10.5281/zenodo.23129999"
+                "doi": "https://doi.org/10.5281/zenodo.23129999",
+                "license": [
+                    "GPL-2.0-or-later"
+                ],
+                "license_details": [
+                    {
+                        "license": "GPL-2.0-or-later",
+                        "name": "ilastik GPL with extension exception",
+                        "url": "https://www.ilastik.org/about"
+                    }
+                ]
             },
             "ilastikGUI-ilastik 1.4.2": {
                 "version": "20260928",
                 "exec": "run_ilastik.sh",
                 "apptainer_args": [],
                 "image": "ilastik_1.4.2",
-                "doi": "https://doi.org/10.5281/zenodo.23129999"
+                "doi": "https://doi.org/10.5281/zenodo.23129999",
+                "license": [
+                    "GPL-2.0-or-later"
+                ],
+                "license_details": [
+                    {
+                        "license": "GPL-2.0-or-later",
+                        "name": "ilastik GPL with extension exception",
+                        "url": "https://www.ilastik.org/about"
+                    }
+                ]
             }
         },
         "categories": [
@@ -6123,7 +6278,10 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "jidt_1.6.1",
-                "doi": "https://doi.org/10.5281/zenodo.23129885"
+                "doi": "https://doi.org/10.5281/zenodo.23129885",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
             },
             "jidt 1.6": {
                 "version": "20260608",
@@ -7442,7 +7600,22 @@
                 "version": "20261101",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "metabody_1.0.5"
+                "image": "metabody_1.0.5",
+                "license": [
+                    "AFNI license and exceptions",
+                    "MIT"
+                ],
+                "license_details": [
+                    {
+                        "license": "MIT",
+                        "name": "NeuroDesk Metabody integration",
+                        "url": "https://github.com/NeuroDesk/neurocontainers/blob/main/LICENSE"
+                    },
+                    {
+                        "name": "AFNI license and exceptions",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
             }
         },
         "categories": [
@@ -7481,25 +7654,81 @@
                 "version": "20230313",
                 "exec": "",
                 "image": "mgltools_1.5.7",
-                "doi": "https://doi.org/10.5281/zenodo.18932145"
+                "doi": "https://doi.org/10.5281/zenodo.18932145",
+                "license": [
+                    "MGLTools license agreements",
+                    "MSMS academic use terms"
+                ],
+                "license_details": [
+                    {
+                        "name": "MGLTools license agreements",
+                        "url": "https://ccsb.scripps.edu/mgltools/downloads/"
+                    },
+                    {
+                        "name": "MSMS academic use terms",
+                        "url": "https://ccsb.scripps.edu/msms/license/"
+                    }
+                ]
             },
             "pmvGUI-mgltools 1.5.7": {
                 "version": "20230313",
                 "exec": "pmv",
                 "image": "mgltools_1.5.7",
-                "doi": "https://doi.org/10.5281/zenodo.18932145"
+                "doi": "https://doi.org/10.5281/zenodo.18932145",
+                "license": [
+                    "MGLTools license agreements",
+                    "MSMS academic use terms"
+                ],
+                "license_details": [
+                    {
+                        "name": "MGLTools license agreements",
+                        "url": "https://ccsb.scripps.edu/mgltools/downloads/"
+                    },
+                    {
+                        "name": "MSMS academic use terms",
+                        "url": "https://ccsb.scripps.edu/msms/license/"
+                    }
+                ]
             },
             "visionGUI-mgltools 1.5.7": {
                 "version": "20230313",
                 "exec": "vision",
                 "image": "mgltools_1.5.7",
-                "doi": "https://doi.org/10.5281/zenodo.18932145"
+                "doi": "https://doi.org/10.5281/zenodo.18932145",
+                "license": [
+                    "MGLTools license agreements",
+                    "MSMS academic use terms"
+                ],
+                "license_details": [
+                    {
+                        "name": "MGLTools license agreements",
+                        "url": "https://ccsb.scripps.edu/mgltools/downloads/"
+                    },
+                    {
+                        "name": "MSMS academic use terms",
+                        "url": "https://ccsb.scripps.edu/msms/license/"
+                    }
+                ]
             },
             "adtGUI-mgltools 1.5.7": {
                 "version": "20230313",
                 "exec": "adt",
                 "image": "mgltools_1.5.7",
-                "doi": "https://doi.org/10.5281/zenodo.18932145"
+                "doi": "https://doi.org/10.5281/zenodo.18932145",
+                "license": [
+                    "MGLTools license agreements",
+                    "MSMS academic use terms"
+                ],
+                "license_details": [
+                    {
+                        "name": "MGLTools license agreements",
+                        "url": "https://ccsb.scripps.edu/mgltools/downloads/"
+                    },
+                    {
+                        "name": "MSMS academic use terms",
+                        "url": "https://ccsb.scripps.edu/msms/license/"
+                    }
+                ]
             }
         },
         "categories": [
@@ -7512,7 +7741,10 @@
                 "version": "20241030",
                 "exec": "",
                 "image": "micapipe_v0.2.3",
-                "doi": "https://doi.org/10.5281/zenodo.18931781"
+                "doi": "https://doi.org/10.5281/zenodo.18931781",
+                "license": [
+                    "GPL-3.0-only"
+                ]
             }
         },
         "categories": [
@@ -7942,6 +8174,22 @@
         },
         "categories": [
             "cryo EM"
+        ]
+    },
+    "mp2ragedenoise": {
+        "apps": {
+            "mp2ragedenoise 0.1.0": {
+                "version": "20261106",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "mp2ragedenoise_0.1.0",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "mricrogl": {
@@ -9105,7 +9353,10 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "niistat_1.0.20191216",
-                "doi": "https://doi.org/10.5281/zenodo.21200436"
+                "doi": "https://doi.org/10.5281/zenodo.21200436",
+                "license": [
+                    "GPL-2.0-only"
+                ]
             }
         },
         "categories": [
@@ -11273,7 +11524,10 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "slicegrappa_0.1.2",
-                "doi": "https://doi.org/10.5281/zenodo.22851274"
+                "doi": "https://doi.org/10.5281/zenodo.22851274",
+                "license": [
+                    "MIT"
+                ]
             }
         },
         "categories": [
@@ -11872,13 +12126,14 @@
                 "license": [
                     "Apache-2.0",
                     "LGPL-2.1-or-later",
-                    "LicenseRef-PARAPET",
                     "MIT",
-                    "MPL-2.0"
+                    "MPL-2.0",
+                    "PARAPET license"
                 ],
                 "license_details": [
                     {
                         "license": "LicenseRef-PARAPET",
+                        "name": "PARAPET license",
                         "url": "https://github.com/UCL/STIR/blob/rel_{{ context.upstream_version }}/LICENSES/PARAPET-license.txt"
                     }
                 ]
@@ -12208,7 +12463,17 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "tgvqsm_1.0.0",
-                "doi": "https://doi.org/10.5281/zenodo.20780404"
+                "doi": "https://doi.org/10.5281/zenodo.20780404",
+                "license": [
+                    "NOASSERTION"
+                ],
+                "license_details": [
+                    {
+                        "license": "NOASSERTION",
+                        "name": "TGVQSM+ distribution (no license declared)",
+                        "url": "https://www.neuroimaging.at/media/qsm/TGVQSM-plus.zip"
+                    }
+                ]
             }
         },
         "categories": [
@@ -12393,14 +12658,32 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "trackvis_0.6.1",
-                "doi": "https://doi.org/10.5281/zenodo.22168690"
+                "doi": "https://doi.org/10.5281/zenodo.22168690",
+                "license": [
+                    "TrackVis Academic Research End-User Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "TrackVis Academic Research End-User Software License Agreement",
+                        "url": "https://trackvis.org/docs/?subsect=license"
+                    }
+                ]
             },
             "trackvisGUI-trackvis 0.6.1": {
                 "version": "20260821",
                 "exec": "trackvis",
                 "apptainer_args": [],
                 "image": "trackvis_0.6.1",
-                "doi": "https://doi.org/10.5281/zenodo.22168690"
+                "doi": "https://doi.org/10.5281/zenodo.22168690",
+                "license": [
+                    "TrackVis Academic Research End-User Software License Agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "TrackVis Academic Research End-User Software License Agreement",
+                        "url": "https://trackvis.org/docs/?subsect=license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -12618,13 +12901,19 @@
                 "version": "20230428",
                 "exec": "",
                 "image": "vesselvio_1.1.2",
-                "doi": "https://doi.org/10.5281/zenodo.18932149"
+                "doi": "https://doi.org/10.5281/zenodo.18932149",
+                "license": [
+                    "GPL-3.0-only"
+                ]
             },
             "vesselvioGUI-vesselvio 1.1.2": {
                 "version": "20230428",
                 "exec": "vesselvio",
                 "image": "vesselvio_1.1.2",
-                "doi": "https://doi.org/10.5281/zenodo.18932149"
+                "doi": "https://doi.org/10.5281/zenodo.18932149",
+                "license": [
+                    "GPL-3.0-only"
+                ]
             }
         },
         "categories": [
@@ -12736,14 +13025,20 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "voreen_5.3.0",
-                "doi": "https://doi.org/10.5281/zenodo.21753718"
+                "doi": "https://doi.org/10.5281/zenodo.21753718",
+                "license": [
+                    "GPL-2.0-only"
+                ]
             },
             "voreenGUI-voreen 5.3.0": {
                 "version": "20260722",
                 "exec": "voreenve",
                 "apptainer_args": [],
                 "image": "voreen_5.3.0",
-                "doi": "https://doi.org/10.5281/zenodo.21753718"
+                "doi": "https://doi.org/10.5281/zenodo.21753718",
+                "license": [
+                    "GPL-2.0-only"
+                ]
             }
         },
         "categories": [
