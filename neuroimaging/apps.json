@@ -260,6 +260,38 @@
                         "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
                     }
                 ]
+            },
+            "afni 26.3.09": {
+                "version": "20261106",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "afni_26.3.09",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
+            },
+            "sumaGUI-afni 26.3.09": {
+                "version": "20261106",
+                "exec": "suma",
+                "apptainer_args": [],
+                "image": "afni_26.3.09",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
             }
         },
         "categories": [
@@ -1473,6 +1505,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidstools_1.3.0",
+                "doi": "https://doi.org/10.5281/zenodo.24027769",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
@@ -1519,6 +1552,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "bidstools_arm64_1.3.0",
+                "doi": "https://doi.org/10.5281/zenodo.24027773",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
@@ -2389,6 +2423,24 @@
                     "GPL-2.0-or-later"
                 ]
             },
+            "cat12 26.0.3": {
+                "version": "20261105",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "cat12_26.0.3",
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
+            },
+            "cat12GUI-cat12 26.0.3": {
+                "version": "20261105",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": [],
+                "image": "cat12_26.0.3",
+                "license": [
+                    "GPL-2.0-or-later"
+                ]
+            },
             "cat12 26.0.rc3": {
                 "version": "20260521",
                 "exec": "",
@@ -2697,10 +2749,20 @@
                 "doi": "https://doi.org/10.5281/zenodo.18931685"
             },
             "code 240320": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "code_240320"
+                "image": "code_240320",
+                "license": [
+                    "Microsoft Visual Studio Code product license"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "Microsoft Visual Studio Code product license",
+                        "url": "https://code.visualstudio.com/license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -2710,10 +2772,20 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": [],
-                "image": "code_arm64_240320"
+                "image": "code_arm64_240320",
+                "license": [
+                    "Microsoft Visual Studio Code product license"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "Microsoft Visual Studio Code product license",
+                        "url": "https://code.visualstudio.com/license"
+                    }
+                ]
             }
         },
         "categories": [
@@ -2894,6 +2966,7 @@
                 "apptainer_args": [],
                 "architecture": "aarch64",
                 "image": "cosmomvpa_1.1.0_arm64",
+                "doi": "https://doi.org/10.5281/zenodo.24027817",
                 "license": [
                     "MIT"
                 ]
@@ -3804,6 +3877,15 @@
                     "MIT"
                 ]
             },
+            "dicompare 0.15.6": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "dicompare_0.15.6",
+                "license": [
+                    "MIT"
+                ]
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -3848,6 +3930,15 @@
                 "apptainer_args": [],
                 "image": "dicompare_arm64_0.15.4",
                 "doi": "https://doi.org/10.5281/zenodo.23630079",
+                "license": [
+                    "MIT"
+                ]
+            },
+            "dicompare_arm64 0.15.6": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "dicompare_arm64_0.15.6",
                 "license": [
                     "MIT"
                 ]
@@ -7601,6 +7692,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "metabody_1.0.5",
+                "doi": "https://doi.org/10.5281/zenodo.24027767",
                 "license": [
                     "AFNI license and exceptions",
                     "MIT"
@@ -8009,11 +8101,10 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.23969620",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8026,11 +8117,10 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.23969674",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8179,7 +8269,7 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261106",
+                "version": "20261107",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mp2ragedenoise_0.1.0",
@@ -8342,6 +8432,24 @@
                 "exec": "",
                 "image": "mriqc_24.0.2",
                 "doi": "https://doi.org/10.5281/zenodo.18932134",
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "mriqc 26.0.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "mriqc_26.0.0",
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "mriqc 26.1.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "mriqc_26.1.0",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -9746,6 +9854,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "pals_2.0.1",
+                "doi": "https://doi.org/10.5281/zenodo.24046054",
                 "license": [
                     "PALS (upstream does not declare a license)"
                 ],
@@ -10325,6 +10434,25 @@
                 "apptainer_args": [],
                 "image": "qsmxt_10.0.0",
                 "doi": "https://doi.org/10.5281/zenodo.23630761",
+                "license": [
+                    "Apache-2.0",
+                    "BSD-2-Clause",
+                    "GPL-3.0-only",
+                    "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "ep3d-highres-preprocessing (no license file upstream; packaged with the author's permission)",
+                        "url": "https://github.com/mrphysics-bonn/ep3d-highres-preprocessing"
+                    }
+                ]
+            },
+            "qsmxt 11.0.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "qsmxt_11.0.0",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
@@ -11318,6 +11446,15 @@
                 "apptainer_args": [],
                 "image": "scipion_3.8.3",
                 "doi": "https://doi.org/10.5281/zenodo.23444330",
+                "license": [
+                    "GPL-3.0-or-later"
+                ]
+            },
+            "scipion 3.9.0": {
+                "version": "20261106",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "scipion_3.9.0",
                 "license": [
                     "GPL-3.0-or-later"
                 ]

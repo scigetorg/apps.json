@@ -1,7 +1,7 @@
 {
-    "entries": 771,
+    "entries": 779,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "4124e9a3f0c9d3136d6074a5b2ff5e1db5811f8b"
+        "NeuroDesk/neurocontainers": "d1f0f5577ead74814233ebc81b391229edd8d082"
     },
     "app_sources": {
         "afni": {
@@ -30,7 +30,9 @@
             "afni 26.3.05": "NeuroDesk/neurocontainers",
             "sumaGUI-afni 26.3.05": "NeuroDesk/neurocontainers",
             "afni 26.3.07": "NeuroDesk/neurocontainers",
-            "sumaGUI-afni 26.3.07": "NeuroDesk/neurocontainers"
+            "sumaGUI-afni 26.3.07": "NeuroDesk/neurocontainers",
+            "afni 26.3.09": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.09": "NeuroDesk/neurocontainers"
         },
         "aidamri": {
             "aidamri 1.1": "NeuroDesk/neurocontainers",
@@ -307,6 +309,8 @@
             "cat12GUI-cat12 26.0.1": "NeuroDesk/neurocontainers",
             "cat12 26.0.2": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 26.0.2": "NeuroDesk/neurocontainers",
+            "cat12 26.0.3": "NeuroDesk/neurocontainers",
+            "cat12GUI-cat12 26.0.3": "NeuroDesk/neurocontainers",
             "cat12 26.0.rc3": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 26.0.rc3": "NeuroDesk/neurocontainers",
             "cat12GUI-cat12 r1933": "NeuroDesk/neurocontainers",
@@ -489,12 +493,14 @@
             "dicompare 0.15.2": "NeuroDesk/neurocontainers",
             "dicompare 0.15.3": "NeuroDesk/neurocontainers",
             "dicompare 0.15.4": "NeuroDesk/neurocontainers",
+            "dicompare 0.15.6": "NeuroDesk/neurocontainers",
             "dicompare 0.5.4": "NeuroDesk/neurocontainers"
         },
         "dicompare_arm64": {
             "dicompare_arm64 0.15.2": "NeuroDesk/neurocontainers",
             "dicompare_arm64 0.15.3": "NeuroDesk/neurocontainers",
-            "dicompare_arm64 0.15.4": "NeuroDesk/neurocontainers"
+            "dicompare_arm64 0.15.4": "NeuroDesk/neurocontainers",
+            "dicompare_arm64 0.15.6": "NeuroDesk/neurocontainers"
         },
         "dicomtools": {
             "dicomtools 1.0.0": "NeuroDesk/neurocontainers",
@@ -1065,7 +1071,9 @@
         "mriqc": {
             "mriqc 0.16.1": "NeuroDesk/neurocontainers",
             "mriqc 22.0.6": "NeuroDesk/neurocontainers",
-            "mriqc 24.0.2": "NeuroDesk/neurocontainers"
+            "mriqc 24.0.2": "NeuroDesk/neurocontainers",
+            "mriqc 26.0.0": "NeuroDesk/neurocontainers",
+            "mriqc 26.1.0": "NeuroDesk/neurocontainers"
         },
         "mritools": {
             "mritools 3.3.0": "NeuroDesk/neurocontainers",
@@ -1344,6 +1352,7 @@
         },
         "qsmxt": {
             "qsmxt 10.0.0": "NeuroDesk/neurocontainers",
+            "qsmxt 11.0.0": "NeuroDesk/neurocontainers",
             "qsmxt 6.3.2": "NeuroDesk/neurocontainers",
             "qsmxt 6.4.4": "NeuroDesk/neurocontainers",
             "qsmxt 7.3.3": "NeuroDesk/neurocontainers",
@@ -1463,7 +1472,8 @@
             "samsrfxGUI-samsrfx v10.004": "NeuroDesk/neurocontainers"
         },
         "scipion": {
-            "scipion 3.8.3": "NeuroDesk/neurocontainers"
+            "scipion 3.8.3": "NeuroDesk/neurocontainers",
+            "scipion 3.9.0": "NeuroDesk/neurocontainers"
         },
         "segmentator": {
             "segmentator 1.6.1": "NeuroDesk/neurocontainers"
