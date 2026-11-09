@@ -85,7 +85,9 @@ and keep unrelated regenerated diffs out of code PRs.
   they are older than 7 days.
 - DOI publication validates the license from recipe history and fails if
   `apps.json` licenses disagree; the plan skips images with no recipe license
-  for their version. Entries that state no license is known
+  for their version, and images whose SIF is absent from the bucket
+  (`sif_reason`: HEAD answers 403/404, e.g. release JSON left by a recipe rename;
+  fix by deleting that release JSON upstream). Entries that state no license is known
   (`license_terms.declares_no_license`: NOASSERTION, NONE, unknown, "no license
   published" names) add no `rights`; an image with only those is published
   without `rights` (verified on sandbox Zenodo), and `build_metadata` omits the
