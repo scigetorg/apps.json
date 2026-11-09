@@ -123,7 +123,12 @@ catalog DOIs in place and does not stop catalog generation. Before publication
 the workflow reads the license from recipe history the same way, validates it
 against Zenodo's live license catalog, and fails if the `apps.json` licenses
 differ. Images whose recipe history has no license for their version are
-skipped by the plan, with the reason in its log. The DOI description links the
+skipped by the plan, with the reason in its log. A recipe that states no license
+is known (`NOASSERTION`, `NONE`, `unknown`, or a custom name such as "no license
+published") is different: its record is published without `rights`, so Zenodo
+shows no license instead of a default. `apps.json` keeps the `NOASSERTION`
+label, and the source URL in `license_details`. When such an entry sits next to a
+real license, only the real one is published. The DOI description links the
 recipe commit for that version.
 
 A weekly read-only audit compares each published Zenodo record's licenses with

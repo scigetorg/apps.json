@@ -10,11 +10,10 @@ from urllib.parse import urlsplit
 
 import requests
 
-from .license_terms import OTHER_IDS, is_custom_term
+from .license_terms import OTHER_IDS, declares_no_license, is_custom_term, is_no_license
 
 
 CATALOGUE_URL = "https://zenodo.org/api/licenses/"
-UNKNOWN_NAMES = {"none", "unknown", "noassertion"}
 # The "Other" categories offered when a recipe license needs review.
 SUGGESTED_OTHER_IDS = frozenset({"other-open", "other-closed"})
 # Deprecated SPDX IDs that Zenodo's legacy deposit API accepted, mapped to the
@@ -228,6 +227,8 @@ def resolve_recipe_license(recipe, catalogue):
 
     A catalogue license becomes {"id": ...}; custom terms (a name, an other-*
     category or LicenseRef-) become {"title", "link"} and need a name and URL.
+    Entries stating no known license (NOASSERTION, NONE, unknown) add nothing,
+    so a recipe declaring only those resolves to `rights: []`.
     Write these bare forms: Zenodo rejects its own expanded entries on update.
     """
     copyrights = recipe.get("copyright") if isinstance(recipe, dict) else None
@@ -245,6 +246,9 @@ def resolve_recipe_license(recipe, catalogue):
             canonical_url(given_url)
         if "license" in item and (not isinstance(identifier, str) or not identifier.strip()):
             raise LicenseValidationError(f"{context} license must be a non-empty string")
+        if declares_no_license(item):
+            # NOASSERTION/NONE/unknown: published without a right for this entry.
+            continue
         if is_custom_license(identifier):
             stated = name.strip() if isinstance(name, str) and name.strip() else None
             if stated is None and not identifier:
@@ -252,14 +256,6 @@ def resolve_recipe_license(recipe, catalogue):
             if stated is None:
                 raise LicenseValidationError(
                     f"{context} custom license {identifier.strip()!r} needs a name and URL"
-                )
-            lowered = stated.lower()
-            if lowered in UNKNOWN_NAMES or any(
-                marker in lowered for marker in ("no licence published", "no license published", "does not declare a license")
-            ):
-                raise LicenseValidationError(
-                    f"{context} does not identify usable license terms: {stated!r}",
-                    suggest_licenses(stated, given_url, catalogue),
                 )
             if not given_url:
                 raise LicenseValidationError(f"{context} custom license {stated!r} needs a URL")
@@ -300,9 +296,12 @@ def rights_from_catalog(entry):
 
     Deprecated SPDX IDs (gpl-2.0, lgpl-2.1, ...) map to Zenodo's IDs as in
     resolve_recipe_license; Zenodo rejects the old spellings ("Invalid value").
+    No-license values (NOASSERTION, NONE, unknown) add no right, so an entry
+    listing only those gives [] (published without rights); check
+    `entry["license"]` to tell that apart from an image with no license at all.
     """
     custom = [detail for detail in entry.get("license_details") or []
-              if is_custom_term(detail.get("license"))]
+              if is_custom_term(detail.get("license")) and not declares_no_license(detail)]
     rights = []
     for detail in custom:
         if not detail.get("name") or not detail.get("url"):
@@ -312,7 +311,8 @@ def rights_from_catalog(entry):
     custom_values = {value.strip().lower() for detail in custom
                      for value in (detail.get("license"), detail.get("name"))
                      if isinstance(value, str) and value.strip()}
-    ids = sorted({value.strip().lower() for value in entry.get("license") or []} - custom_values)
+    ids = sorted({value.strip().lower() for value in entry.get("license") or []
+                  if not is_no_license(value)} - custom_values)
     for value in ids:
         if is_custom_term(value):
             raise ValueError(f"apps.json has no license_details (name and URL) for {value!r}")

@@ -90,6 +90,16 @@ class BackfillTests(unittest.TestCase):
         self.assertNotIn("is_draft", sent)
         session.delete.assert_not_called()
 
+    def test_noassertion_record_with_zenodo_default_is_cleared(self):
+        title = "tool_1.0_20260101"
+        artifacts = {title: {"license": ["NOASSERTION"], "license_details": [
+            {"license": "NOASSERTION", "url": "https://example.org/src"}]}}
+        records = {title: record([{"id": "cc-by-4.0"}], title=title)}
+        code, session = run("--apply", session=edit_session(publish=reply(record([], title=title))),
+                            artifacts=artifacts, records=records)
+        self.assertEqual(code, 0)
+        self.assertEqual(session.put.call_args.kwargs["json"]["metadata"]["rights"], [])
+
     def test_rejected_update_discards_the_edit_draft(self):
         code, session = run("--apply", session=edit_session(
             update=reply({"errors": [{"field": "metadata.rights", "messages": ["bad"]}]})))

@@ -80,7 +80,13 @@ and keep unrelated regenerated diffs out of code PRs.
   they are older than 7 days.
 - DOI publication validates the license from recipe history and fails if
   `apps.json` licenses disagree; the plan skips images with no recipe license
-  for their version. The weekly audit
+  for their version. Entries that state no license is known
+  (`license_terms.declares_no_license`: NOASSERTION, NONE, unknown, "no license
+  published" names) add no `rights`; an image with only those is published
+  without `rights` (verified on sandbox Zenodo), and `build_metadata` omits the
+  key. An empty `license` list in apps.json is still skipped. A legacy
+  `cc-by-4.0`/`other-*` record for such an image is `verified_legacy`, and the
+  backfill clears it. The weekly audit
   compares each Zenodo record with apps.json only (no recipe calls),
   using `doi_license.same_rights`. A Zenodo failure must not block catalog updates.
 - `licenses/zenodo.json` lists Zenodo license IDs that are also non-deprecated
