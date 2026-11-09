@@ -300,6 +300,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "afni_26.3.10",
+                "doi": "https://doi.org/10.5281/zenodo.24071691",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -316,6 +317,7 @@
                 "exec": "suma",
                 "apptainer_args": [],
                 "image": "afni_26.3.10",
+                "doi": "https://doi.org/10.5281/zenodo.24071691",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -2789,6 +2791,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_240320",
+                "doi": "https://doi.org/10.5281/zenodo.24071697",
                 "license": [
                     "Microsoft Visual Studio Code product license"
                 ],
@@ -2812,6 +2815,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_arm64_240320",
+                "doi": "https://doi.org/10.5281/zenodo.24071700",
                 "license": [
                     "Microsoft Visual Studio Code product license"
                 ],
@@ -8143,6 +8147,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
+                "doi": "https://doi.org/10.5281/zenodo.24071703",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8159,6 +8164,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
+                "doi": "https://doi.org/10.5281/zenodo.24071694",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8185,6 +8191,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.24072020",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8202,6 +8209,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.24071811",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -9682,8 +9690,27 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "openmsk_0.1.11",
+                "doi": "https://doi.org/10.5281/zenodo.24072838",
                 "license": [
                     "NOASSERTION"
+                ],
+                "license_details": [
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/KneePipeline"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/DOSMA"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/nsm"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/pymskt"
+                    }
                 ]
             },
             "openmsk 0.2.0": {
@@ -9691,8 +9718,27 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "openmsk_0.2.0",
+                "doi": "https://doi.org/10.5281/zenodo.24072834",
                 "license": [
                     "NOASSERTION"
+                ],
+                "license_details": [
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/KneePipeline"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/DOSMA"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/nsm"
+                    },
+                    {
+                        "license": "NOASSERTION",
+                        "url": "https://github.com/gattia/pymskt"
+                    }
                 ]
             }
         },
@@ -10149,7 +10195,7 @@
                 "license_details": [
                     {
                         "name": "Vanderbilt University Contribution and Software License Agreement",
-                        "url": "https://github.com/MASILab/PreQual/blob/v{{ context.version }}/LICENSE.md"
+                        "url": "https://github.com/MASILab/PreQual/blob/v1.1.0/LICENSE.md"
                     }
                 ]
             }
@@ -11108,6 +11154,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "relion_5.1.1",
+                "doi": "https://doi.org/10.5281/zenodo.24071695",
                 "license": [
                     "GPL-2.0-only"
                 ]
@@ -12311,7 +12358,7 @@
                     {
                         "license": "LicenseRef-PARAPET",
                         "name": "PARAPET license",
-                        "url": "https://github.com/UCL/STIR/blob/rel_{{ context.upstream_version }}/LICENSES/PARAPET-license.txt"
+                        "url": "https://github.com/UCL/STIR/blob/rel_6.4.0/LICENSES/PARAPET-license.txt"
                     }
                 ]
             }
