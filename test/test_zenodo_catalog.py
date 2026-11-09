@@ -14,6 +14,7 @@ from scripts.zenodo_catalog import (
     missing_batches,
     publish_deposition,
     record_doi,
+    sif_reason,
     user_records,
 )
 
@@ -119,6 +120,28 @@ class ZenodoCatalogTests(unittest.TestCase):
         self.assertIn("no license_details", skipped["fsl_1.0_20260109"])
         self.assertEqual(missing_batches({"old_1.0_20200101": artifacts["old_1.0_20200101"]}, {})[0],
                          [[]])
+
+    def test_image_without_a_sif_is_skipped_by_the_plan(self) -> None:
+        # neurodesktop-lite_20260428_arm64: release JSON left by a rename, no SIF uploaded.
+        title = "neurodesktop-lite_20260428_arm64_20260519"
+        url = f"https://neurocontainers.s3.us-east-2.amazonaws.com/{title}.simg"
+        for status in (403, 404):
+            with patch("scripts.zenodo_catalog.requests.head",
+                       return_value=reply({}, status=status)) as head:
+                self.assertEqual(sif_reason(title), f"no SIF at {url} (HTTP {status})")
+            self.assertEqual(head.call_args.args[0], url)
+            self.assertNotIn("headers", head.call_args.kwargs)  # never the Zenodo token
+        # Present, or an error the publish step should retry and report: not skipped.
+        for outcome in (reply({}), reply({}, status=503), requests.ConnectionError("down")):
+            with patch("scripts.zenodo_catalog.requests.head",
+                       **({"side_effect": outcome} if isinstance(outcome, Exception)
+                          else {"return_value": outcome})):
+                self.assertIsNone(sif_reason(title))
+        artifacts = {title: {"doi": "", "license": ["MIT"]},
+                     "tool_1.0_20260101": {"doi": "", "license": ["MIT"]}}
+        batches, skipped = missing_batches(
+            artifacts, {}, recipe_reason=lambda name: f"no SIF" if name == title else None)
+        self.assertEqual((batches, list(skipped)), ([["tool_1.0_20260101"]], [title]))
 
     def test_removed_releases_are_absent_from_doi_plan(self) -> None:
         for domain in ("neuroimaging", "microscopy"):

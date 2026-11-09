@@ -189,6 +189,28 @@ def unpublishable_reason(metadata: dict[str, Any]) -> str | None:
     return None
 
 
+def sif_url(title: str) -> str:
+    return f"{SIF_BASE}/{quote(title, safe='')}.simg"
+
+
+def sif_reason(title: str) -> str | None:
+    """Why the image's SIF cannot be uploaded (absent from the bucket), or None.
+
+    The public bucket answers 403 (not 404) for a missing key. Release JSON that
+    names an image never uploaded (e.g. left over from a recipe rename) would
+    otherwise fail publication every night. Other errors are not a skip: the
+    publish step retries and reports them.
+    """
+    try:
+        # Public request: the Zenodo bearer token must never reach S3.
+        response = requests.head(sif_url(title), allow_redirects=True, timeout=(15, 60))
+    except requests.RequestException:
+        return None
+    if response.status_code in (403, 404):
+        return f"no SIF at {sif_url(title)} (HTTP {response.status_code})"
+    return None
+
+
 def recipe_reason(recipes: SourceRecipes, title: str, metadata: dict[str, Any]) -> str | None:
     """Why the recipe history cannot back a publication for this image, or None."""
     try:
@@ -255,7 +277,7 @@ def publish_deposition(
     title: str, license_info: dict[str, Any], session: requests.Session
 ) -> str:
     """Create a draft, stream the SIF from S3 into it, and publish; return the DOI."""
-    source_url = f"{SIF_BASE}/{quote(title, safe='')}.simg"
+    source_url = sif_url(title)
     # The public S3 request must never receive the Zenodo bearer token.
     download = requests.get(source_url, stream=True, timeout=(15, 300))
     try:
@@ -387,9 +409,11 @@ def main() -> int:
             parser.error("--limit must be 0 or more")
         batches, skipped = missing_batches(
             artifacts, user_records(session), limit=args.limit,
-            recipe_reason=lambda title: recipe_reason(recipes, title, artifacts[title]))
+            # The SIF check runs last: one HEAD request per otherwise publishable image.
+            recipe_reason=lambda title: (recipe_reason(recipes, title, artifacts[title])
+                                         or sif_reason(title)))
         if skipped:
-            print(f"Skipping {len(skipped)} image(s) apps.json cannot license:", file=sys.stderr)
+            print(f"Skipping {len(skipped)} image(s) that cannot be published:", file=sys.stderr)
             for title, reason in sorted(skipped.items()):
                 print(f"  {title}: {reason}", file=sys.stderr)
         print(f"Planned {sum(map(len, batches))} image(s) in {len(batches)} batch(es)",
