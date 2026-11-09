@@ -8,7 +8,7 @@ afterwards, between each Zenodo record and the catalog entry for its title.
     Zenodo record (title, metadata.rights)          from /api/user/records
         │ title in apps.json?  no → skipped (retired image; DOI stays)
         ▼
-    rights_from_catalog(apps.json) ─► same rights? ─► verified
+    rights_from_catalog(apps.json) ─► same rights? ─► verified   (NOASSERTION/unknown: both empty)
         │                               └─ one license (old pipeline)    → verified_legacy
         │                               └─ several, differing            → mismatch
         └ no license ─► no_catalog_license
@@ -42,13 +42,17 @@ def legacy_reason(published_key, expected_key):
     apps.json (recipe history); records with several licenses that differ stay a
     mismatch, since only the records API could have written them.
     """
-    if len(published_key) != 1 or not expected_key:
+    if len(published_key) != 1:
         return None
     (single,) = published_key
+    # Placeholders and the default are replaced even when apps.json lists only
+    # NOASSERTION/unknown (expected_key empty): the backfill then clears them.
     if single in PLACEHOLDERS:
         return "legacy placeholder category"
     if single == ZENODO_DEFAULT and single not in expected_key:
         return "Zenodo's default license (none was sent)"
+    if not expected_key:
+        return None
     if published_key < expected_key:
         return "legacy one-license record, a subset of apps.json"
     return "legacy one-license record (the old pipeline read the first license of the recipe on main)"

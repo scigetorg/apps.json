@@ -11,6 +11,32 @@ OTHER_IDS = frozenset({"other-open", "other-closed", "other-at", "other-nc", "ot
 # Shape of a license catalogue ID such as "gpl-3.0-only".
 CATALOGUE_ID = re.compile(r"^[a-z0-9][a-z0-9.+-]*$")
 
+# Values stating that no license is known: SPDX's NOASSERTION/NONE, "unknown",
+# or a custom name saying none was published. The DOI is minted without
+# `rights` for these entries (Zenodo's records API accepts a record without one).
+NO_LICENSE_IDS = frozenset({"noassertion", "none", "unknown"})
+NO_LICENSE_PHRASES = ("no licence published", "no license published",
+                      "does not declare a license", "no license declared")
+
+
+def is_no_license(value):
+    """A license ID, name or apps.json label that states no license is known."""
+    value = (value or "").strip().lower() if isinstance(value, str) else ""
+    return value in NO_LICENSE_IDS or any(phrase in value for phrase in NO_LICENSE_PHRASES)
+
+
+def declares_no_license(entry):
+    """A recipe copyright entry (or apps.json license_details entry) with no known license.
+
+    A real license ID wins over its name; otherwise the custom name decides.
+    """
+    identifier = entry.get("license")
+    if is_no_license(identifier):
+        return True
+    if isinstance(identifier, str) and identifier.strip() and not is_custom_term(identifier):
+        return False
+    return is_no_license(entry.get("name"))
+
 
 def is_custom_term(value):
     """A declared license with no license ID: other-*, LicenseRef-…, or free text.
@@ -54,7 +80,8 @@ def license_details(recipe):
     details = []
     for entry in recipe.get("copyright") or []:
         identifier = entry.get("license") or ""
-        if entry.get("name") or is_custom_term(identifier):
+        # No-license entries keep their URL so readers can see where the source is.
+        if entry.get("name") or is_custom_term(identifier) or declares_no_license(entry):
             details.append({
                 key: entry[key].strip()
                 for key in ("license", "name", "url")

@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 
 from scripts import audit_doi_licenses, doi_license, zenodo_catalog
 from scripts.audit_doi_licenses import audit_record
+from scripts.doi_metadata import build_metadata
 from scripts.license_terms import declared_licenses, license_details
 from scripts.zenodo_catalog import publish_batch
 
@@ -91,9 +92,7 @@ class DoiLicenseTests(unittest.TestCase):
         for entry, message in (({"license": "LicenseRef-PARAPET", "url": "https://example.org/p"},
                                 "needs a name and URL"),
                                ({"name": "Research terms"}, "needs a URL"),
-                               ({"license": "other-closed"}, "needs a name and URL"),
-                               ({"name": "Unknown", "url": "https://example.org/u"},
-                                "does not identify usable license terms")):
+                               ({"license": "other-closed"}, "needs a name and URL")):
             with self.assertRaisesRegex(doi_license.LicenseValidationError, message):
                 doi_license.resolve_recipe_license({"copyright": [entry]}, catalogue())
         info = doi_license.resolve_recipe_license({"zenodo_license": "other-closed", "copyright": [
@@ -333,6 +332,100 @@ class DoiLicenseTests(unittest.TestCase):
             report = json.loads(output.read_text())
             self.assertEqual([row["title"] for row in report["records"]], [current])
             self.assertEqual(report["summary"], {"mismatch": 1})
+
+
+NOASSERTION = {"copyright": [{"license": "NOASSERTION", "url": "https://github.com/example/tool"}]}
+
+
+def no_license_entry(recipe=NOASSERTION):
+    return {"doi": "", "license": declared_licenses(recipe), "license_details": license_details(recipe),
+            "source_repositories": ["Example/microcontainers"]}
+
+
+class NoLicenseTests(unittest.TestCase):
+    """NOASSERTION / NONE / unknown: the DOI is minted without `rights`."""
+
+    def test_no_license_entries_resolve_to_empty_rights(self):
+        for entry in ({"license": "NOASSERTION", "url": "https://example.org/src"},
+                      {"license": "NONE", "url": "https://example.org/src"},
+                      {"license": "NOASSERTION", "name": "Tool source (no license declared)",
+                       "url": "https://example.org/src"},
+                      {"name": "Unknown", "url": "https://example.org/u"},
+                      {"license": "other-closed", "name": "No license published",
+                       "url": "https://example.org/u"}):
+            recipe = {"copyright": [entry]}
+            self.assertEqual(doi_license.resolve_recipe_license(recipe, catalogue())["rights"], [],
+                             entry)
+            catalog_entry = {"license": declared_licenses(recipe),
+                             "license_details": license_details(recipe)}
+            self.assertEqual(doi_license.rights_from_catalog(catalog_entry), [], entry)
+            self.assertIsNone(zenodo_catalog.unpublishable_reason(catalog_entry), entry)
+        # Only the known license is published when one is declared alongside.
+        mixed = {"copyright": [{"license": "MIT"}, *NOASSERTION["copyright"]]}
+        self.assertEqual(doi_license.resolve_recipe_license(mixed, catalogue())["rights"],
+                         [{"id": "mit"}])
+        self.assertEqual(doi_license.rights_from_catalog(no_license_entry(mixed)), [{"id": "mit"}])
+        # A real license ID is never overridden by a misleading name.
+        self.assertEqual(doi_license.resolve_recipe_license(
+            {"copyright": [{"license": "MIT", "name": "unknown"}]}, catalogue())["rights"],
+            [{"id": "mit"}])
+        # A recipe with no copyright at all still cannot be published.
+        with self.assertRaisesRegex(doi_license.LicenseValidationError, "no copyright entries"):
+            doi_license.resolve_recipe_license({}, catalogue())
+
+    def test_apps_json_keeps_the_label_and_source_url(self):
+        entry = no_license_entry()
+        self.assertEqual(entry["license"], ["NOASSERTION"])
+        self.assertEqual(entry["license_details"],
+                         [{"license": "NOASSERTION", "url": "https://github.com/example/tool"}])
+
+    def test_image_without_any_license_is_still_skipped(self):
+        for entry in ({"license": []}, {}):
+            self.assertEqual(zenodo_catalog.unpublishable_reason(entry), "apps.json has no license")
+        artifacts = {TITLE: {"doi": "", "license": [], "source_repositories": []}}
+        with (patch("scripts.zenodo_catalog.user_records", return_value={}),
+              patch("scripts.zenodo_catalog.publish_deposition") as publish):
+            with self.assertRaisesRegex(RuntimeError, "apps.json has no license"):
+                publish_batch(artifacts, [TITLE], MagicMock(), catalogue(),
+                              recipes({"rights": [], "declared": [], "license_details": []}))
+        publish.assert_not_called()
+
+    def test_noassertion_image_is_planned_and_published_without_rights(self):
+        artifacts = {TITLE: no_license_entry()}
+        self.assertEqual(zenodo_catalog.missing_batches(artifacts, {}), ([[TITLE]], {}))
+        info = {"rights": [], "declared": ["NOASSERTION"], "license_details": [],
+                "recipe": "demo", "source_repository": "Example/microcontainers"}
+        with (patch("scripts.zenodo_catalog.user_records", return_value={}),
+              patch("scripts.zenodo_catalog.publish_deposition",
+                    return_value="10.5281/zenodo.99") as publish):
+            self.assertEqual(publish_batch(artifacts, [TITLE], MagicMock(), catalogue(),
+                                           recipes(info)), 1)
+        body = build_metadata(TITLE, publish.call_args.args[1])
+        self.assertNotIn("rights", body["metadata"])
+        self.assertEqual(build_metadata(TITLE, {**publish.call_args.args[1], "rights": [{"id": "mit"}]})
+                         ["metadata"]["rights"], [{"id": "mit"}])
+
+    def test_recipe_with_a_license_blocks_a_noassertion_catalog_entry(self):
+        info = {"rights": [{"id": "mit"}], "declared": ["MIT"], "license_details": []}
+        with (patch("scripts.zenodo_catalog.user_records", return_value={}),
+              patch("scripts.zenodo_catalog.publish_deposition") as publish):
+            with self.assertRaisesRegex(RuntimeError, "Catalog licenses"):
+                publish_batch({TITLE: no_license_entry()}, [TITLE], MagicMock(), catalogue(),
+                              recipes(info))
+        publish.assert_not_called()
+
+    def test_audit_of_noassertion_records(self):
+        entry = no_license_entry()
+        self.assertEqual(audit_record(record([]), entry)["status"], "verified")
+        # Zenodo's default from the legacy pipeline (tgvqsm_1.0.0): the backfill clears it.
+        row = audit_record(record([{"id": "cc-by-4.0"}]), entry)
+        self.assertEqual(row["status"], "verified_legacy")
+        self.assertEqual(row["catalog_license"], [])
+        self.assertEqual(audit_record(record([{"id": "other-open"}]), entry)["status"],
+                         "verified_legacy")
+        # A real license on Zenodo for an image apps.json says has none is a mismatch.
+        self.assertEqual(audit_record(record([{"id": "mit"}]), entry)["status"], "mismatch")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -175,12 +175,18 @@ PUBLISH_JOBS = 6
 
 
 def unpublishable_reason(metadata: dict[str, Any]) -> str | None:
-    """Why apps.json cannot back a publication for this image, or None."""
+    """Why apps.json cannot back a publication for this image, or None.
+
+    An image whose licenses are all NOASSERTION/NONE/unknown is publishable:
+    its rights are empty and the record is published without a license.
+    """
+    if not metadata.get("license"):
+        return "apps.json has no license"
     try:
-        rights = rights_from_catalog(metadata)
+        rights_from_catalog(metadata)
     except ValueError as exc:
         return str(exc)
-    return None if rights else "apps.json has no license"
+    return None
 
 
 def recipe_reason(recipes: SourceRecipes, title: str, metadata: dict[str, Any]) -> str | None:
@@ -324,7 +330,11 @@ def publish_batch(
             license_info = recipes.license(
                 title, artifacts[title]["source_repositories"], catalogue)
             expected = rights_from_catalog(artifacts[title])
-            if not expected or not same_rights(license_info["rights"], expected):
+            # Empty rights on both sides (NOASSERTION/unknown) agree; an image with
+            # no license at all in apps.json never publishes.
+            if not artifacts[title].get("license"):
+                raise ValueError("apps.json has no license (not even NOASSERTION)")
+            if not same_rights(license_info["rights"], expected):
                 raise ValueError(
                     f"Catalog licenses {expected!r} differ from the recipe for version "
                     f"{license_info['version']} ({license_info['revision'][:12]}): "
