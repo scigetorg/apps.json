@@ -6817,6 +6817,22 @@
     },
     "lcmodel": {
         "apps": {
+            "lcmodel 6.3.0": {
+                "version": "20261109",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "lcmodel_6.3.0",
+                "license": [
+                    "LCModel and LCMgui License Agreement",
+                    "MIT"
+                ],
+                "license_details": [
+                    {
+                        "name": "LCModel and LCMgui License Agreement",
+                        "url": "https://lcmodel.ca/lcm-license.shtml"
+                    }
+                ]
+            },
             "lcmodel 6.3": {
                 "version": "20220222",
                 "exec": "",
@@ -6825,7 +6841,8 @@
             }
         },
         "categories": [
-            "spectroscopy"
+            "spectroscopy",
+            "image reconstruction"
         ]
     },
     "lesionquantificationtoolkit": {
@@ -10189,6 +10206,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "prequal_1.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.24073740",
                 "license": [
                     "Vanderbilt University Contribution and Software License Agreement"
                 ],
