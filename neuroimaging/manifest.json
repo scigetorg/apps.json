@@ -1,7 +1,7 @@
 {
-    "entries": 779,
+    "entries": 780,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "d1f0f5577ead74814233ebc81b391229edd8d082"
+        "NeuroDesk/neurocontainers": "7de8be892e9ec1d7bbd5f5b2c201422e35cd3528"
     },
     "app_sources": {
         "afni": {
@@ -32,7 +32,9 @@
             "afni 26.3.07": "NeuroDesk/neurocontainers",
             "sumaGUI-afni 26.3.07": "NeuroDesk/neurocontainers",
             "afni 26.3.09": "NeuroDesk/neurocontainers",
-            "sumaGUI-afni 26.3.09": "NeuroDesk/neurocontainers"
+            "sumaGUI-afni 26.3.09": "NeuroDesk/neurocontainers",
+            "afni 26.3.10": "NeuroDesk/neurocontainers",
+            "sumaGUI-afni 26.3.10": "NeuroDesk/neurocontainers"
         },
         "aidamri": {
             "aidamri 1.1": "NeuroDesk/neurocontainers",

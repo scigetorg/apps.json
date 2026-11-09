@@ -266,6 +266,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "afni_26.3.09",
+                "doi": "https://doi.org/10.5281/zenodo.24047832",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -282,6 +283,39 @@
                 "exec": "suma",
                 "apptainer_args": [],
                 "image": "afni_26.3.09",
+                "doi": "https://doi.org/10.5281/zenodo.24047832",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
+            },
+            "afni 26.3.10": {
+                "version": "20261108",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "afni_26.3.10",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
+            },
+            "sumaGUI-afni 26.3.10": {
+                "version": "20261108",
+                "exec": "suma",
+                "apptainer_args": [],
+                "image": "afni_26.3.10",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -2428,6 +2462,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cat12_26.0.3",
+                "doi": "https://doi.org/10.5281/zenodo.24047792",
                 "license": [
                     "GPL-2.0-or-later"
                 ]
@@ -2437,6 +2472,7 @@
                 "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
                 "apptainer_args": [],
                 "image": "cat12_26.0.3",
+                "doi": "https://doi.org/10.5281/zenodo.24047792",
                 "license": [
                     "GPL-2.0-or-later"
                 ]
@@ -2749,7 +2785,7 @@
                 "doi": "https://doi.org/10.5281/zenodo.18931685"
             },
             "code 240320": {
-                "version": "20261105",
+                "version": "20261108",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_240320",
@@ -2772,7 +2808,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261105",
+                "version": "20261108",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_arm64_240320",
@@ -3882,6 +3918,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dicompare_0.15.6",
+                "doi": "https://doi.org/10.5281/zenodo.24047778",
                 "license": [
                     "MIT"
                 ]
@@ -3939,6 +3976,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "dicompare_arm64_0.15.6",
+                "doi": "https://doi.org/10.5281/zenodo.24047782",
                 "license": [
                     "MIT"
                 ]
@@ -8101,7 +8139,7 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261105",
+                "version": "20261108",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
@@ -8117,7 +8155,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261105",
+                "version": "20261108",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
@@ -8143,11 +8181,10 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261103",
+                "version": "20261106",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.23969753",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8161,11 +8198,10 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261103",
+                "version": "20261106",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.23969618",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8273,6 +8309,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mp2ragedenoise_0.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.24047776",
                 "license": [
                     "GPL-3.0-or-later"
                 ]
@@ -8441,6 +8478,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mriqc_26.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.24047786",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -8450,6 +8488,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mriqc_26.1.0",
+                "doi": "https://doi.org/10.5281/zenodo.24047784",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -10453,6 +10492,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "qsmxt_11.0.0",
+                "doi": "https://doi.org/10.5281/zenodo.24047780",
                 "license": [
                     "Apache-2.0",
                     "BSD-2-Clause",
@@ -11064,11 +11104,10 @@
                 ]
             },
             "relion 5.1.1": {
-                "version": "20261028",
+                "version": "20261107",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "relion_5.1.1",
-                "doi": "https://doi.org/10.5281/zenodo.23995622",
                 "license": [
                     "GPL-2.0-only"
                 ]
@@ -11455,6 +11494,7 @@
                 "exec": "",
                 "apptainer_args": [],
                 "image": "scipion_3.9.0",
+                "doi": "https://doi.org/10.5281/zenodo.24047834",
                 "license": [
                     "GPL-3.0-or-later"
                 ]
