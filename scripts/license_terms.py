@@ -49,6 +49,60 @@ def is_custom_term(value):
             or not CATALOGUE_ID.fullmatch(value))
 
 
+# The only Jinja apps.json renders in a recipe's copyright entries:
+# {{ context.<key> }} or {{ <key> }}, key = version, name or a top-level scalar
+# variable. neurocontainers' validation (builder/validation.py) allows no more.
+COPYRIGHT_TEMPLATE = re.compile(r"\{\{\s*(?:context\.)?([A-Za-z_]\w*)\s*\}\}")
+COPYRIGHT_FIELDS = ("license", "name", "url")
+MAX_RENDER_PASSES = 10
+
+
+def _render(text, values, where):
+    for _ in range(MAX_RENDER_PASSES):
+        def substitute(match):
+            if match.group(1) not in values:
+                raise ValueError(f"{where}: cannot render {match.group(0)!r} "
+                                 "(only version, name or a scalar top-level variable)")
+            return values[match.group(1)]
+        rendered = COPYRIGHT_TEMPLATE.sub(substitute, text)
+        if rendered == text:
+            break
+        text = rendered
+    if "{{" in text or "{%" in text:
+        raise ValueError(f"{where}: cannot render template in {text!r} "
+                         "(only {{ context.<variable> }} substitutions are supported)")
+    return text
+
+
+def render_copyright(document):
+    """A copy of a recipe document with Jinja in its copyright entries rendered.
+
+    Recipes are read from git as plain YAML, so a URL such as
+    `.../blob/v{{ context.version }}/LICENSE` would otherwise reach apps.json and
+    Zenodo verbatim (Zenodo rejects it as a link). Raises ValueError for any
+    template beyond simple variable substitution.
+    """
+    entries = document.get("copyright")
+    if not isinstance(entries, list) or not any(
+            isinstance(entry, dict) and any("{" in str(entry.get(key) or "") for key in COPYRIGHT_FIELDS)
+            for entry in entries):
+        return document
+    variables = document.get("variables")
+    values = {key: value for key, value in (variables if isinstance(variables, dict) else {}).items()
+              if isinstance(value, str)}
+    for key in ("version", "name"):
+        if isinstance(document.get(key), str):
+            values[key] = document[key]
+    rendered = []
+    for number, entry in enumerate(entries, 1):
+        if isinstance(entry, dict):
+            entry = {key: _render(value, values, f"copyright entry {number} {key}")
+                     if key in COPYRIGHT_FIELDS and isinstance(value, str) else value
+                     for key, value in entry.items()}
+        rendered.append(entry)
+    return {**document, "copyright": rendered}
+
+
 def license_label(entry):
     """How a copyright entry is listed in apps.json `license`.
 

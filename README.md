@@ -104,7 +104,10 @@ or network calls, so a license fixed in a recipe without a version bump reaches
 `apps.json` on the next run, with no rebuild. The `license` list shows catalogue
 IDs such as `MIT` as the ID, and custom terms (`other-*`, `LicenseRef-…`) by their
 `name`, e.g. `FreeSurfer Software License Agreement`; their name and URL are also
-in `license_details`.
+in `license_details`. Templated values such as
+`https://github.com/MASILab/PreQual/blob/v{{ context.version }}/LICENSE.md` are
+rendered first, using the recipe's `version`, `name` and top-level scalar
+`variables` at that commit; other Jinja is reported as a license error.
 
 This states what the recipe declares for that version, not what the image was
 built with: a build made before a license fix shows the fixed license. The
