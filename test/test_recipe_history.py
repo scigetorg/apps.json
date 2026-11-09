@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 
 from scripts import catalog_licenses, zenodo_catalog
-from scripts.doi_license import LicenseValidationError
+from scripts.doi_license import LicenseValidationError, rights_from_catalog, same_rights
+from scripts.license_terms import render_copyright
 from scripts.recipe_history import RecipeHistory, SourceRecipes, source_roots
 
 REPO = "Example/containers"
@@ -109,6 +110,55 @@ class RecipeHistoryTests(unittest.TestCase):
         reason = zenodo_catalog.recipe_reason(recipes, "demo_1.0_20200101",
                                               {"source_repositories": [REPO]})
         self.assertIn("declares version '1.0'", reason)
+
+    def test_templated_license_urls_are_rendered_for_catalog_and_publication(self):
+        text = "\n".join([
+            "name: demo", "version: 1.1.0",
+            "variables:", "  upstream_version: '{{ context.version }}-rc'",
+            "  arch_url:", "    x86_64: a", "    aarch64: b",
+            "copyright:",
+            "  - name: Demo terms",
+            "    url: https://example.org/demo/blob/v{{ context.version }}/LICENSE.md",
+            "  - license: MIT",
+            "    url: https://example.org/{{context.name}}/{{ upstream_version }}/LICENSE",
+        ]) + "\n"
+        self.clone.commit({"recipes/demo/build.yaml": text,
+                           "releases/demo/1.1.0.json": release("1.1.0", "20260101")})
+        recipes = SourceRecipes({REPO: self.clone.root})
+        title = "demo_1.1.0_20260101"
+        catalogue = {"mit": {"id": "mit", "title": "MIT", "url": None}}
+        info = recipes.license(title, [REPO], catalogue)
+        terms = "https://example.org/demo/blob/v1.1.0/LICENSE.md"
+        self.assertEqual(info["license_details"], [{"name": "Demo terms", "url": terms}])
+        self.assertEqual(info["rights"], [{"title": {"en": "Demo terms"}, "link": terms},
+                                          {"id": "mit"}])
+        document = recipes.history(REPO).at_version("demo", "1.1.0")[1]
+        # Nested variables and the no-space form render too.
+        self.assertEqual(render_copyright(document)["copyright"][1]["url"],
+                         "https://example.org/demo/1.1.0-rc/LICENSE")
+        # The cached document is untouched.
+        self.assertIn("{{ context.version }}", document["copyright"][0]["url"])
+        # The catalog entry built from it agrees with the recipe at publish time.
+        entry = catalog_licenses.resolve_artifacts(
+            {title: {"repository": REPO, "root": str(self.clone.root)}})["resolved"][title]
+        self.assertTrue(same_rights(info["rights"], rights_from_catalog(entry)))
+
+    def test_unrenderable_license_template_is_reported(self):
+        for url in ("https://example.org/{{ context.version | replace('.', '') }}/LICENSE",
+                    "https://example.org/{{ context.missing }}/LICENSE",
+                    "https://example.org/{{ context.arch_url }}/LICENSE",
+                    "https://example.org/{% if true %}x{% endif %}/LICENSE"):
+            text = "\n".join(["name: demo", "version: '1.0'", "variables:",
+                              "  arch_url:", "    x86_64: a",
+                              "copyright:", "  - name: Demo terms", f"    url: \"{url}\""]) + "\n"
+            self.clone.commit({"recipes/demo/build.yaml": text,
+                               "releases/demo/1.0.json": release("1.0", "20260101")})
+            recipes = SourceRecipes({REPO: self.clone.root})
+            with self.assertRaisesRegex(LicenseValidationError, "cannot render", msg=url):
+                recipes.license("demo_1.0_20260101", [REPO])
+            # The plan skips the image with the reason instead of failing at publish.
+            self.assertIn("cannot render", zenodo_catalog.recipe_reason(
+                recipes, "demo_1.0_20260101", {"source_repositories": [REPO]}), url)
 
     def test_source_roots_match_workflow_checkout_layout(self):
         # scripts/workflow.mjs sourcePath: join(root, ".catalog-sources", encodeURIComponent(repo))

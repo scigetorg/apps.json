@@ -24,7 +24,7 @@ from urllib.parse import quote
 import yaml
 
 from .doi_license import LicenseValidationError, resolve_recipe_license
-from .license_terms import declared_licenses, license_details
+from .license_terms import declared_licenses, license_details, render_copyright
 
 
 def _git(root: Path, *args: str) -> str:
@@ -125,6 +125,13 @@ class RecipeHistory:
             raise LicenseValidationError(f"{title} has no release JSON in {self.repository}")
         recipe, version = self.index()[title]
         commit, document = self.at_version(recipe, version)
+        try:
+            # Catalog, plan and publish all read licenses here, so they all see the
+            # same rendered URLs (e.g. .../blob/v{{ context.version }}/LICENSE).
+            document = render_copyright(document)
+        except ValueError as exc:
+            raise LicenseValidationError(
+                f"recipes/{recipe}/build.yaml at {commit[:12]}: {exc}") from exc
         info = resolve_recipe_license(document, catalogue) if catalogue is not None else {}
         info.update(
             declared=declared_licenses(document) if document.get("copyright") else [],

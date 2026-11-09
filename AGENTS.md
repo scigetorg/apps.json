@@ -70,6 +70,11 @@ and keep unrelated regenerated diffs out of code PRs.
   URL in `license_details`; `rights_from_catalog` accepts the name or the older
   `other-*`/`LicenseRef-` form, and `rights_from_catalog` refuses to turn such
   terms into IDs. No registry (GHCR/Docker Hub) or OCI label is used.
+- Recipes are read as plain YAML, so `RecipeHistory.license` renders Jinja in
+  `copyright` (`license_terms.render_copyright`) before catalog/plan/publish use
+  it. Only `{{ context.<key> }}` / `{{ <key> }}` with `version`, `name` or a
+  top-level scalar `variables` key is supported (e.g. `.../blob/v{{ context.version }}/LICENSE`);
+  anything else is a license error, and neurocontainers' validation rejects it.
 - Never borrow a license from another version of a tool: licenses change
   between versions. An image with no recipe license for its version and none
   stored stays unlicensed (logged by the catalog run).
