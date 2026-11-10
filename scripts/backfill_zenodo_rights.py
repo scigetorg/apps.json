@@ -32,9 +32,12 @@ from .zenodo_catalog import (
 EDITABLE = ("metadata", "files", "access", "pids", "custom_fields")
 
 
-def legacy_targets(artifacts, records, titles=None):
+def legacy_targets(artifacts, records, titles=None, include_mismatch=False):
+    statuses = {"verified_legacy"}
+    if include_mismatch:
+        statuses.add("mismatch")
     return [row for row in audit_rows(artifacts, records)
-            if row["status"] == "verified_legacy" and (not titles or row["title"] in titles)]
+            if row["status"] in statuses and (not titles or row["title"] in titles)]
 
 
 def raise_for_zenodo(response):
@@ -83,6 +86,8 @@ def main():
     parser.add_argument("--catalog-root", type=Path, default=Path("."))
     parser.add_argument("--apply", action="store_true", help="write to Zenodo (default: dry run)")
     parser.add_argument("--limit", type=int, default=0, help="at most this many records (0 = all)")
+    parser.add_argument("--include-mismatch", action="store_true",
+                        help="also update mismatch records (default: only verified_legacy)")
     parser.add_argument("--title", action="append", default=[],
                         help="only this image title; repeat for several")
     args = parser.parse_args()
@@ -93,7 +98,8 @@ def main():
         parser.error("--limit must be 0 or more")
     session = build_session(token)
     artifacts = catalog_artifacts(args.catalog_root)
-    targets = legacy_targets(artifacts, user_records(session), set(args.title))
+    targets = legacy_targets(artifacts, user_records(session), set(args.title),
+                              args.include_mismatch)
     # Checked in the dry run too, so IDs Zenodo would reject show up before --apply.
     catalogue = fetch_catalogue()["entries"]
     total = len(targets)

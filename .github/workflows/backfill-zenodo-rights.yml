@@ -13,6 +13,10 @@ on:
         description: 'At most this many records (0 = all)'
         type: string
         default: '0'
+      include_mismatch:
+        description: 'Also update mismatch records (not just legacy)'
+        type: boolean
+        default: false
       title:
         description: 'Only this image title (optional)'
         type: string
@@ -40,9 +44,11 @@ jobs:
           ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
           APPLY: ${{ inputs.apply }}
           LIMIT: ${{ inputs.limit }}
+          INCLUDE_MISMATCH: ${{ inputs.include_mismatch }}
           TITLE: ${{ inputs.title }}
         run: |
           args=(--catalog-root . --limit "$LIMIT")
           if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          if [ "$INCLUDE_MISMATCH" = "true" ]; then args+=(--include-mismatch); fi
           if [ -n "$TITLE" ]; then args+=(--title "$TITLE"); fi
           python -m scripts.backfill_zenodo_rights "${args[@]}"
