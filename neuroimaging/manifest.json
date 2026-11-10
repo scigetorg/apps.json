@@ -1,7 +1,7 @@
 {
-    "entries": 780,
+    "entries": 781,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "7de8be892e9ec1d7bbd5f5b2c201422e35cd3528"
+        "NeuroDesk/neurocontainers": "44085f4b2755f6c08c5b4a0ab9f5d1228cdc166b"
     },
     "app_sources": {
         "afni": {
@@ -861,6 +861,7 @@
             "laynii_arm64 2.10.0": "NeuroDesk/neurocontainers"
         },
         "lcmodel": {
+            "lcmodel 6.3.0": "NeuroDesk/neurocontainers",
             "lcmodel 6.3": "NeuroDesk/neurocontainers"
         },
         "lesionquantificationtoolkit": {
