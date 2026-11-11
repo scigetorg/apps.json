@@ -13019,7 +13019,8 @@
                 "license_details": [
                     {
                         "license": "LicenseRef-StarTrack",
-                        "url": "https://nbl-research.github.io/startrack.html"
+                        "url": "https://nbl-research.github.io/startrack.html",
+                        "name": "LicenseRef-StarTrack"
                     }
                 ]
             },
@@ -13034,7 +13035,8 @@
                 "license_details": [
                     {
                         "license": "LicenseRef-StarTrack",
-                        "url": "https://nbl-research.github.io/startrack.html"
+                        "url": "https://nbl-research.github.io/startrack.html",
+                        "name": "LicenseRef-StarTrack"
                     }
                 ]
             }
@@ -13229,7 +13231,8 @@
                 "license_details": [
                     {
                         "license": "FreeSurfer Software License Agreement",
-                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense",
+                        "name": "FreeSurfer Software License Agreement"
                     }
                 ]
             },
@@ -13509,7 +13512,8 @@
                 "license_details": [
                     {
                         "license": "LicenseRef-FreeSurfer",
-                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
+                        "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense",
+                        "name": "LicenseRef-FreeSurfer"
                     }
                 ]
             },
