@@ -1,7 +1,7 @@
 {
-    "entries": 782,
+    "entries": 786,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "d9750327f01eb8e57eae0701415a06a79554fdfd"
+        "NeuroDesk/neurocontainers": "1c134c9690fa2985b429e15c892e5eb74e20e928"
     },
     "app_sources": {
         "afni": {
@@ -553,7 +553,10 @@
         "eman2": {
             "eman2 2.99.85": "NeuroDesk/neurocontainers",
             "e2projectmanagerGUI-eman2 2.99.85": "NeuroDesk/neurocontainers",
-            "e2displayGUI-eman2 2.99.85": "NeuroDesk/neurocontainers"
+            "e2displayGUI-eman2 2.99.85": "NeuroDesk/neurocontainers",
+            "eman2 2.99.86": "NeuroDesk/neurocontainers",
+            "e2projectmanagerGUI-eman2 2.99.86": "NeuroDesk/neurocontainers",
+            "e2displayGUI-eman2 2.99.86": "NeuroDesk/neurocontainers"
         },
         "emuses": {
             "emuses 1.3.0": "NeuroDesk/neurocontainers"
@@ -1667,12 +1670,14 @@
         "vertexwiser": {
             "vertexwiser 1.5.1": "NeuroDesk/neurocontainers",
             "vertexwiser 1.5.4": "NeuroDesk/neurocontainers",
-            "vertexwiser 1.5.5": "NeuroDesk/neurocontainers"
+            "vertexwiser 1.5.5": "NeuroDesk/neurocontainers",
+            "vertexwiser 1.6.0": "NeuroDesk/neurocontainers"
         },
         "vertexwiser_arm64": {
             "vertexwiser_arm64 1.5.1": "NeuroDesk/neurocontainers",
             "vertexwiser_arm64 1.5.4": "NeuroDesk/neurocontainers",
-            "vertexwiser_arm64 1.5.5": "NeuroDesk/neurocontainers"
+            "vertexwiser_arm64 1.5.5": "NeuroDesk/neurocontainers",
+            "vertexwiser_arm64 1.6.0": "NeuroDesk/neurocontainers"
         },
         "vesselboost": {
             "vesselboost 1.0.0": "NeuroDesk/neurocontainers",
@@ -1716,7 +1721,8 @@
             "whitematterlesions 0.2.20261009": "NeuroDesk/neurocontainers",
             "whitematterlesions 0.3.20261015": "NeuroDesk/neurocontainers",
             "whitematterlesions 0.5.20261022": "NeuroDesk/neurocontainers",
-            "whitematterlesions 0.5.20261103": "NeuroDesk/neurocontainers"
+            "whitematterlesions 0.5.20261103": "NeuroDesk/neurocontainers",
+            "whitematterlesions 0.5.20261108": "NeuroDesk/neurocontainers"
         },
         "workshopdemo": {
             "workshopdemo 1.0.0": "NeuroDesk/neurocontainers"
