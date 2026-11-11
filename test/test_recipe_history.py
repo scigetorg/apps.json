@@ -182,9 +182,42 @@ class RecipeHistoryTests(unittest.TestCase):
         source = {"repository": REPO, "root": str(self.clone.root)}
         result = catalog_licenses.resolve_artifacts(
             {"demo_1.0_20260101": source, "demo_0.9_20250101": source})
-        self.assertEqual(result["resolved"], {"demo_1.0_20260101": {
-            "license": ["other-closed"], "license_details": [{"license": "other-closed"}]}})
+        # Bare other-closed without name+url is now caught at consolidate time.
+        self.assertIn("needs a name", result["errors"]["demo_1.0_20260101"])
         self.assertIn("declares version '0.9'", result["errors"]["demo_0.9_20250101"])
+
+    def test_custom_license_with_name_and_url_resolves(self):
+        text = "\n".join([
+            "name: demo", "version: '1.0'",
+            "copyright:",
+            "  - license: other-closed",
+            "    name: Demo proprietary license",
+            "    url: https://example.org/LICENSE",
+        ]) + "\n"
+        self.clone.commit({"recipes/demo/build.yaml": text,
+                           "releases/demo/1.0.json": release("1.0", "20260101")})
+        source = {"repository": REPO, "root": str(self.clone.root)}
+        result = catalog_licenses.resolve_artifacts(
+            {"demo_1.0_20260101": source})
+        entry = result["resolved"]["demo_1.0_20260101"]
+        self.assertEqual(entry["license"], ["Demo proprietary license"])
+        self.assertEqual(entry["license_details"],
+                         [{"license": "other-closed", "name": "Demo proprietary license",
+                           "url": "https://example.org/LICENSE"}])
+
+    def test_custom_license_missing_url_is_error(self):
+        text = "\n".join([
+            "name: demo", "version: '1.0'",
+            "copyright:",
+            "  - license: other-open",
+            "    name: Some open license",
+        ]) + "\n"
+        self.clone.commit({"recipes/demo/build.yaml": text,
+                           "releases/demo/1.0.json": release("1.0", "20260101")})
+        source = {"repository": REPO, "root": str(self.clone.root)}
+        result = catalog_licenses.resolve_artifacts(
+            {"demo_1.0_20260101": source})
+        self.assertIn("needs a url", result["errors"]["demo_1.0_20260101"])
 
 
 if __name__ == "__main__":
