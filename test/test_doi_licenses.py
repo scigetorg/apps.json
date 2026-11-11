@@ -153,13 +153,19 @@ class DoiLicenseTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "no license_details"):
                 doi_license.rights_from_catalog({"license": ["MIT", value]})
         # A free-text license value is custom too, so its details are kept.
+        # license_details promotes the license value to name when it's a custom
+        # term without an explicit name field.
         recipe = {"copyright": [{"license": "FreeSurfer Software License Agreement",
                                  "url": "https://example.org/fs"}, {"license": "MIT"}]}
         self.assertEqual(license_details(recipe), [{"license": "FreeSurfer Software License Agreement",
+                                                    "name": "FreeSurfer Software License Agreement",
                                                     "url": "https://example.org/fs"}])
-        with self.assertRaisesRegex(ValueError, "needs a name and URL"):
-            doi_license.rights_from_catalog({"license": declared_licenses(recipe),
-                                             "license_details": license_details(recipe)})
+        self.assertEqual(doi_license.rights_from_catalog(
+            {"license": declared_licenses(recipe),
+             "license_details": license_details(recipe)}),
+            [{"id": "mit"},
+             {"title": {"en": "FreeSurfer Software License Agreement"},
+              "link": "https://example.org/fs"}])
         row = audit_record(record([{"id": "other-closed"}]), {"license": ["other-closed"]})
         self.assertEqual(row["status"], "mismatch")
         self.assertIn("no license_details", row["reason"])
