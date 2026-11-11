@@ -1,7 +1,7 @@
 {
-    "entries": 781,
+    "entries": 782,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "0bbfa571c707f9a2bb08516426d701c3d2977d44"
+        "NeuroDesk/neurocontainers": "d9750327f01eb8e57eae0701415a06a79554fdfd"
     },
     "app_sources": {
         "afni": {
@@ -218,7 +218,9 @@
             "blender 5.2.2": "NeuroDesk/neurocontainers",
             "blenderGUI-blender 5.2.2": "NeuroDesk/neurocontainers",
             "blender 5.2.3": "NeuroDesk/neurocontainers",
-            "blenderGUI-blender 5.2.3": "NeuroDesk/neurocontainers"
+            "blenderGUI-blender 5.2.3": "NeuroDesk/neurocontainers",
+            "blender 5.3.0": "NeuroDesk/neurocontainers",
+            "blenderGUI-blender 5.3.0": "NeuroDesk/neurocontainers"
         },
         "blochsiegertb1mapping": {
             "blochsiegertb1mapping 1.1.0": "NeuroDesk/neurocontainers"
