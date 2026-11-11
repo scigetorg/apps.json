@@ -13019,6 +13019,7 @@
                 "license_details": [
                     {
                         "license": "LicenseRef-StarTrack",
+                        "name": "StarTrack Software License",
                         "url": "https://nbl-research.github.io/startrack.html"
                     }
                 ]
@@ -13034,6 +13035,7 @@
                 "license_details": [
                     {
                         "license": "LicenseRef-StarTrack",
+                        "name": "StarTrack Software License",
                         "url": "https://nbl-research.github.io/startrack.html"
                     }
                 ]
@@ -13228,7 +13230,8 @@
                 ],
                 "license_details": [
                     {
-                        "license": "FreeSurfer Software License Agreement",
+                        "license": "other-open",
+                        "name": "FreeSurfer Software License Agreement",
                         "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
                     }
                 ]
@@ -13503,12 +13506,13 @@
                 "image": "topofit_0.5.1",
                 "doi": "https://doi.org/10.5281/zenodo.22730955",
                 "license": [
-                    "GPL-3.0-only",
-                    "LicenseRef-FreeSurfer"
+                    "FreeSurfer Software License Agreement",
+                    "GPL-3.0-only"
                 ],
                 "license_details": [
                     {
-                        "license": "LicenseRef-FreeSurfer",
+                        "license": "other-open",
+                        "name": "FreeSurfer Software License Agreement",
                         "url": "https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense"
                     }
                 ]
