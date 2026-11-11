@@ -1,8 +1,9 @@
 name: Publish apps catalog DOIs
 
 on:
-  schedule:
-    - cron: '25 4 * * *'
+  workflow_run:
+    workflows: ["Consolidate apps catalog"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       limit:
@@ -19,6 +20,8 @@ permissions:
 
 jobs:
   plan:
+    # Skip when triggered by a failed or cancelled consolidate run.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-24.04
     outputs:
       batches: ${{ steps.plan.outputs.batches }}
