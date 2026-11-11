@@ -136,9 +136,17 @@ def license_details(recipe):
         identifier = entry.get("license") or ""
         # No-license entries keep their URL so readers can see where the source is.
         if entry.get("name") or is_custom_term(identifier) or declares_no_license(entry):
-            details.append({
+            detail = {
                 key: entry[key].strip()
                 for key in ("license", "name", "url")
                 if isinstance(entry.get(key), str) and entry[key].strip()
-            })
+            }
+            # Custom terms without an explicit name (e.g. license: "FreeSurfer
+            # Software License Agreement" with no name field): the license value
+            # IS the human-readable name, so promote it.
+            if "name" not in detail and is_custom_term(detail.get("license", "")):
+                lic = detail.get("license", "")
+                if lic and lic.lower() not in OTHER_IDS and not declares_no_license(entry):
+                    detail["name"] = lic
+            details.append(detail)
     return details
