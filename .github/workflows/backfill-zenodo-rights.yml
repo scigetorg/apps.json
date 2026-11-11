@@ -17,6 +17,10 @@ on:
         description: 'Also update mismatch records (not just legacy)'
         type: boolean
         default: false
+      clear_placeholders:
+        description: 'Clear placeholder licenses from no_catalog_license records'
+        type: boolean
+        default: false
       title:
         description: 'Only this image title (optional)'
         type: string
@@ -45,10 +49,12 @@ jobs:
           APPLY: ${{ inputs.apply }}
           LIMIT: ${{ inputs.limit }}
           INCLUDE_MISMATCH: ${{ inputs.include_mismatch }}
+          CLEAR_PLACEHOLDERS: ${{ inputs.clear_placeholders }}
           TITLE: ${{ inputs.title }}
         run: |
           args=(--catalog-root . --limit "$LIMIT")
           if [ "$APPLY" = "true" ]; then args+=(--apply); fi
           if [ "$INCLUDE_MISMATCH" = "true" ]; then args+=(--include-mismatch); fi
+          if [ "$CLEAR_PLACEHOLDERS" = "true" ]; then args+=(--clear-placeholders); fi
           if [ -n "$TITLE" ]; then args+=(--title "$TITLE"); fi
           python -m scripts.backfill_zenodo_rights "${args[@]}"

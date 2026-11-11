@@ -80,25 +80,23 @@ def audit_record(record, entry):
            "doi_url": f"https://doi.org/{doi}" if doi else None,
            "published_license": describe(published)}
     if not entry.get("license"):
-        row.update(status="no_catalog_license", problems=[],
-                   reason="apps.json has no license for this image")
+        row.update(status="no_catalog_license", reason="apps.json has no license for this image")
         return row
     try:
         expected = rights_from_catalog(entry)
     except ValueError as exc:
-        row.update(status="mismatch", problems=[f"apps.json license is incomplete: {exc}"])
+        row.update(status="mismatch", reason=f"apps.json license is incomplete: {exc}")
         return row
     row["catalog_license"] = describe(expected)
     published_key, expected_key = rights_key(published), rights_key(expected)
     if published_key == expected_key:
-        row.update(status="verified", problems=[])
+        row.update(status="verified", reason="")
     elif reason := legacy_reason(published_key, expected_key):
         # The backfill replaces it with apps.json's licenses (recipe history).
-        row.update(status="verified_legacy", problems=[], reason=reason)
+        row.update(status="verified_legacy", reason=reason)
     else:
-        row.update(status="mismatch", problems=[
-            f"Zenodo licenses {row['published_license']!r} differ from apps.json {row['catalog_license']!r}"
-        ])
+        row.update(status="mismatch", reason=(
+            f"Zenodo licenses {row['published_license']!r} differ from apps.json {row['catalog_license']!r}"))
     return row
 
 
@@ -121,8 +119,7 @@ def write_summary(path, report):
     lines.extend(["", "Detailed results are in the `zenodo-license-audit` artifact.", ""])
     findings = [row for row in report["records"] if row["status"] != "verified"]
     for row in findings[:100]:
-        reason = "; ".join(row.get("problems") or []) or row.get("reason", "")
-        lines.append(f"- **{row['status']}** `{row['title']}`: {reason}")
+        lines.append(f"- **{row['status']}** `{row['title']}`: {row['reason']}")
     if len(findings) > 100:
         lines.append(f"- … and {len(findings) - 100} more findings in the JSON artifact")
     with open(path, "a", encoding="utf-8") as stream:
