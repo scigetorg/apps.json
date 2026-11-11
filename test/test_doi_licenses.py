@@ -162,7 +162,7 @@ class DoiLicenseTests(unittest.TestCase):
                                              "license_details": license_details(recipe)})
         row = audit_record(record([{"id": "other-closed"}]), {"license": ["other-closed"]})
         self.assertEqual(row["status"], "mismatch")
-        self.assertIn("no license_details", row["problems"][0])
+        self.assertIn("no license_details", row["reason"])
 
     def test_catalog_license_mismatch_blocks_publication(self):
         artifacts = {"demo_1.0_20260101": {"doi": "", "license": ["Apache-2.0"],
@@ -267,7 +267,7 @@ class DoiLicenseTests(unittest.TestCase):
         ):
             row = audit_record(record(published), entry)
             self.assertEqual(row["status"], "verified", published)
-            self.assertEqual(row["problems"], [])
+            self.assertEqual(row["reason"], "")
         self.assertEqual(row["doi_url"], "https://doi.org/10.5281/zenodo.12")
 
     def test_audit_accepts_single_other_category_from_legacy_publication(self):
@@ -303,11 +303,11 @@ class DoiLicenseTests(unittest.TestCase):
                            {"license": ["Apache-2.0", "MIT"]})
         self.assertEqual(row["status"], "mismatch")
         self.assertEqual(row["catalog_license"], ["apache-2.0", "mit"])
-        self.assertIn("gpl-3.0-only", row["problems"][0])
+        self.assertIn("gpl-3.0-only", row["reason"])
         row = audit_record(record([{"id": "other-open"}]), {
             "license": ["other-open"], "license_details": [{"license": "other-open"}]})
         self.assertEqual(row["status"], "mismatch")
-        self.assertIn("incomplete", row["problems"][0])
+        self.assertIn("incomplete", row["reason"])
 
     def test_audit_reports_catalog_entry_without_license(self):
         row = audit_record(record([{"id": "mit"}]), {"license": []})

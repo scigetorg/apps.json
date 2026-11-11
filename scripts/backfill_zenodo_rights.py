@@ -1,11 +1,11 @@
-"""Backfill full license lists onto records published with one legacy license.
+"""Backfill catalog license lists onto legacy records and selected mismatches.
 
 neurocommand's old pipeline (deposit API) gave each record one license, often a
 placeholder: an `other-*` category, Zenodo's default `cc-by-4.0` when none was
-sent, or just the first of several. This edits exactly the audit's
-`verified_legacy` records so their `rights` are apps.json's licenses (recipe
-history); the placeholder is replaced, not kept. Nothing else changes: same record, DOI,
-version and files. Dry run by default; `--apply` writes.
+sent, or just the first of several. This edits the audit's `verified_legacy`
+records, plus `mismatch` records with `--include-mismatch`, so their `rights`
+are apps.json's licenses (recipe history). Nothing else changes: same record,
+DOI, version and files. Dry run by default; `--apply` writes.
 
     audit_rows(apps.json, /api/user/records) ─► status verified_legacy
         ─► POST   /records/{id}/draft                 (open an edit draft)
@@ -105,12 +105,12 @@ def main():
     total = len(targets)
     if args.limit:
         targets = targets[:args.limit]
-    print(f"{ZENODO_API}: {total} legacy record(s), handling {len(targets)}"
+    print(f"{ZENODO_API}: {total} target record(s), handling {len(targets)}"
           f"{'' if args.apply else ' (dry run, nothing is written)'}", flush=True)
     updated, failures = 0, 0
     for row in targets:
         line = (f"{row['title']} {row['doi_url']}: {row['published_license']} -> "
-                f"{row['catalog_license']} ({row['reason']})")
+                f"{row.get('catalog_license', 'unavailable')} ({row['reason']})")
         try:
             expected = rights_from_catalog(artifacts[row["title"]])
             if unknown := unknown_ids(expected, catalogue):
