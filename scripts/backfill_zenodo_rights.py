@@ -12,6 +12,14 @@ DOI, version and files. Dry run by default; `--apply` writes.
         ─► PUT    /records/{id}/draft                 (rights = rights_from_catalog)
         ─► POST   /records/{id}/draft/actions/publish (same DOI)
         any error before publish ─► DELETE the edit draft (published record unchanged)
+
+Modes:
+    (default)            verified_legacy records only
+    --include-mismatch   also mismatch records (Zenodo has multi-license that
+                         differs from apps.json, e.g. after a recipe correction)
+    --clear-placeholders no_catalog_license records whose Zenodo license is a
+                         known placeholder (other-*, cc-by-4.0 default); clears
+                         rights to [] since no real license is known
 """
 
 import argparse
@@ -22,7 +30,10 @@ from pathlib import Path
 import requests
 
 from .audit_doi_licenses import audit_rows
-from .doi_license import fetch_catalogue, rights_from_catalog, same_rights
+from .doi_license import (
+    fetch_catalogue, license_equivalence_key, rights_from_catalog, same_rights,
+)
+from .license_terms import OTHER_IDS
 from .zenodo_catalog import (
     RDM_JSON, ZENODO_API, build_session, catalog_artifacts, raise_draft_errors,
     record_doi, user_records,
@@ -31,6 +42,13 @@ from .zenodo_catalog import (
 # Fields the records API accepts back on a draft update.
 EDITABLE = ("metadata", "files", "access", "pids", "custom_fields")
 
+# Zenodo's default and the other-* placeholders: the old pipeline wrote these
+# when it had no license, so they carry no signal about the actual terms.
+_PLACEHOLDER_KEYS = (
+    {("id", license_equivalence_key(other)) for other in OTHER_IDS}
+    | {("id", license_equivalence_key("cc-by-4.0"))}
+)
+
 
 def legacy_targets(artifacts, records, titles=None, include_mismatch=False):
     statuses = {"verified_legacy"}
@@ -38,6 +56,23 @@ def legacy_targets(artifacts, records, titles=None, include_mismatch=False):
         statuses.add("mismatch")
     return [row for row in audit_rows(artifacts, records)
             if row["status"] in statuses and (not titles or row["title"] in titles)]
+
+
+def placeholder_targets(artifacts, records, titles=None):
+    """no_catalog_license records whose single Zenodo license is a known placeholder."""
+    from .doi_license import rights_key
+    targets = []
+    for row in audit_rows(artifacts, records):
+        if row["status"] != "no_catalog_license":
+            continue
+        if titles and row["title"] not in titles:
+            continue
+        published = (records.get(row["title"], {}).get("metadata") or {}).get("rights") or []
+        pub_key = rights_key(published)
+        if len(pub_key) == 1 and pub_key <= _PLACEHOLDER_KEYS:
+            row["reason"] = "clearing placeholder (no license known)"
+            targets.append(row)
+    return targets
 
 
 def raise_for_zenodo(response):
@@ -88,6 +123,8 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="at most this many records (0 = all)")
     parser.add_argument("--include-mismatch", action="store_true",
                         help="also update mismatch records (default: only verified_legacy)")
+    parser.add_argument("--clear-placeholders", action="store_true",
+                        help="clear placeholder licenses from no_catalog_license records")
     parser.add_argument("--title", action="append", default=[],
                         help="only this image title; repeat for several")
     args = parser.parse_args()
@@ -98,21 +135,27 @@ def main():
         parser.error("--limit must be 0 or more")
     session = build_session(token)
     artifacts = catalog_artifacts(args.catalog_root)
-    targets = legacy_targets(artifacts, user_records(session), set(args.title),
-                              args.include_mismatch)
+    records = user_records(session)
+    targets = legacy_targets(artifacts, records, set(args.title), args.include_mismatch)
+    if args.clear_placeholders:
+        targets += placeholder_targets(artifacts, records, set(args.title))
     # Checked in the dry run too, so IDs Zenodo would reject show up before --apply.
     catalogue = fetch_catalogue()["entries"]
     total = len(targets)
     if args.limit:
         targets = targets[:args.limit]
-    print(f"{ZENODO_API}: {total} target record(s), handling {len(targets)}"
+    print(f"{ZENODO_API}: {total} record(s) to update, handling {len(targets)}"
           f"{'' if args.apply else ' (dry run, nothing is written)'}", flush=True)
     updated, failures = 0, 0
     for row in targets:
+        is_placeholder_clear = row["status"] == "no_catalog_license"
+        expected = [] if is_placeholder_clear else None
+        target_label = "[]" if is_placeholder_clear else str(row.get("catalog_license"))
         line = (f"{row['title']} {row['doi_url']}: {row['published_license']} -> "
                 f"{row.get('catalog_license', 'unavailable')} ({row['reason']})")
         try:
-            expected = rights_from_catalog(artifacts[row["title"]])
+            if expected is None:
+                expected = rights_from_catalog(artifacts[row["title"]])
             if unknown := unknown_ids(expected, catalogue):
                 raise ValueError(f"not Zenodo license IDs: {unknown} (fix the recipe license)")
             if not args.apply:
