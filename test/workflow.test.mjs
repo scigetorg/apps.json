@@ -229,3 +229,96 @@ test("duplicate app identity across separate domains fails", async () => {
     sourceCommits: { [repo]: sha, [second]: "b".repeat(40) }, doiDelayMs: 0,
   }), /Duplicate app.*Example\/containers.*Other\/containers/);
 });
+
+async function writeGenerator(source, generated) {
+  await mkdir(join(source, "tools"), { recursive: true });
+  await writeFile(join(source, "tools", "generate_apps_json.py"), [
+    "import json, os, sys",
+    "args = dict(zip(sys.argv[1::2], sys.argv[2::2]))",
+    "if 'ZENODO_TOKEN' in os.environ: sys.exit('ZENODO_TOKEN reached the generator')",
+    "if not os.path.isfile(os.path.join(args['--releases-dir'], 'demo', '1.0.json')): sys.exit('no releases')",
+    generated === null ? "sys.exit('recipe compile exploded')" :
+      `json.dump(json.loads(${JSON.stringify(JSON.stringify(generated))}), open(args['--output'], 'w'))`,
+  ].join("\n"));
+}
+
+async function publishedText(root, text) {
+  await writeFile(join(root, "neuroimaging", "apps.json"), JSON.stringify({
+    demo: { apps: {}, categories: [], ...text },
+  }));
+}
+
+async function runWithToken(root) {
+  process.env.ZENODO_TOKEN = "secret";
+  try {
+    await consolidateDomains(root, domains, {
+      sourceCommits: { [repo]: sha }, resolveLicenses, publishedDois: {},
+    });
+  } finally {
+    delete process.env.ZENODO_TOKEN;
+  }
+  return JSON.parse(await readFile(join(root, "neuroimaging", "apps.json"), "utf8"));
+}
+
+test("the source generator's citation and description reach the catalog by tool", async () => {
+  const { root, source } = await fixture();
+  await writeGenerator(source, {
+    demo: { apps: {}, categories: [], citation: "Demo et al. 2024", description: "Demo tool." },
+    unreleased: { citation: "Not in this catalog" },
+  });
+  const catalog = await runWithToken(root);
+  assert.deepEqual(Object.keys(catalog.demo), ["apps", "categories", "citation", "description"]);
+  assert.equal(catalog.demo.citation, "Demo et al. 2024");
+  assert.equal(catalog.demo.description, "Demo tool.");
+  assert.equal(Object.hasOwn(catalog, "unreleased"), false);
+});
+
+test("fields the generator omits or leaves blank are absent, replacing published text", async () => {
+  const { root, source } = await fixture();
+  await publishedText(root, { citation: "Old citation", description: "Old description" });
+  await writeGenerator(source, { demo: { apps: {}, categories: [], citation: "  " } });
+  const catalog = await runWithToken(root);
+  assert.equal(Object.hasOwn(catalog.demo, "citation"), false);
+  assert.equal(Object.hasOwn(catalog.demo, "description"), false);
+});
+
+test("a source without a generator yields no tool text", async () => {
+  const { root } = await fixture();
+  await publishedText(root, { citation: "Old citation" });
+  const catalog = await runWithToken(root);
+  assert.deepEqual(Object.keys(catalog.demo), ["apps", "categories"]);
+  assert.deepEqual(Object.keys(catalog.demo.apps), ["demo 1.0"]);
+});
+
+test("a failing generator warns and keeps the published text", async () => {
+  const { root, source } = await fixture();
+  await publishedText(root, { citation: "Old citation", description: "Old description" });
+  await writeGenerator(source, null);
+  const warnings = [];
+  const warn = console.warn;
+  console.warn = (message) => warnings.push(message);
+  let catalog;
+  try {
+    catalog = await runWithToken(root);
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(catalog.demo.citation, "Old citation");
+  assert.equal(catalog.demo.description, "Old description");
+  assert.deepEqual(Object.keys(catalog.demo.apps), ["demo 1.0"]);
+  assert.match(warnings.join("\n"), /Example\/containers.*generate_apps_json\.py failed: recipe compile exploded/);
+});
+
+test("the generator's description wins and the recipe readme fills a gap", async () => {
+  const { root, source } = await fixture();
+  await writeFile(join(source, "recipes", "demo", "build.yaml"),
+    "domains: [neuroimaging]\nreadme: |\n  ## demo/1.0 ##\n  From the recipe readme.\n");
+  await writeGenerator(source, { demo: { citation: "Demo et al. 2024" } });
+  let catalog = await runWithToken(root);
+  assert.equal(catalog.demo.citation, "Demo et al. 2024");
+  assert.equal(catalog.demo.description, "From the recipe readme.");
+  await writeGenerator(source, { demo: { description: "From the generator." } });
+  catalog = await runWithToken(root);
+  assert.equal(catalog.demo.description, "From the generator.");
+  assert.equal(Object.hasOwn(catalog.demo, "citation"), false);
+});

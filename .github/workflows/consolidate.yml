@@ -31,8 +31,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Install license lookup dependencies
-        run: python -m pip install requests 'pyyaml>=6.0.2' packaging
+      # jinja2 and attrs run neurocontainers' tools/generate_apps_json.py,
+      # which supplies tool citations and descriptions.
+      - name: Install license lookup and source generator dependencies
+        run: python -m pip install requests 'pyyaml>=6.0.2' packaging jinja2 attrs
       - name: Check out configured containers repositories
         run: node scripts/workflow.mjs checkout
       - name: Consolidate every domain and recipe licenses

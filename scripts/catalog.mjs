@@ -1,9 +1,13 @@
 import YAML from "yaml";
-import { spawn } from "node:child_process";
-import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
+import { execFile, spawn } from "node:child_process";
+import { access, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { promisify } from "node:util";
 
 const IMAGE = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
+const TOOL_TEXT_FIELDS = ["citation", "description"];
+const TOOL_TEXT_GENERATOR = join("tools", "generate_apps_json.py");
 
 function jsonText(value) {
   return `${JSON.stringify(value, null, 4)}\n`;
@@ -302,6 +306,53 @@ export async function collectDoiMetadata(
   return found;
 }
 
+function toolTextFields(entry) {
+  const fields = {};
+  for (const field of TOOL_TEXT_FIELDS) {
+    const value = entry?.[field];
+    if (typeof value === "string" && value.trim()) fields[field] = value;
+  }
+  return fields;
+}
+
+// A source repository that ships tools/generate_apps_json.py owns its tools'
+// citation and description: its generator renders each recipe for the
+// release's variant, so its output is taken rather than re-parsed here.
+// Returns {} when the source has no generator; throws when the generator fails.
+export async function readToolText(sourceRoot) {
+  const generator = join(sourceRoot, TOOL_TEXT_GENERATOR);
+  try {
+    await access(generator);
+  } catch (error) {
+    if (error.code === "ENOENT") return {};
+    throw error;
+  }
+  const directory = await mkdtemp(join(tmpdir(), "tool-text-"));
+  try {
+    const output = join(directory, "apps.json");
+    const { ZENODO_TOKEN, ...env } = process.env;
+    try {
+      await promisify(execFile)("python3",
+        [generator, "--releases-dir", join(sourceRoot, "releases"), "--output", output],
+        { cwd: sourceRoot, env, maxBuffer: 64 * 1024 * 1024 });
+    } catch (error) {
+      const detail = error.stderr?.trim().split("\n").at(-1) || error.message;
+      throw new Error(`${TOOL_TEXT_GENERATOR} failed: ${detail}`);
+    }
+    const generated = JSON.parse(await readFile(output, "utf8"));
+    if (!generated || typeof generated !== "object" || Array.isArray(generated))
+      throw new Error(`${TOOL_TEXT_GENERATOR} did not write an object`);
+    const text = {};
+    for (const [tool, entry] of Object.entries(generated)) {
+      const fields = toolTextFields(entry);
+      if (Object.keys(fields).length) text[tool] = fields;
+    }
+    return text;
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+
 // Reads every title's license from its recipe history (scripts/recipe_history.py).
 // `titles` maps image title -> { repository, root } of its source clone.
 export async function resolveRecipeLicenses(titles) {
@@ -423,7 +474,10 @@ export async function consolidate({
       const metadata = source.metadata.get(tool);
       if (!metadata.domains.includes(domain)) continue;
       releases.push({ path: release.path, data: { ...release.data, repository: source.repository } });
-      details[tool] = metadata.details;
+      // The source generator's text wins over the description parsed here.
+      // toolText null: the generator failed, so keep the published text.
+      details[tool] = { ...metadata.details, ...toolTextFields(source.toolText === null
+        ? previous.catalog[tool] : source.toolText?.[tool]) };
       sourceRoots[tool] ??= {};
       for (const name of Object.keys(release.data.apps))
         sourceRoots[tool][name] = {

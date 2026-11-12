@@ -91,6 +91,21 @@ Deleting a release JSON retires that version from the next catalog while
 retaining other versions. Deleting the last release produces an empty catalog.
 `manifest.json` records the image count and source commits.
 
+### Where citations and descriptions come from
+
+A tool entry may carry `citation` and `description` strings next to `apps`
+and `categories`. The source repository decides them. When it ships
+`tools/generate_apps_json.py`, every catalog run executes that script on the
+clone (`--releases-dir`, `--output`) and copies the non-empty `citation` and
+`description` of each tool in its output. neurocontainers compiles each recipe
+for the release's variant and reads `structured_readme` or the readme. When the
+script gives no `description`, or the source has no script, the catalog run
+takes the paragraph after the recipe readme's `## name/version ##` title
+instead; a source without the script gets no `citation`. If the script fails,
+the run logs a warning and keeps the strings already in `apps.json`. Its Python dependencies
+(`jinja2`, `attrs`, `pyyaml`, `requests`, `packaging`) are installed by the
+catalog workflow; cairosvg is not needed.
+
 ### Where licenses come from
 
 An image `<image>_<build date>` comes from `releases/<tool>/<release>.json`, and
@@ -258,7 +273,8 @@ public Worker.
 
 ## Local checks
 
-Use Node.js 24.0.0, then run `npm ci` and `npm test`. The DOI helper tests use
+Use Node.js 24.0.0, then run `npm ci` and `npm test`. The workflow tests run
+small Python generator fixtures with `python3`. The DOI helper tests use
 Python with `requests` and `pyyaml`: `python -m unittest discover -s test -p 'test_*.py'`.
 The `Test` workflow runs both suites, without secrets, on pull requests and on
 code pushes to `main`.
@@ -270,3 +286,8 @@ npm run consolidate
 ```
 
 The clone step writes to ignored `.catalog-sources/<repository>/` directories.
+Consolidation needs `python3` with `requests`, `pyyaml`, `packaging`, `jinja2`
+and `attrs`. Without `ZENODO_TOKEN` it skips the DOI lookup and keeps the DOIs
+already in `apps.json`; it never mints DOIs or publishes to Cloudflare.
+Discard the regenerated files (`git checkout -- neuroimaging`) unless they
+belong in your change.
