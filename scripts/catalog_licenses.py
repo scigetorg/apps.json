@@ -8,7 +8,21 @@ license_details}}, "errors": {title: reason}}.
 import json
 import sys
 
+from .license_terms import is_custom_term
 from .recipe_history import SourceRecipes
+
+
+def _validate_custom_details(license_details):
+    """Raise ValueError when a custom license entry is missing its name or URL."""
+    for detail in license_details:
+        identifier = detail.get("license", "")
+        if is_custom_term(identifier):
+            if not detail.get("name"):
+                raise ValueError(
+                    f"Custom license {identifier!r} needs a name in license_details")
+            if not detail.get("url"):
+                raise ValueError(
+                    f"Custom license {detail.get('name') or identifier!r} needs a url in license_details")
 
 
 def resolve_artifacts(titles):
@@ -17,6 +31,7 @@ def resolve_artifacts(titles):
     for title, source in titles.items():
         try:
             info = recipes.license(title, [source["repository"]])
+            _validate_custom_details(info["license_details"])
             resolved[title] = {"license": info["declared"], "license_details": info["license_details"]}
         except (OSError, RuntimeError, ValueError) as exc:
             errors[title] = str(exc)
