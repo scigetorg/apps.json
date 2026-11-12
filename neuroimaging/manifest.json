@@ -1,7 +1,7 @@
 {
-    "entries": 787,
+    "entries": 789,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "5aa1f104e3cd6e3c152efaf3037706f0580aea23"
+        "NeuroDesk/neurocontainers": "96d0129653f11d9d1b87e72fc3196c175e94f515"
     },
     "app_sources": {
         "afni": {
@@ -1321,6 +1321,12 @@
             "prostatefiducialseg 8.0.2": "NeuroDesk/neurocontainers",
             "prostatefiducialseg 8.0.3": "NeuroDesk/neurocontainers",
             "prostatefiducialseg 8.0.4": "NeuroDesk/neurocontainers"
+        },
+        "pycortex": {
+            "pycortex 1.4.0": "NeuroDesk/neurocontainers"
+        },
+        "pycortex_arm64": {
+            "pycortex_arm64 1.4.0": "NeuroDesk/neurocontainers"
         },
         "pydeface": {
             "pydeface 2.0.2": "NeuroDesk/neurocontainers",
