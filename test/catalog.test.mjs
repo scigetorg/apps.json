@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import {
   applyMetadata, buildCatalog, collectDoiMetadata, collectLicenseMetadata,
-  makeFiles, readReleases, readSourceDomains,
+  describeReadme, makeFiles, readReleases, readSourceDomains,
 } from "../scripts/catalog.mjs";
 
 const repository = "Example/containers";
@@ -161,4 +161,39 @@ test("recipe domains are mandatory and validated against the registry", async ()
   await assert.rejects(readSourceDomains(root, releases, registry, repository), /Unknown domain/);
   await writeFile(join(root, "recipes", "demo", "build.yaml"), "categories: [visualization]\n");
   await assert.rejects(readSourceDomains(root, releases, registry, repository), /Missing or invalid domains/);
+});
+
+test("recipes supply each tool's description and OpenRecon flag", async () => {
+  const root = await mkdtemp(join(tmpdir(), "catalog-details-"));
+  const registry = { neuroimaging: { source_repositories: [repository] } };
+  for (const tool of ["demo", "scanner", "plain"]) {
+    await mkdir(join(root, "releases", tool), { recursive: true });
+    await mkdir(join(root, "recipes", tool), { recursive: true });
+    await writeFile(join(root, "releases", tool, "1.0.json"), JSON.stringify(rows[0].data));
+  }
+  await writeFile(join(root, "recipes", "demo", "build.yaml"), [
+    "name: demo", 'version: "1.0"', "domains: [neuroimaging]", "variables:", "  upstream: Demo {{ context.version }}",
+    "readme: |", "  ----------------------------------", "  ## demo/{{ context.version }} ##",
+    "  Packages {{ context.upstream }}", "  for viewing.", "", "  Example:", "  ```", "  demo", "  ```", "",
+  ].join("\n"));
+  await writeFile(join(root, "recipes", "scanner", "build.yaml"), "domains: [neuroimaging]\n");
+  await writeFile(join(root, "recipes", "scanner", "README.md"), "## scanner/2 ##\nRuns on the scanner.\n");
+  await writeFile(join(root, "recipes", "scanner", "OpenReconLabel.gpu.json"), "{}");
+  await writeFile(join(root, "recipes", "plain", "build.yaml"), "domains: [neuroimaging]\n");
+  const metadata = await readSourceDomains(root, await readReleases(root), registry, repository);
+  assert.deepEqual(metadata.get("demo").details, { description: "Packages Demo 1.0 for viewing." });
+  assert.deepEqual(metadata.get("scanner").details, { description: "Runs on the scanner.", openrecon: true });
+  assert.deepEqual(metadata.get("plain").details, {});
+
+  const catalog = applyMetadata(buildCatalog(rows, { catalog: {} }), {}, {},
+    { demo: metadata.get("demo").details });
+  assert.equal(catalog.demo.description, "Packages Demo 1.0 for viewing.");
+  assert.equal(catalog.demo.openrecon, undefined);
+  assert.deepEqual(Object.keys(catalog.demo.apps), ["demo 1.0", "viewerGUI-demo 1.0"]);
+});
+
+test("a readme without description text yields none", () => {
+  assert.equal(describeReadme("## demo/1 ##\nExample:\ndemo"), undefined);
+  assert.equal(describeReadme("demo/{{ context.version }}\n{{ context.missing }} stays", {}), "{{ context.missing }} stays");
+  assert.equal(describeReadme(undefined), undefined);
 });

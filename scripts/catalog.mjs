@@ -65,6 +65,62 @@ export function imageBuild(tool, release, app) {
   return `${imageKey(tool, release, app)}_${app.version}`;
 }
 
+// A recipe readme opens with a separator and a "## name/version ##" title, then
+// the description, then usage sections. Anything matching SECTION_END ends it.
+const SECTION_END =
+  /^(##\s|```|Examples?:?|---+$|More documentation|To setup|Licensing|Usage|Citation)/i;
+const TITLE = /^(##\s.*|[\w.+-]+\/(\{\{[^}]*\}\}|\S)+)$/;
+const PLACEHOLDER = /\{\{\s*(?:context\.)?(\w+)\s*\}\}/g;
+
+// Variables may reference each other, so render until nothing changes. Unknown
+// keys stay as written.
+function renderPlaceholders(text, context) {
+  for (let pass = 0; pass < 5; pass++) {
+    const next = text.replace(PLACEHOLDER, (match, key) =>
+      typeof context[key] === "string" || typeof context[key] === "number" ? String(context[key]) : match);
+    if (next === text) break;
+    text = next;
+  }
+  return text;
+}
+
+export function describeReadme(readme, context = {}) {
+  if (typeof readme !== "string") return undefined;
+  const lines = readme.split("\n").map((line) => line.trim());
+  let start = 0;
+  while (start < lines.length && (!lines[start] || /^-{3,}$/.test(lines[start]))) start++;
+  if (TITLE.test(lines[start] ?? "")) start++;
+  const body = [];
+  for (const line of lines.slice(start)) {
+    if (SECTION_END.test(line)) break;
+    body.push(line);
+  }
+  const text = renderPlaceholders(body.join(" "), context).replace(/\s+/g, " ").trim();
+  return text || undefined;
+}
+
+async function readOptional(path) {
+  try {
+    return await readFile(path, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
+// Tool-level fields for the catalog: the recipe's description and whether it
+// ships an OpenRecon scanner label (OpenReconLabel.json, OpenReconLabel.gpu.json, ...).
+async function recipeDetails(directory, document) {
+  const variables = Object.fromEntries(
+    Object.entries(document.variables ?? {}).filter(([, value]) => typeof value !== "object"),
+  );
+  const context = { ...variables, name: document.name, version: document.version };
+  const description = describeReadme(document.readme, context) ??
+    describeReadme(await readOptional(join(directory, "README.md")), context);
+  const openrecon = (await readdir(directory)).some((name) => /^OpenReconLabel.*\.json$/.test(name));
+  return { ...(description && { description }), ...(openrecon && { openrecon }) };
+}
+
 export async function readSourceDomains(sourceRoot, releases, domains, repository) {
   const result = new Map();
   let retirements = [];
@@ -94,6 +150,7 @@ export async function readSourceDomains(sourceRoot, releases, domains, repositor
         }
       }
     }
+    const details = document ? await recipeDetails(join(sourceRoot, "recipes", recipe), document) : {};
     document ??= retired.get(recipe);
     const labels = document?.domains;
     if (!Array.isArray(labels) || !labels.length ||
@@ -107,7 +164,7 @@ export async function readSourceDomains(sourceRoot, releases, domains, repositor
       if (!domains[label].source_repositories.includes(repository))
         throw new Error(`${repository}/${tool} declares ${label}, but that domain does not list ${repository}`);
     }
-    result.set(tool, { domains: labels, recipe });
+    result.set(tool, { domains: labels, recipe, details });
   }
   return result;
 }
@@ -324,9 +381,10 @@ export async function collectLicenseMetadata(catalog, sourceRoots, {
   return apps;
 }
 
-export function applyMetadata(catalog, dois, licenses) {
+export function applyMetadata(catalog, dois, licenses, details = {}) {
   const updated = structuredClone(catalog);
   for (const [tool, entry] of Object.entries(updated)) {
+    Object.assign(entry, details[tool]);
     for (const [name, app] of Object.entries(entry.apps)) {
       if (dois[tool]?.[name]) app.doi = dois[tool][name];
       if (licenses[tool]?.[name]) {
@@ -357,6 +415,7 @@ export async function consolidate({
   const releases = [];
   const sourceRoots = {};
   const sourceCommits = {};
+  const details = {};
   for (const source of sources) {
     sourceCommits[source.repository] = source.sourceCommit;
     for (const release of source.releases) {
@@ -364,6 +423,7 @@ export async function consolidate({
       const metadata = source.metadata.get(tool);
       if (!metadata.domains.includes(domain)) continue;
       releases.push({ path: release.path, data: { ...release.data, repository: source.repository } });
+      details[tool] = metadata.details;
       sourceRoots[tool] ??= {};
       for (const name of Object.keys(release.data.apps))
         sourceRoots[tool][name] = {
@@ -379,7 +439,7 @@ export async function consolidate({
     }),
   ]);
   const files = await makeFiles(
-    applyMetadata(base, dois, licenses),
+    applyMetadata(base, dois, licenses, details),
     sourceCommits,
     releases,
   );
