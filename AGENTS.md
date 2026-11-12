@@ -58,6 +58,12 @@ and keep unrelated regenerated diffs out of code PRs.
 - Each app carries the exact SIF `image` name (GUI launchers included).
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
+- A tool may carry `description` (the recipe `build.yaml` `readme`, else
+  `README.md`: the text after the `## name/version ##` title up to the first
+  usage section, with `{{ context.* }}` rendered from `name`, `version` and
+  scalar `variables`) and `openrecon: true` (the recipe directory has an
+  `OpenReconLabel*.json`). Both come from the current recipe, so retired
+  recipes have neither. neurodesk.org's application browser reads them.
 - Licenses come from recipe history (`scripts/recipe_history.py`): the newest
   commit of `recipes/<recipe>/build.yaml` whose `version:` equals the release
   file name. Consolidate resolves every image on every run, and publish
