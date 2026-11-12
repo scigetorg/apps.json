@@ -58,12 +58,18 @@ and keep unrelated regenerated diffs out of code PRs.
 - Each app carries the exact SIF `image` name (GUI launchers included).
   `show_in_menu` / `show_in_applist` appear only if the release JSON sets them.
   The catalog omits a `domains` field (the path implies it).
-- A tool may carry `description` (the recipe `build.yaml` `readme`, else
-  `README.md`: the text after the `## name/version ##` title up to the first
-  usage section, with `{{ context.* }}` rendered from `name`, `version` and
-  scalar `variables`) and `openrecon: true` (the recipe directory has an
-  `OpenReconLabel*.json`). Both come from the current recipe, so retired
-  recipes have neither. neurodesk.org's application browser reads them.
+- Tool-level `citation` and `description` come from the source repository's
+  own `tools/generate_apps_json.py`, run once per source on every consolidate
+  (`readToolText`); only those two keys are taken from its output, by tool key.
+  A source without that script contributes none. If the script fails, the run
+  warns and keeps the published text. The child process gets no `ZENODO_TOKEN`.
+- When the generator gives no `description`, the recipe's is used: the
+  `build.yaml` `readme`, else `README.md`: the text after the `## name/version ##`
+  title up to the first usage section, with `{{ context.* }}` rendered from
+  `name`, `version` and scalar `variables` (`describeReadme`). A tool may also
+  carry `openrecon: true` (the recipe directory has an `OpenReconLabel*.json`).
+  Both come from the current recipe, so retired recipes have neither.
+  neurodesk.org's application browser reads them.
 - Licenses come from recipe history (`scripts/recipe_history.py`): the newest
   commit of `recipes/<recipe>/build.yaml` whose `version:` equals the release
   file name. Consolidate resolves every image on every run, and publish
@@ -138,7 +144,8 @@ deposit:actions), `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, optional
 ## Commands
 
 Node.js 24 (ESM, only dependency is `yaml`); Python 3.11 with `requests` and
-`pyyaml>=6.0.2`.
+`pyyaml>=6.0.2` (consolidate also needs `packaging`, `jinja2` and `attrs` for
+the source generator).
 
 ```bash
 npm ci

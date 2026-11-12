@@ -3,7 +3,9 @@ import { readFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
-import { consolidate, imageBuild, readReleases, readSourceDomains, readPreviousCatalog } from "./catalog.mjs";
+import {
+  consolidate, imageBuild, readReleases, readSourceDomains, readPreviousCatalog, readToolText,
+} from "./catalog.mjs";
 
 const exec = promisify(execFile);
 const DOMAIN_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
@@ -110,7 +112,14 @@ export async function consolidateDomains(root, domains, {
     if (!/^[0-9a-f]{40}$/.test(sourceCommit)) throw new Error(`Invalid source commit for ${repository}`);
     const releases = await readReleases(sourceRoot);
     const metadata = await readSourceDomains(sourceRoot, releases, domains, repository);
-    sources.set(repository, { sourceRoot, sourceCommit, releases, metadata });
+    let toolText;
+    try {
+      toolText = await readToolText(sourceRoot);
+    } catch (error) {
+      console.warn(`Keeping published citations and descriptions for ${repository}: ${error.message}`);
+      toolText = null;
+    }
+    sources.set(repository, { sourceRoot, sourceCommit, releases, metadata, toolText });
   }
   assertUniqueSources(sources);
   const activeTitles = new Set();
