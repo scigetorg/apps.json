@@ -328,6 +328,38 @@
                         "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
                     }
                 ]
+            },
+            "afni 26.3.11": {
+                "version": "20261111",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "afni_26.3.11",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
+            },
+            "sumaGUI-afni 26.3.11": {
+                "version": "20261111",
+                "exec": "suma",
+                "apptainer_args": [],
+                "image": "afni_26.3.11",
+                "license": [
+                    "AFNI public domain core and restricted third-party components"
+                ],
+                "license_details": [
+                    {
+                        "license": "other-closed",
+                        "name": "AFNI public domain core and restricted third-party components",
+                        "url": "https://github.com/afni/afni/blob/master/LICENSE.txt"
+                    }
+                ]
             }
         },
         "categories": [
@@ -8831,11 +8863,10 @@
                 ]
             },
             "mneextended 1.2.0": {
-                "version": "20261106",
+                "version": "20261109",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.24072020",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -8849,11 +8880,10 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261106",
+                "version": "20261109",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mneextended_arm64_1.2.0",
-                "doi": "https://doi.org/10.5281/zenodo.24071811",
                 "license": [
                     "BSD-3-Clause"
                 ]
