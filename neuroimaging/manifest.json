@@ -1,7 +1,7 @@
 {
-    "entries": 789,
+    "entries": 784,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "96d0129653f11d9d1b87e72fc3196c175e94f515"
+        "NeuroDesk/neurocontainers": "6cfc4597e0bbd2e1b460f3ae95c8200304183d62"
     },
     "app_sources": {
         "afni": {
@@ -1243,17 +1243,11 @@
             "openmsk 0.1.11": "NeuroDesk/neurocontainers",
             "openmsk 0.2.0": "NeuroDesk/neurocontainers"
         },
-        "openreconacsrss": {
-            "openreconacsrss 0.1.0": "NeuroDesk/neurocontainers"
-        },
         "openreconexample": {
             "openreconexample 1.0.0": "NeuroDesk/neurocontainers"
         },
         "openreconi2iexample": {
             "openreconi2iexample 1.0.89": "NeuroDesk/neurocontainers"
-        },
-        "openreconslicegrappa": {
-            "openreconslicegrappa 0.1.0": "NeuroDesk/neurocontainers"
         },
         "openrefine": {
             "openrefine 3.10.1": "NeuroDesk/neurocontainers"
@@ -1567,13 +1561,6 @@
             "spinalcordtoolbox 7.3.0": "NeuroDesk/neurocontainers",
             "spinalcordtoolbox 7.3.3": "NeuroDesk/neurocontainers",
             "spinalcordtoolbox 7.3.4": "NeuroDesk/neurocontainers"
-        },
-        "spinalcordtoolbox_gpu": {
-            "spinalcordtoolbox_gpu 7.3.3": "NeuroDesk/neurocontainers",
-            "spinalcordtoolbox_gpu 7.3.4": "NeuroDesk/neurocontainers"
-        },
-        "spinalcordtoolbox_lite": {
-            "spinalcordtoolbox_lite 7.3.4": "NeuroDesk/neurocontainers"
         },
         "spm12": {
             "spm12 r7771": "NeuroDesk/neurocontainers",
