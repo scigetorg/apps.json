@@ -330,11 +330,10 @@
                 ]
             },
             "afni 26.3.11": {
-                "version": "20261111",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "afni_26.3.11",
-                "doi": "https://doi.org/10.5281/zenodo.24150135",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -347,11 +346,10 @@
                 ]
             },
             "sumaGUI-afni 26.3.11": {
-                "version": "20261111",
+                "version": "20261113",
                 "exec": "suma",
                 "apptainer_args": [],
                 "image": "afni_26.3.11",
-                "doi": "https://doi.org/10.5281/zenodo.24150135",
                 "license": [
                     "AFNI public domain core and restricted third-party components"
                 ],
@@ -520,6 +518,21 @@
                         "url": "https://github.com/daducci/AMICO/blob/master/LICENSE"
                     }
                 ]
+            },
+            "amico 2.2.0": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "amico_2.2.0",
+                "license": [
+                    "AMICO software license agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "AMICO software license agreement",
+                        "url": "https://github.com/daducci/AMICO/blob/master/LICENSE"
+                    }
+                ]
             }
         },
         "categories": [
@@ -536,6 +549,21 @@
                 "apptainer_args": [],
                 "image": "amico_arm64_2.1.1",
                 "doi": "https://doi.org/10.5281/zenodo.22984864",
+                "license": [
+                    "AMICO software license agreement"
+                ],
+                "license_details": [
+                    {
+                        "name": "AMICO software license agreement",
+                        "url": "https://github.com/daducci/AMICO/blob/master/LICENSE"
+                    }
+                ]
+            },
+            "amico_arm64 2.2.0": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "amico_arm64_2.2.0",
                 "license": [
                     "AMICO software license agreement"
                 ],
@@ -3158,11 +3186,10 @@
                 ]
             },
             "code 240320": {
-                "version": "20261111",
+                "version": "20261112",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_240320",
-                "doi": "https://doi.org/10.5281/zenodo.24150137",
                 "license": [
                     "Microsoft Visual Studio Code product license"
                 ],
@@ -3183,11 +3210,10 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261111",
+                "version": "20261112",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "code_arm64_240320",
-                "doi": "https://doi.org/10.5281/zenodo.24150133",
                 "license": [
                     "Microsoft Visual Studio Code product license"
                 ],
@@ -3449,11 +3475,10 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261030",
+                "version": "20261112",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "cryosparc_1.0.0",
-                "doi": "https://doi.org/10.5281/zenodo.23995580",
                 "license": [
                     "CryoSPARC licence (not included; installed with each user's own licence ID)",
                     "MIT"
@@ -5118,6 +5143,15 @@
                 "apptainer_args": [],
                 "image": "fastsurfer_2.6.0",
                 "doi": "https://doi.org/10.5281/zenodo.23630013",
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "fastsurfer 2.6.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "fastsurfer_2.6.1",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -6932,6 +6966,15 @@
                 "license": [
                     "Apache-2.0"
                 ]
+            },
+            "heudiconv 1.6.0": {
+                "version": "20261112",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "heudiconv_1.6.0",
+                "license": [
+                    "Apache-2.0"
+                ]
             }
         },
         "categories": [
@@ -6948,6 +6991,15 @@
                 "apptainer_args": [],
                 "image": "heudiconv_arm64_1.5.1",
                 "doi": "https://doi.org/10.5281/zenodo.23129756",
+                "license": [
+                    "Apache-2.0"
+                ]
+            },
+            "heudiconv_arm64 1.6.0": {
+                "version": "20261112",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "heudiconv_arm64_1.6.0",
                 "license": [
                     "Apache-2.0"
                 ]
@@ -7995,6 +8047,86 @@
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
                 ]
+            },
+            "libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "libreoffice",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeWriterGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lowriter",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeCalcGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "localc",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeImpressGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "loimpress",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeDrawGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lodraw",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeBaseGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lobase",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeMathGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lomath",
+                "apptainer_args": [],
+                "image": "libreoffice_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
             }
         },
         "categories": [
@@ -8087,6 +8219,86 @@
                 "apptainer_args": [],
                 "image": "libreoffice_arm64_26.8.2.2",
                 "doi": "https://doi.org/10.5281/zenodo.23933481",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "libreoffice",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeWriterGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lowriter",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeCalcGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "localc",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeImpressGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "loimpress",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeDrawGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lodraw",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeBaseGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lobase",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
+                "license": [
+                    "LGPL-3.0-or-later",
+                    "MPL-2.0"
+                ]
+            },
+            "libreofficeMathGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lomath",
+                "apptainer_args": [],
+                "image": "libreoffice_arm64_26.8.3.1",
                 "license": [
                     "LGPL-3.0-or-later",
                     "MPL-2.0"
@@ -9214,11 +9426,10 @@
                 ]
             },
             "mne 1.13.2": {
-                "version": "20261108",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.24071703",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -9233,11 +9444,10 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261108",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mne_arm64_1.13.2",
-                "doi": "https://doi.org/10.5281/zenodo.24071694",
                 "license": [
                     "BSD-3-Clause"
                 ]
@@ -9401,11 +9611,10 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261107",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": [],
                 "image": "mp2ragedenoise_0.1.0",
-                "doi": "https://doi.org/10.5281/zenodo.24047776",
                 "license": [
                     "GPL-3.0-or-later"
                 ]

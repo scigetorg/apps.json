@@ -1,7 +1,7 @@
 {
-    "entries": 784,
+    "entries": 791,
     "source_commits": {
-        "NeuroDesk/neurocontainers": "29adb5a8ef1e227f852e8b1e8dfc61175d1aa584"
+        "NeuroDesk/neurocontainers": "571ce16d71c6463f0bf1a65c8a716654827adc24"
     },
     "app_sources": {
         "afni": {
@@ -53,10 +53,12 @@
         "amico": {
             "amico 2.1.0 arm64": "NeuroDesk/neurocontainers",
             "amico 2.1.0": "NeuroDesk/neurocontainers",
-            "amico 2.1.1": "NeuroDesk/neurocontainers"
+            "amico 2.1.1": "NeuroDesk/neurocontainers",
+            "amico 2.2.0": "NeuroDesk/neurocontainers"
         },
         "amico_arm64": {
-            "amico_arm64 2.1.1": "NeuroDesk/neurocontainers"
+            "amico_arm64 2.1.1": "NeuroDesk/neurocontainers",
+            "amico_arm64 2.2.0": "NeuroDesk/neurocontainers"
         },
         "ants": {
             "ants 2.3.1": "NeuroDesk/neurocontainers",
@@ -592,7 +594,8 @@
         "fastsurfer": {
             "fastsurfer 2.4.2": "NeuroDesk/neurocontainers",
             "fastsurfer 2.5.4": "NeuroDesk/neurocontainers",
-            "fastsurfer 2.6.0": "NeuroDesk/neurocontainers"
+            "fastsurfer 2.6.0": "NeuroDesk/neurocontainers",
+            "fastsurfer 2.6.1": "NeuroDesk/neurocontainers"
         },
         "fatsegnet": {
             "fatsegnet 1.0.gpu": "NeuroDesk/neurocontainers"
@@ -773,10 +776,12 @@
         },
         "heudiconv": {
             "heudiconv 1.3.1": "NeuroDesk/neurocontainers",
-            "heudiconv 1.5.1": "NeuroDesk/neurocontainers"
+            "heudiconv 1.5.1": "NeuroDesk/neurocontainers",
+            "heudiconv 1.6.0": "NeuroDesk/neurocontainers"
         },
         "heudiconv_arm64": {
-            "heudiconv_arm64 1.5.1": "NeuroDesk/neurocontainers"
+            "heudiconv_arm64 1.5.1": "NeuroDesk/neurocontainers",
+            "heudiconv_arm64 1.6.0": "NeuroDesk/neurocontainers"
         },
         "hmri": {
             "hmriGUI-hmri 0.6.0": "NeuroDesk/neurocontainers",
@@ -897,7 +902,15 @@
             "libreofficeImpressGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
             "libreofficeDrawGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
             "libreofficeBaseGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
-            "libreofficeMathGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers"
+            "libreofficeMathGUI-libreoffice 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeWriterGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeCalcGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeImpressGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeDrawGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeBaseGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeMathGUI-libreoffice 26.8.3.1": "NeuroDesk/neurocontainers"
         },
         "libreoffice_arm64": {
             "libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
@@ -907,7 +920,15 @@
             "libreofficeImpressGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
             "libreofficeDrawGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
             "libreofficeBaseGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
-            "libreofficeMathGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers"
+            "libreofficeMathGUI-libreoffice_arm64 26.8.2.2": "NeuroDesk/neurocontainers",
+            "libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeWriterGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeCalcGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeImpressGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeDrawGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeBaseGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers",
+            "libreofficeMathGUI-libreoffice_arm64 26.8.3.1": "NeuroDesk/neurocontainers"
         },
         "linda": {
             "linda 0.5.1": "NeuroDesk/neurocontainers"
